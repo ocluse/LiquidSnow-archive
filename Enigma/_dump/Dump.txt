@@ -1,0 +1,221 @@
+//////////////////////////////TAKEN FROM A PREVIOUS DICTCHECK
+string dict_check(string input) {	
+	string check;
+	string output = "&";
+	string intray = input;
+	for(int i=0;i<=10000;i++)
+	 {
+		check = dictionary[i];
+		if (check.size() > input.size()) {
+			check.resize(5);			
+		}
+		else if (check.size() > input.size()) 
+		{
+			intray.resize(check.size());
+		}
+		check = upper(check);
+		//intray = upper(check);
+
+		if (intray == check) {
+			output = check;
+		}
+	}
+	return output;
+}////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+void fillGrid() 
+{
+	int pos;
+	unsigned int key_length;
+	int filled=0;
+	string shortKey;
+	//key_length = key.;
+	key_grid[0][0] = key[0];
+
+	//shortening the key to remove double letters:
+	for (int i = 0; i < key.length; i++) 
+	{
+		if (shortKey.length = 0)shortKey[0] = key[0]; else 
+		{
+			bool unq=true;
+			for (int check = 0; check < shortKey.length; check++) 
+			{
+				if (key[i] == shortKey[check]) 
+				{
+					unq = false;
+				}
+			}
+			//Weigh whether to add the char to key
+			if (unq = true)shortKey += key[i];
+		}
+	}
+	cout << shortKey;
+	
+}
+
+
+//get values of the five digits:
+	int val[5];
+	for (int i = 0; i < 5; i++) {
+		int check=0;
+		while (letters[check] != samp[i])
+			check++;
+		val[i] = check;
+	}
+	ofstream output;
+	output.open("output.txt");
+	for (int a = 0; a <= 25; a++) {
+		for (int b = 0; b <= 25; b++) {
+			for (int c = 0; c <= 25; c++) {
+				for (int d = 0; d <= 25; d++) {
+					for (int e = 0; e <= 25; e++) {
+						string possiblity;
+						string posskey;
+						posskey += letters[a];
+						posskey += letters[b];
+						posskey += letters[c];
+						posskey += letters[d];
+						posskey += letters[e];
+						//first letter
+						int q = val[0] - a;
+						
+						if (q < 0)q += 26;
+						possiblity += letters[q];
+						//second letter
+						q = val[1] - b;
+						if (q < 0)q += 26;
+						possiblity += letters[q];
+						//third letter
+						q = val[2] - c;
+						if (q < 0)q += 26;
+						possiblity += letters[q];
+						//fourth letter
+						q = val[3] - d;
+						if (q < 0)q += 26;
+						possiblity += letters[q];
+						//fifth letter
+						q = val[4] - e;
+						if (q < 0)q += 26;
+						possiblity += letters[q];
+						if (vin_detective(possiblity[0], possiblity[1], possiblity[2]) == true 
+							&& vin_detective(posskey[0], posskey[1],possiblity[2]) == true) 
+						{						
+							if (output.is_open()) {
+								string possi = dict_check(posskey);
+								if (possi != "&") {
+									output << posskey << " ";
+									cout << posskey << " ";
+									poss++;
+								}
+								else {
+									cout << ".";
+								}
+								
+								
+							}
+							
+						}						
+					}
+				}
+			}
+		}
+	}
+	cout<<endl << "Generated " << poss << "Possible Keys!";
+	....................................>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..............................>>>>>>>>>>
+	char key_grid[5][5];
+	char key_stack[25];
+	int col = 0;
+	int row = 0;
+	int key_praser=0;
+	int alphaplacer=0;
+	for (int i = 0; i < 25; i++) 
+	{
+		if (col > 4) 
+		{
+			col = 0;
+			row++;
+		}
+		if (key_praser >= key.size()) 
+		{
+			//this means we have finished with the key so we add the alphabet
+			bool exists=false;
+			do
+			{
+				for (int check = 0; check < i; check++) 
+				{
+					if (letters[alphaplacer] == key_stack[check])
+					{
+						exists = true;
+						alphaplacer++;
+					}
+				}
+			} while (exists == false);
+			if (letters[alphaplacer] == 'Q') 
+			{
+				alphaplacer++;
+			}
+			key_stack[i] = letters[alphaplacer];
+			key_grid[row][col] = letters[alphaplacer];
+			
+		}
+		else 
+		{
+			
+			char cell = ' ';
+			//check if the character preexists so that we do not add it back
+			bool exists = false;
+			do
+			{
+				if (key_praser < key.size()) {
+					cell = key[key_praser];
+					for (int check = 0; check < i; check++)
+					{
+						if (key_stack[check] == cell)
+						{
+							exists = true;
+						}
+					}
+					if (exists) { key_praser++; }
+				}
+				else 
+				{
+					exists=true;
+				}
+				
+
+			} while (exists);
+			if (cell == 'A' || cell == 'B' || cell == 'C' || cell == 'D' || cell == 'E' || cell == 'F' ||
+				cell == 'G' || cell == 'H' || cell == 'I' || cell == 'J' || cell == 'K' || cell == 'L' ||
+				cell == 'M' || cell == 'N' || cell == 'O' || cell == 'P' || cell == 'Q' || cell == 'R' ||
+				cell == 'S' || cell == 'T' || cell == 'U' || cell == 'V' || cell == 'W' || cell == 'X' ||
+				cell == 'Y' || cell == 'Z') 
+			{
+				key_stack[i] = cell;
+				key_grid[row][col] = cell;
+				col++;
+			}
+			
+		}
+		key_praser += 1;
+		cout << key_stack[i];
+	}
+		
+	
+	//Lets display our result for scrutiny for now:
+	for(int i=0;i<25;i++)
+	{
+
+		
+	}
+	return "aloy";
