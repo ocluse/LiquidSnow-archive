@@ -282,6 +282,27 @@ namespace Thismaker.Enigma
             File.WriteAllBytes(path, msData.ToArray());
         }
 
+        public void Delete(string name)
+        {
+            using var fsContainer = new FileStream(Path, FileMode.Open);
+            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Update);
+            var coGet = Files.Find(x => x.PlainName == name);
+            var zaeGet = zaContainer.GetEntry(coGet.EntryName);
+            zaeGet.Delete();
+        }
+
+        /// <summary>
+        /// Returns the contents of an item in the container as UTF8 string
+        /// </summary>
+        /// <param name="name">The name of the item whose contents are to be read</param>
+        public string ReadAllText(string name)
+        {
+            using var msFile = new MemoryStream();
+            Get(msFile, name);
+            var baFile = msFile.ToArray();
+            return Encoding.UTF8.GetString(baFile);
+        }
+
         #endregion
     }
     /// <summary>

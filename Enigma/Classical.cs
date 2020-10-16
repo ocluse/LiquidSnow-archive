@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Thismaker.Enigma
@@ -399,7 +400,7 @@ namespace Thismaker.Enigma
 		/// <param name="input">The input that is to be attacked</param>
 		/// <param name="omit">The omitted character while attacking</param>
 		/// <returns></returns>
-        public async static Task<List<AttackPossibility>> PlayfairHackAsync(IProgress<float> progress, string input, char omit)
+		public static async Task<List<AttackPossibility>> PlayfairHackAsync(IProgress<float> progress, string input, char omit)
         {
 			if (!dictLoaded) throw new InvalidOperationException("Dictionary not loaded");
 
@@ -423,7 +424,37 @@ namespace Thismaker.Enigma
 			});
 			
 			return result;
+		}
 
+		/// <summary>
+		/// An asynchronous task that runs the Playfair hack on the input
+		/// </summary>
+		/// <param name="progress">Implement the Progress interface to get results of the hacking progress.
+		/// 0 is no progress and 1 is completed progress</param>
+		/// <param name="input">The input that is to be attacked</param>
+		/// <param name="omit">The omitted character while attacking</param>
+		/// <returns></returns>
+		public static async Task PlayfairHackAsync(IProgress<float> progress, IProgress<AttackPossibility> discovered, string input, char omit)
+        {
+			if (!dictLoaded) throw new InvalidOperationException("Dictionary not loaded");
+
+			input = input.Prepare();
+			await Task.Run(() => {
+
+				int curr = 0, max = key_dict.Count;
+				foreach (var key in key_dict)
+				{
+					curr++;
+					var output = PlayfairDecipher(input, key, omit);
+					if (CheckDictionary(output, 3))
+					{
+						var poss = new AttackPossibility(key, output);
+						discovered?.Report(poss);
+					}
+					float prog = curr / (float)max;
+					progress?.Report(prog);
+				}
+			});
 		}
 
 		/// <summary>
@@ -473,17 +504,28 @@ namespace Thismaker.Enigma
 
 		private static bool CheckDictionary(string input, int depth)
         {
+			//ADDED
+			if (input.Length == 0) return true;
+			//
+
 			foreach(var word in lang_dict)
             {
 				if (word.Length < 3) continue;
 				if (input.Contains(word))
 				{
-					if (depth == 0) return true;
-                    else
-                    {
-						var nextInput = input.Replace(word, "");
-						return CheckDictionary(nextInput, depth - 1);
-                    }
+					//if (depth == 0) return true;
+     //               else
+     //               {
+					//	var nextInput = input.Replace(word, "");
+					//	if (nextInput.Length < 3) return true;
+					//	else return CheckDictionary(nextInput, depth - 1);
+
+					//}
+
+
+					var nextInput = input.Replace(word, "");
+					if (nextInput.Length < 3) return true;
+					else return CheckDictionary(nextInput, depth - 1);
 				}
 				continue;
             }

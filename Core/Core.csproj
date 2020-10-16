@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
+    <RootNamespace>Thismaker.Core</RootNamespace>
   </PropertyGroup>
 
 </Project>
