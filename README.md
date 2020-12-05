@@ -13,13 +13,13 @@ A super interesting one, one that came about by my need of creating nice UIs tha
 ## 4. Mercury
 Just like the Roman god Mercury, this assembly is useful for those intending to send messages. It provides a Server Client infrastructure that the dotnet developer can use to make his life very easy. The Mercury.Azure.Blobs provides an interface for blob transfer, which is secure and very safe for use. It provides a way to enqueue downloads/uploads to an Azure Blob Storage account. The project is mainly useful in scenarios where the .NET developer has decided to use the SAS approach.
 
-##5. Pluto
+## 5. Pluto
 Basically, if you're developing software that has anything Financial or Accounting in it, Pluto is the one for you. The assembly provides interface and logic for dealing with Financial Accounting information and data, using accepted international standards. It is .NET Standard, so chill, it will be easy to intergrate it to the stuff you already have.
 
-##6. Lansique
+## 6. Lansique
 Basically again, if you're developing software that has anything legal, lawyerish in it, then this will help you. Although still under construction, it's ultimate goal is to provide a way to organize legal documents, scan and obtain them from the web and allow the dotnet developer to present such data to the user meaningfully.
 
-##8. Sia
+## 8. Sia
 Basically again again, Sia is for those who are organizing libraries and such, in it's complete form, it is intended to be fully able to manage libraries, and provide interfaces that the dotnet developer can use to display such library information to the user, such as loading pdf documents, organizing files, viewing ebups etc. Sia is still in very early developemt and its definate path is yet to be shaped, I'm a solo dev, remeber....these things drain :)
 
 ## 7. Anubis
