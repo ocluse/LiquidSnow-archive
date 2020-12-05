@@ -77,11 +77,16 @@ namespace Thismaker.Pluto
             return JsonConvert.DeserializeObject<Account>(json);
         }
 
+        public void GenerateNewID()
+        {
+            AccountID = Enigma.Enigma.GenerateID();
+        }
     }
 
     public enum AccountType
     {
         Asset, Liability, Equity, Payable, Receiveable, Income, Expense, Cash, Bank
+
     }
 
 }

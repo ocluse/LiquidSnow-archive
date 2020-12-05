@@ -1,14 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Authors>Thismaker</Authors>
-    <LangVersion>8.0</LangVersion>
+    <RootNamespace>Thismaker.Mercury.Azure.Blobs</RootNamespace>
     <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.4" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.7.0" />
   </ItemGroup>
 
   <ItemGroup>

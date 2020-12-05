@@ -6,7 +6,7 @@ using Thismaker.Enigma;
 
 namespace Thismaker.Pluto
 {
-    public class Transaction:INotifyPropertyChanged
+    public class Transaction : INotifyPropertyChanged
     {
 
         #region Props
@@ -60,7 +60,7 @@ namespace Thismaker.Pluto
         
         public Transaction()
         {
-            ID = Enigma.Enigma.GenerateHashID();
+            ID = Enigma.Enigma.GenerateID(IDKind.Hash);
         }
 
         public Transaction(Transaction copy)

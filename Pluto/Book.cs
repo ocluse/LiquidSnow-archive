@@ -23,8 +23,9 @@ namespace Thismaker.Pluto
 
         public ObservableCollection<Account> Accounts;
 
-        public void Initialize()
+        public Book(string name)
         {
+            Name = name;
             var acc = new Account
             {
                 Name = "Cash Account"

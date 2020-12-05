@@ -5,6 +5,7 @@
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
     <RootNamespace>Thismaker.Core</RootNamespace>
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Security;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -37,7 +38,7 @@ namespace Thismaker.Enigma
         }
 
         /// <summary>
-        /// Creates a new EnigmaFile objects and reads its contents from the specified path.
+        /// Creates a new EnigmaFile and reads its contents from the specified path.
         /// </summary>
         /// <param name="path">The file path to the location where the EnigmaFile is saved/to be saved.
         /// This is not the path where the unencrypted data resides, to set the unencrypted data,
@@ -47,7 +48,7 @@ namespace Thismaker.Enigma
         public EnigmaFile(string path, string key)
         {
             Path = path;
-            Key = key.ToBytesUTF8();
+            SetKey(key);
             Load();
         }
         #endregion
@@ -59,7 +60,7 @@ namespace Thismaker.Enigma
         /// <param name="key">The UTF8 string to be used as the key</param>
         public void SetKey(string key)
         {
-            Key = key.ToBytesUTF8();
+            Key = key.GetBytes<UTF8Encoding>();
         }
 
         /// <summary>
@@ -73,7 +74,7 @@ namespace Thismaker.Enigma
 
         /// <summary>
         /// Used to return the .NET object whose data is stored inside the file.
-        /// Must only be used if the data was saved by serialization
+        /// Must only be used if the data was set by calling EnigmaFile.Serialize<T>();
         /// </summary>
         /// <typeparam name="T">The type of object to return</typeparam>
         /// <param name="obj">The class object whose properties will be saved to</param>
@@ -82,7 +83,6 @@ namespace Thismaker.Enigma
             //Create serializer and stream
             var xmlsData = new XmlSerializer(typeof(T));
             using var msData = new MemoryStream();
-
             //Decrypt the data to the stream
             Decrypt(msData);
             msData.Position = 0;
@@ -114,7 +114,7 @@ namespace Thismaker.Enigma
             }
 
             //Save if necessary
-            if (save)
+            if (save && !string.IsNullOrEmpty(Path))
             {
                 Save();
             }
@@ -154,27 +154,19 @@ namespace Thismaker.Enigma
         public void SetData(byte[] data)
         {
             //Hash the data:
-            Hash = Encoding.UTF8.GetString(Enigma.GetHash(data));
-
+            Hash = Enigma.GetHash(data).GetString<UTF8Encoding>();
             //Encrypt the data:
             Data = Enigma.AESEncrypt(data, Key);
         }
 
         /// <summary>
-        /// Loads encrypted data into the disk from the Path property of the Object.
+        /// Loads encrypted data from the disk into the file
         /// You don't have to call this method if the File was created by specifying the path
         /// </summary>
         public void Load()
         {
-            byte[] encryptedData;
-
-            //Get the data from specified location:
-            encryptedData = File.ReadAllBytes(Path);
-
-            //Check Key and data
-            if (Key == null) { throw new InvalidOperationException("The provided Key is invalid or null"); }
-
-            Data = Enigma.AESDecrypt(encryptedData, Key);
+            var data = File.ReadAllBytes(Path);
+            Load(data);
         }
 
         /// <summary>
@@ -183,11 +175,8 @@ namespace Thismaker.Enigma
         /// <param name="data"></param>
         public void Load(byte[] data)
         {
-            byte[] encryptedData = data;
-
-            if (Key == null) { throw new InvalidOperationException("The provided Key is invalid or null"); }
-
-            Data = Enigma.AESDecrypt(encryptedData, Key);
+            Data = new byte[data.Length];
+            data.CopyTo(Data, 0);
         }
 
         /// <summary>
@@ -196,13 +185,8 @@ namespace Thismaker.Enigma
         /// <param name="srcStream"></param>
         public void Load(Stream srcStream)
         {
-            using var msLoad = new MemoryStream();
-            srcStream.CopyTo(msLoad);
-
-            byte[] encryptedData = msLoad.ToArray();
-
-            if (Key == null) { throw new InvalidOperationException("The provided Key is invalid or null"); }
-            Data = Enigma.AESDecrypt(encryptedData, Key);
+            var data = srcStream.ReadAllBytes();
+            Load(data);
         }
 
         /// <summary>
@@ -211,7 +195,6 @@ namespace Thismaker.Enigma
         public void Save()
         {
             File.WriteAllBytes(Path,Data);
-
         }
 
         /// <summary>
@@ -220,8 +203,12 @@ namespace Thismaker.Enigma
         /// <param name="stream"></param>
         public void Save(Stream stream)
         {
-            using var msEncrypted = new MemoryStream(Data);
-            msEncrypted.CopyTo(stream);
+            if (stream.CanSeek)
+            {
+                stream.SetLength(0);
+                stream.Position = 0;
+            }
+            stream.Write(Data, 0, Data.Length);
         }
 
         /// <summary>
@@ -241,8 +228,9 @@ namespace Thismaker.Enigma
         public void Decrypt(Stream stream)
         {
             var decrypted = Enigma.AESDecrypt(Data, Key);
-            using var memStream = new MemoryStream(decrypted);
-            memStream.CopyTo(stream);
+            stream.SetLength(0);
+            stream.Position = 0;
+            stream.Write(decrypted, 0, decrypted.Length);
         }
 
         /// <summary>

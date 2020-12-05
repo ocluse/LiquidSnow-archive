@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security;
-using System.Security.Cryptography;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.IO.Compression;
 using System.IO;
 using System.Xml.Serialization;
 using SysPath = System.IO.Path;
-using System.Collections;
-using System.Runtime.InteropServices;
-using System.ComponentModel;
 using System.Runtime.Serialization;
+using System;
+using System.Data.SqlTypes;
+using Thismaker.Core; using Thismaker.Core.Utilities;
+using Thismaker.Core.Utilities;
 
 namespace Thismaker.Enigma
 {
@@ -18,21 +16,22 @@ namespace Thismaker.Enigma
     /// An Enigma Container is a self-managing collection for storing, accessing and updating files. 
     /// Files within are encrypted using a common password
     /// </summary>
-    [DataContract]
-    public class EnigmaContainer
+    public sealed class EnigmaContainer : IDisposable
     {
         #region Properties
-        [DataMember]
-        private List<ContainerObject> Files { get; set; }
+
+        public List<ContainerObject> Files { get; set; } = new List<ContainerObject>();
 
         /// <summary>
         /// The path is the path(including the file name) to the Enigma Container file. 
         /// Set during initialization
         /// </summary>
-        [XmlIgnore] public string Path { get; private set; }
+        public string Path { get; private set; }
 
         //Password set only once!
         private readonly string Password;
+
+        //private ZipArchive zaContainer;
         #endregion
 
         #region Initialization
@@ -55,87 +54,128 @@ namespace Thismaker.Enigma
             if (open)
             {
                 ReadHeaderFile();
+
             }
 
             else
             {
                 //Create the zipFile:
-                using var zipToOpen = new FileStream(Path, FileMode.Create);
-                using var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create);
-
-                archive.Dispose();
-                zipToOpen.Dispose();
-                //Create the header file:
                 WriteHeaderFile();
-
             }
 
         }
         #endregion
 
         #region Private Methods
+
         //Open a stream to write the header data information. Use when the header has been updated
         private void WriteHeaderFile()
         {
-            using var fsContainer = new FileStream(Path, FileMode.Open);
+            var writer = new XmlSerializer(typeof(List<ContainerObject>));
+            
+            using var fsContainer = new FileStream(Path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Update);
 
-            //Create or open the header file:
-            var header = zaContainer.GetEntry(".header");
-            if (header == null) header = zaContainer.CreateEntry(".header");
-
-            //Write to the entry stream:
-            using var swHeader = new StreamWriter(header.Open());
-            var xmlsCreate = new XmlSerializer(typeof(EnigmaContainer));
-            xmlsCreate.Serialize(swHeader, this);
-
+            var entry=zaContainer.GetEntry(".header");
+            if (entry == null) entry = zaContainer.CreateEntry(".header");
+            writer.Serialize(entry.Open(), Files);
+            zaContainer.Dispose();
+            fsContainer.Close();
         }
 
         //Open a stream to read header information. Use should be restricted to initialization
         private void ReadHeaderFile()
         {
-            using var fsContainer = new FileStream(Path, FileMode.Open);
+            using var fsContainer = new FileStream(Path, FileMode.Open, FileAccess.Read);
             using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Read);
+            var entry = zaContainer.GetEntry(".header");
 
-            //Open the header file
-            var header = zaContainer.GetEntry(".header");
+            var files = new List<ContainerObject>();
+            var reader = new XmlSerializer(typeof(List<ContainerObject>));
 
-            //Read the header file:
-            var reader = new XmlSerializer(typeof(EnigmaContainer));
-            using var srHeader = new StreamReader(header.Open());
-            var myContainer = reader.Deserialize(srHeader) as EnigmaContainer;
-
-            //Apply the aquired changes:
-            Files = myContainer.Files;
+            files=(List<ContainerObject>)reader.Deserialize(entry.Open());
+            Files.AddRange(files);
         }
+
+        private void AddStream(Stream stream, string name)
+        {
+            var obj = new ContainerObject(name);
+            var efAdd = new EnigmaFile(Password);
+            efAdd.SetData(stream);
+
+            //Open zipFile:
+            using var fsContainer = new FileStream(Path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Update);
+
+            ZipArchiveEntry zaeEdit;
+            //Rewrite if Exists
+            if (Files.Exists(x => x.PlainName == name))
+            {
+                obj = Files.Find(x => x.PlainName == name);
+                //rewrite:
+                zaeEdit = zaContainer.GetEntry(obj.EntryName);
+            }
+            else
+            {
+                Files.Add(obj);
+                zaeEdit = zaContainer.CreateEntry(obj.EntryName);
+            }
+            using var s=zaeEdit.Open();
+            efAdd.Save(s);
+
+            zaContainer.Dispose();
+            fsContainer.Close();
+
+            WriteHeaderFile();
+        }
+
+        private void GetStream(Stream stream, string name)
+        {
+            
+            var efGet = new EnigmaFile(Password);
+            var coGet = Files.Find((x) => x.PlainName == name);
+
+            if(coGet==null)
+            {
+                throw new NullReferenceException("File does not exist in the container");
+            }
+
+            var eName = coGet.EntryName;
+
+            //Open zipFile:
+            using var fsContainer = new FileStream(Path, FileMode.Open, FileAccess.Read);
+            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Read, true);
+
+            var zaeGet = zaContainer.GetEntry(eName);
+            using var dsGet = zaeGet.Open();
+            using var msGet = new MemoryStream();
+            dsGet.CopyTo(msGet);
+            efGet.Load(msGet);
+            efGet.Decrypt(stream);
+            zaContainer.Dispose();
+            fsContainer.Close();
+        }
+
         #endregion
 
         #region Public Methods
 
-        public void ExtractContainer(string path, ContainerExtractionMode mode=ContainerExtractionMode.Complete)
+        /// <summary>
+        /// Extracts the contents of the container to the specified path
+        /// </summary>
+        /// <param name="path">The path where the contents of the container will be extracted to, if the file exists, it will be skipped</param>
+        public void ExtractContainer(string path, bool overwrite=false)
         {
-
-            using var zipToOpen = new FileStream(Path, FileMode.Open);
-            using var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read);
-            foreach (var file in Files)
+            foreach(var file in Files)
             {
-                var entry = archive.GetEntry(file.EntryName);
-                try
+                if (file.PlainName == ".header") continue;
+                if (File.Exists(path))
                 {
-                    var extractedDir = SysPath.Combine(path, file.PlainName);
-                    entry.ExtractToFile(SysPath.Combine(extractedDir));
-                    file.ExtractedDirectory = extractedDir;
-
-                    //If mode is complete, further decrypt the EnigmaFile:
-                    if (mode == ContainerExtractionMode.Complete)
-                    {
-                        var destination = SysPath.Combine(extractedDir, file.PlainName);
-                        var efExtract = new EnigmaFile(extractedDir, Password);
-                        efExtract.Decrypt(destination);
-                    }
+                    if (!overwrite) continue;
+                    else File.Delete(path);
                 }
-                catch { throw; }
-
+                var extracDir = IOUtility.CombinePath(path, file.PlainName);
+                Get(extracDir, file.PlainName);
             }
         }
 
@@ -149,46 +189,43 @@ namespace Thismaker.Enigma
             get
             {
                 var ef = new EnigmaFile(Password);
+                using var msGet = new MemoryStream();
+                Get(msGet, key);
+                ef.SetData(msGet);
                 return ef;
             }
         }
 
         /// <summary>
-        /// Adds an entry to the container from the specified path, where the entry name becomes the name of the file
+        /// Adds an entry to the container from the specified path, where the entry name becomes the name of the file. 
+        /// If the file already exists, it is overwritten.
         /// </summary>
         /// <param name="srcPath">The path of the file to be added to the container</param>
         public void Add(string srcPath)
         {
-            var fInfo = new FileInfo(srcPath);
-            using var msAdd = new MemoryStream(File.ReadAllBytes(srcPath));
-            Add(msAdd, fInfo.Name);
+            try
+            {
+                var fInfo = new FileInfo(srcPath);
+                using var msAdd = new MemoryStream(File.ReadAllBytes(srcPath));
+                Add(msAdd, fInfo.Name);
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         /// <summary>
-        /// Adds an entry to the container from the specified stream.
+        /// Adds an entry to the container from the specified stream, if the file exists, it is overwritten.
         /// </summary>
         /// <param name="stream">The stream representing the data to be wirtten to the entry</param>
         /// <param name="name">The name of the entry for purposes of retrieving and extracting</param>
         public void Add(Stream stream, string name)
         {
-            var obj = new ContainerObject(name);
+            //Checking for valid name
+            if (name == ".header") throw new ArgumentException("Invalid name for file");
 
-            var efAdd = new EnigmaFile(Password);
-            efAdd.SetData(stream);
-
-            //Open the zipFile:
-            using var fsContainer = new FileStream(Path, FileMode.Open);
-            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Update);
-
-            var zaeAdd = zaContainer.CreateEntry(obj.EntryName);
-            efAdd.Save(zaeAdd.Open());
-
-            zaContainer.Dispose();
-            fsContainer.Dispose();
-
-            Files.Add(obj);
-            WriteHeaderFile();
-
+            AddStream(stream, name);
         }
 
         /// <summary>
@@ -199,26 +236,12 @@ namespace Thismaker.Enigma
         /// <param name="name">The name of the object that will be used for retrieval purposes</param>
         public void AddObject<T>(T srcObj, string name)
         {
-            var obj = new ContainerObject(name);
-
-            //Create the enigma file:
-            var efAdd = new EnigmaFile(Password);
-            efAdd.Serialize(srcObj, false);
-
-            //Open the zipFile:
-            using var fsContainer = new FileStream(Path, FileMode.Open);
-            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Update);
-
-            var zaeAdd = zaContainer.CreateEntry(obj.EntryName);
-            efAdd.Save(zaeAdd.Open());
-
-            //Close streams:
-            zaContainer.Dispose();
-            fsContainer.Dispose();
-
-            //Add the CO and write header:
-            Files.Add(obj);
-            WriteHeaderFile();
+            using var msAdd = new MemoryStream();
+            var xsAdd = new XmlSerializer(typeof(T));
+            xsAdd.Serialize(msAdd, srcObj);
+            msAdd.Position = 0;
+            Add(msAdd, name);
+ 
         }
 
         /// <summary>
@@ -229,22 +252,11 @@ namespace Thismaker.Enigma
         /// <param name="name">The name used to store the object in the container</param>
         public void Get<T>(out T obj, string name)
         {
-            var efGet = new EnigmaFile(Password);
-
-            //Open the zipFile:
-            using var fsContainer = new FileStream(Path, FileMode.Open);
-            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Read);
-            var coGet = Files.Find((x) => x.PlainName == name);
-            var zaeGet = zaContainer.GetEntry(coGet.EntryName);
-
-            efGet.Load(zaeGet.Open());
-
-            //Close streams:
-            zaContainer.Dispose();
-            fsContainer.Dispose();
-
-
-            efGet.Deserialize(out obj);
+            using var msGet = new MemoryStream();
+            Get(msGet, name);
+            msGet.Position = 0;
+            var xrGet = new XmlSerializer(typeof(T));
+            obj=(T)xrGet.Deserialize(msGet);
         }
 
         /// <summary>
@@ -254,14 +266,10 @@ namespace Thismaker.Enigma
         /// <param name="name">The name of the entry to be copied from</param>
         public void Get( Stream stream, string name)
         {
-            var efGet = new EnigmaFile(Password);
-            using var fsContainer = new FileStream(Path, FileMode.Open);
-            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Read);
-            var coGet = Files.Find((x) => x.PlainName == name);
-            var zaeGet = zaContainer.GetEntry(coGet.EntryName);
-            efGet.Load(zaeGet.Open());
-            efGet.Decrypt(stream);
-;
+            //Checking for valid name
+            if (name == ".header") throw new ArgumentException("Invalid name for file");
+
+            GetStream(stream, name);
         }
 
         /// <summary>
@@ -271,24 +279,42 @@ namespace Thismaker.Enigma
         /// <param name="name">The name of the entry to be copied</param>
         public void Get(string path, string name)
         {
-            var efEx = new EnigmaFile(Password);
-            using var fsContainer = new FileStream(Path, FileMode.Open);
-            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Read);
-            var coGet = Files.Find((x) => x.PlainName == name);
-            var zaeGet = zaContainer.GetEntry(coGet.EntryName);
-            efEx.Load(zaeGet.Open());
-            using var msData = new MemoryStream();
-            efEx.Decrypt(msData);
-            File.WriteAllBytes(path, msData.ToArray());
+            using var msGet = new MemoryStream();
+            Get(msGet, name);
+            File.WriteAllBytes(path, msGet.ToArray());
         }
 
-        public void Delete(string name)
+        /// <summary>
+        /// Deletes a file in the container, returning true if deletion was successful, otherwise false
+        /// </summary>
+        /// <param name="name">The name of the file to be deleted</param>
+        /// <returns></returns>
+        public bool Delete(string name)
         {
-            using var fsContainer = new FileStream(Path, FileMode.Open);
-            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Update);
             var coGet = Files.Find(x => x.PlainName == name);
+            if (coGet == null) return false;
+            //Open zipFile:
+            using var fsContainer = new FileStream(Path, FileMode.Open, FileAccess.ReadWrite, FileShare.Inheritable);
+            using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Update, true);
             var zaeGet = zaContainer.GetEntry(coGet.EntryName);
+            if (coGet == null) return false;
             zaeGet.Delete();
+            Files.Remove(coGet);
+            zaContainer.Dispose();
+            fsContainer.Close();
+            WriteHeaderFile();
+            return true;
+        }
+
+        /// <summary>
+        /// Writes all the text in the string to a file in the container, if the file exists, it is overwritten
+        /// </summary>
+        /// <param name="text">The text to be written to the file</param>
+        /// <param name="name">The name to give the file entry</param>
+        public void WriteAllText(string text, string name)
+        {
+            var baText = Encoding.UTF8.GetBytes(text);
+            WriteAllBytes(baText, name);
         }
 
         /// <summary>
@@ -297,10 +323,33 @@ namespace Thismaker.Enigma
         /// <param name="name">The name of the item whose contents are to be read</param>
         public string ReadAllText(string name)
         {
+            return Encoding.UTF8.GetString(ReadAllBytes(name));
+        }
+
+        public void WriteAllBytes(byte[] bytes, string name)
+        {
+            using var msFile = new MemoryStream();
+            msFile.Write(bytes, 0, bytes.Length);
+
+            msFile.Position = 0;
+            Add(msFile, name);
+        }
+
+        public byte[] ReadAllBytes(string name)
+        {
             using var msFile = new MemoryStream();
             Get(msFile, name);
-            var baFile = msFile.ToArray();
-            return Encoding.UTF8.GetString(baFile);
+            return msFile.ToArray();
+        }
+
+        public bool Exists(string name)
+        {
+            return Files.Exists(x => x.PlainName == name);
+        }
+
+        public void Dispose()
+        {
+            Files = null;
         }
 
         #endregion
@@ -310,15 +359,18 @@ namespace Thismaker.Enigma
     /// </summary>
     public enum ContainerAccess { Create, Open, CreateOrOpen};
 
-    public enum ContainerExtractionMode { Complete, Parent}
-
-    [DataContract]
-    class ContainerObject
+    public class ContainerObject
     {
-        [DataMember] public string PlainName { get; set; }
-        [DataMember] public string EntryName { get; set; }
-        [DataMember] public string ExtractedDirectory { get; set; }
-        [DataMember] public string Hash { get; set; }
+
+        public string PlainName { get; set; }
+        
+        public string EntryName { get; set; }
+        
+        public string ExtractedDirectory { get; set; }
+        
+        public string Hash { get; set; }
+
+        private ContainerObject() { }
 
         public ContainerObject(string name)
         {

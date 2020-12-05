@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Thismaker.Core
+namespace Thismaker.Core.Utilities
 {
-    public static class Storage
+    public static class IOUtility
     {
         public static string CombinePath(string path1, string path2)
         {
