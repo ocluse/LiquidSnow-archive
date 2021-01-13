@@ -2,7 +2,7 @@
 using System.IO;
 using Thismaker.Core; using Thismaker.Core.Utilities;
 
-namespace Thismaker.Mercury.Azure.Blobs
+namespace Thismaker.Aba.Client.Transfers
 {
 
 

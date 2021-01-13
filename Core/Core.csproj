@@ -6,6 +6,11 @@
     <LangVersion>8.0</LangVersion>
     <RootNamespace>Thismaker.Core</RootNamespace>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <AssemblyName>Thismaker.Core</AssemblyName>
   </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <!--Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;$(SolutionDir)Alox.Poker.Client\Assets\Assemblies\$(AssemblyName).dll&quot;" /-->
+  </Target>
 
 </Project>

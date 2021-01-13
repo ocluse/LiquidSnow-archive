@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Thismaker.Mercury.Azure.Blobs
+namespace Thismaker.Aba.Client.Transfers
 {
     public interface ITransferAuthenticator
     {

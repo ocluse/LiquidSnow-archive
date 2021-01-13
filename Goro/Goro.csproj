@@ -5,6 +5,7 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>Thismaker.Goro</RootNamespace>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <AssemblyName>Thismaker.Goro</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

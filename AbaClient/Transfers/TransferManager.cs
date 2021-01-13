@@ -7,11 +7,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Thismaker.Mercury.Azure.Blobs
+namespace Thismaker.Aba.Client.Transfers
 {
     public class TransferManager
     {
-        private Queue<Transfer> pending;
+        private readonly Queue<Transfer> pending;
         public  ObservableCollection<Transfer> ActiveTransfers { get; private set; }
 
         /// <summary>

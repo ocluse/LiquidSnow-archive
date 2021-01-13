@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Thismaker.Aba.Common</AssemblyName>
+    <RootNamespace>Thismaker.Aba.Common</RootNamespace>
+  </PropertyGroup>
+
+</Project>

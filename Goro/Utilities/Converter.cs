@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Windows.Data;
+using System.Windows.Media.Imaging;
+using Thismaker.Goro.Utilities;
 
 namespace Thismaker.Goro
 {
@@ -95,6 +98,22 @@ namespace Thismaker.Goro
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    [ValueConversion(typeof(Bitmap), typeof(BitmapImage))]
+    public class BitmapConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null) return null;
+            var image = (Bitmap)value;
+            return BitmapUtility.BitmapToBitmapImage(image);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
         }
     }
 

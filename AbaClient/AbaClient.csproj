@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Thismaker.Aba.Client</RootNamespace>
+    <Platforms>AnyCPU;x64;x86</Platforms>
+    <AssemblyName>Thismaker.Aba.Client</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.7.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.24.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AbaCommon\AbaCommon.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+</Project>

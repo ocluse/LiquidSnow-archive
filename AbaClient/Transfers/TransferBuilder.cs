@@ -1,9 +1,45 @@
 ﻿using System.IO;
 
-namespace Thismaker.Mercury.Azure.Blobs
+namespace Thismaker.Aba.Client.Transfers
 {
-    public static class TransferBuilder
+    public class TransferBuilder<T> where T:Transfer, new()
     {
+
+        readonly T transfer;
+        public TransferBuilder()
+        {
+            transfer = new T();
+        }
+
+        public TransferBuilder<T> WithMode(TransferMode mode)
+        {
+            transfer.Mode = mode;
+            return this;
+        }
+
+        public TransferBuilder<T> WithBlobName(string name)
+        {
+            transfer.BlobName = name;
+            return this;
+        }
+
+        public TransferBuilder<T> WithLocal(string path)
+        {
+            ((FileTransfer)(object)transfer).Path = path;
+            return this;
+        }
+        
+        public TransferBuilder<T> WithLocal(Stream stream)
+        {
+            ((StreamTransfer)(object)transfer).Stream = stream;
+            return this;
+        }
+
+        public T Build()
+        {
+            return transfer;
+        }
+
         public static FileTransfer CreateFileUpload(string transferName, string blobName, string path)
         {
             return new FileTransfer

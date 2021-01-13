@@ -18,7 +18,7 @@ namespace Thismaker.Goro.Utilities
         /// <returns></returns>
         public static BitmapImage BitmapToBitmapImage(Bitmap bitmap)
         {
-            using var ms = new MemoryStream();
+            var ms = new MemoryStream();
             bitmap.Save(ms, ImageFormat.Png);
             var image = new BitmapImage();
             image.BeginInit();

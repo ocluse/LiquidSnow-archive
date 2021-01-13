@@ -4,6 +4,8 @@
                      xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <FontFamily x:Key="Password">#Password</FontFamily>
 
+    <local:BitmapConverter x:Key="bitmapConverter"/>
+
     <!--#region Image Resources-->
     <BitmapImage x:Key="DefaultDP" UriSource="/Assets/defaultprofile.png"/>
     <!--#endregion-->
