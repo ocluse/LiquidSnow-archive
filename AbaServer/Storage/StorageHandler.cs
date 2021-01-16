@@ -13,8 +13,6 @@ namespace Thismaker.Aba.Server.Storage
     {
         public string AccountName { get; set; }
 
-        public string BlobEndpoint { get; set; }
-
         public string ContainerName { get; set; }
 
         public string AccountKey { get; set;}
@@ -23,7 +21,7 @@ namespace Thismaker.Aba.Server.Storage
 
         private BlobContainerClient containerClient;
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             var blobEndpoint = $"https://{AccountName}.blob.core.windows.net";
             var cred = new StorageSharedKeyCredential(AccountName, AccountKey);
@@ -34,7 +32,15 @@ namespace Thismaker.Aba.Server.Storage
         public bool BlobExists(string name)
         {
             var bc = containerClient.GetBlobClient(name);
-            return bc.Exists().Value;
+            try
+            {
+                var exists = bc.Exists();
+                return exists.Value;
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public void GetBlob(string name, Stream destination)

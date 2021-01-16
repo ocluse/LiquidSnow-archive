@@ -19,6 +19,7 @@ namespace Thismaker.Aba.Client
         VersionMismatch,
         LoginFailure,
         HubException,
-        NoEntitlements
+        NoEntitlements,
+        RegisterFailure
     }
 }

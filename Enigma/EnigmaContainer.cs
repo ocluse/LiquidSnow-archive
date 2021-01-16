@@ -7,7 +7,6 @@ using SysPath = System.IO.Path;
 using System.Runtime.Serialization;
 using System;
 using System.Data.SqlTypes;
-using Thismaker.Core; using Thismaker.Core.Utilities;
 using Thismaker.Core.Utilities;
 
 namespace Thismaker.Enigma

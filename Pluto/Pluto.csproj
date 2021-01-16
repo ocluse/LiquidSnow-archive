@@ -1,10 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <RootNamespace>Thismaker.Pluto</RootNamespace>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <PackageId>Thismaker.Pluto</PackageId>
+    <Product>Thismaker.Pluto</Product>
   </PropertyGroup>
 
   <ItemGroup>

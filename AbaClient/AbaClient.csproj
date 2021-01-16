@@ -5,6 +5,8 @@
     <RootNamespace>Thismaker.Aba.Client</RootNamespace>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <AssemblyName>Thismaker.Aba.Client</AssemblyName>
+    <Company>Thismaker</Company>
+    <Authors>Thismaker</Authors>
   </PropertyGroup>
 
   <ItemGroup>

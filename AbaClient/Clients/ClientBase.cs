@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Thismaker.AbaCommon;
+using Thismaker.Aba.Common;
 
 namespace Thismaker.Aba.Client.Clients
 {
@@ -84,7 +84,8 @@ namespace Thismaker.Aba.Client.Clients
         {
             try
             {
-                return await HttpClient.GetAsync(requestUri);
+                return await HttpClient.GetAsync(ApiEndpoint==null?$"/{requestUri}"
+                    :$"/{ApiEndpoint}/{requestUri}");
             }
             catch
             {
@@ -96,7 +97,7 @@ namespace Thismaker.Aba.Client.Clients
         {
             try
             {
-                return await HttpClient.GetAsync(requestUri);
+                return await HttpClient.GetAsync($"{endpoint}/{requestUri}");
             }
             catch
             {
@@ -108,7 +109,7 @@ namespace Thismaker.Aba.Client.Clients
         {
             try
             {
-                return await HttpClient.PostAsync(requestUri, content);
+                return await HttpClient.PostAsync($"{endpoint}/{requestUri}", content);
             }
             catch
             {
@@ -126,7 +127,8 @@ namespace Thismaker.Aba.Client.Clients
         {
             try
             {
-                return await HttpClient.PostAsync(requestUri, content);
+                return await HttpClient.PostAsync(ApiEndpoint == null ? $"/{requestUri}"
+                    : $"/{ApiEndpoint}/{requestUri}", content);
             }
             catch
             {
@@ -138,7 +140,7 @@ namespace Thismaker.Aba.Client.Clients
         {
             var abaSection = config.GetSection("AbaClient");
             BaseAddress = abaSection.GetSection("BaseAddress").Value;
-            
+            ApiEndpoint = abaSection.GetSection("ApiEndpoint").Value;
             
             HttpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
             HubConnection = new HubConnectionBuilder()

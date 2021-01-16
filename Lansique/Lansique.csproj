@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
+    <PackageId>Thismaker.Lansique</PackageId>
+    <Product>Thismaker.Lansique</Product>
   </PropertyGroup>
 
   <ItemGroup>

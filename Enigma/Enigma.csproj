@@ -6,6 +6,7 @@
     <LangVersion>8.0</LangVersion>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <AssemblyName>Thismaker.Enigma</AssemblyName>
+    <RootNamespace>Thismaker.Enigma</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
