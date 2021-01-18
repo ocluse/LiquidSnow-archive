@@ -56,6 +56,7 @@ namespace Thismaker.Aba.Server.Authentication
                 var validationParameters = new TokenValidationParameters()
                 {
                     RequireExpirationTime = true,
+                    ValidIssuer=JwtIssuer,
                     ValidateIssuer = true,
                     ValidateAudience = false,
                     IssuerSigningKey = securityKey
@@ -64,7 +65,7 @@ namespace Thismaker.Aba.Server.Authentication
                 var principal = tokenHander.ValidateToken(token, validationParameters, out _);
                 return principal;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null;
             }

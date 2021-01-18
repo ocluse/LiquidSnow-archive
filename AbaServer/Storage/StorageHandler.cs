@@ -72,7 +72,7 @@ namespace Thismaker.Aba.Server.Storage
             var bc = containerClient.GetBlobClient(name);
 
             source.Position = 0;
-            bc.Upload(source);
+            bc.Upload(source, true);
         }
 
         public async Task SetBlobAsync(string name, Stream source)
@@ -80,7 +80,7 @@ namespace Thismaker.Aba.Server.Storage
             var bc = containerClient.GetBlobClient(name);
 
             source.Position = 0;
-            await bc.UploadAsync(source);
+            await bc.UploadAsync(source, true);
         }
     }
 }

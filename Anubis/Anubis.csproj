@@ -2,14 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
     <PackageId>Thismaker.Anubis</PackageId>
     <Authors>Thismaker</Authors>
     <Product>Thismaker.Anubis</Product>
     <Description />
+    <AssemblyName>Thismaker.Anubis</AssemblyName>
+    <RootNamespace>Thismaker.Anubis</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
 </Project>

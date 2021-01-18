@@ -5,7 +5,7 @@
     <FontFamily x:Key="Password">#Password</FontFamily>
 
     <local:BitmapConverter x:Key="bitmapConverter"/>
-
+    <local:DateTimeConverter x:Key="dateTimeConverter"/>
     <!--#region Image Resources-->
     <BitmapImage x:Key="DefaultDP" UriSource="/Assets/defaultprofile.png"/>
     <!--#endregion-->
