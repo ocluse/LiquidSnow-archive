@@ -36,6 +36,8 @@ namespace Thismaker.Aba.Client.Clients
 
         public string ApiEndpoint { get; set; }
 
+        public string HubEndpoint { get; set; }
+
         /// <summary>
         /// The access token that is usually added as an authorization header
         /// to the app's <see cref="HubConnection"/> and <see cref="HttpClient"/>.
@@ -141,27 +143,34 @@ namespace Thismaker.Aba.Client.Clients
             var abaSection = config.GetSection("AbaClient");
             BaseAddress = abaSection.GetSection("BaseAddress").Value;
             ApiEndpoint = abaSection.GetSection("ApiEndpoint").Value;
-            
+            HubEndpoint = abaSection.GetSection("HubEndpoint").Value;
+
             HttpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
             HubConnection = new HubConnectionBuilder()
                    .WithAutomaticReconnect()
-                   .WithUrl($"{BaseAddress}hub",
+                   .WithUrl($"{BaseAddress}/{HubEndpoint}/",
                    options =>
                    {
-                       //Check access token:
-                       if (AccessToken != null)
-                       {
-                           if (AccessToken.Kind == AccessTokenKind.Custom)
-                           {
-                               options.Headers.Add(accessToken.Key, accessToken.Value);
-                           }
-                           else
-                           {
-                               options.AccessTokenProvider = () => Task.FromResult(AccessToken.Value);
-                           }
-                       }
+                       options.AccessTokenProvider = GetHubToken;
                    })
                    .Build();
+        }
+
+        private Task<string> GetHubToken()
+        {
+            return Task.FromResult(AccessToken?.Value);
+
+            //if (AccessToken != null)
+            //{
+            //    if (AccessToken.Kind == AccessTokenKind.Custom)
+            //    {
+            //        options.Headers.Add(accessToken.Key, accessToken.Value);
+            //    }
+            //    else
+            //    {
+            //        options.AccessTokenProvider = () => Task.FromResult(AccessToken.Value);
+            //    }
+            //}
         }
 
         public void MakeSingleton()
@@ -181,32 +190,58 @@ namespace Thismaker.Aba.Client.Clients
 
         public async Task ConnectHub()
         {
-            await HubConnection.StartAsync();
+            try
+            {
+                await HubConnection.StopAsync();
+            }
+            catch
+            {
+                //do nothing
+            }
+
+            try
+            {
+                await HubConnection.StartAsync();
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            
         }
 
-        public async void HubSend(string methodName)
+        public async Task HubSend(string methodName)
         {
             await HubConnection.SendAsync(methodName);
         }
 
+        public async Task HubSend<T1>(string methodName, T1 arg1)
+        {
+            await HubConnection.SendAsync(methodName, arg1);
+        }
+
         public void BindHub(Action action)
         {
-            HubConnection.On(nameof(action), action);
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
         }
 
         public void UnbindHub(Action action)
         {
-            HubConnection.Remove(nameof(action));
+            var name = action.Method.Name;
+            HubConnection.Remove(name);
         }
 
         public void BindHub<T1>(Action<T1> action)
         {
-            HubConnection.On(nameof(action), action);
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
         }
 
         public void BindHub<T1,T2>(Action<T1,T2> action)
         {
-            HubConnection.On(nameof(action), action);
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
         }
 
         public async Task<Result> CallHubAsync<Result>(string methodName)

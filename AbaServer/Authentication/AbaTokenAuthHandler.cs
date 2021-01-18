@@ -35,12 +35,24 @@ namespace Thismaker.Aba.Server.Authentication
             string authorization = request.Headers[HeaderNames.Authorization];
 
             string token = null;
-            if (string.IsNullOrEmpty(authorization))
+            //Check for hub:
+
+            bool isHub = false;
+            var accessToken = Context.Request.Query["access_token"];
+            var path = Context.Request.Path;
+            if(!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/ScopedHub")))
+            {
+                token = accessToken;
+                isHub = true;
+            }
+
+
+            if (string.IsNullOrEmpty(authorization) && !isHub)
             {
                 return AuthenticateResult.NoResult();
             }
 
-            if(authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            if(!isHub && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 token = authorization["Bearer ".Length..].Trim();
             }

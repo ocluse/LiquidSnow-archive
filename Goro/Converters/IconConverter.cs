@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
-using System.Text;
 using System.Windows.Data;
-using System.Windows.Media.Imaging;
-using Thismaker.Goro.Utilities;
 
 namespace Thismaker.Goro
 {
@@ -26,35 +21,34 @@ namespace Thismaker.Goro
                         StatusInfo.Information => IconType.StatusCircleInfo,
                         StatusInfo.Success => IconType.StatusCircleCheckmark,
                         StatusInfo.Warning => IconType.StatusCircleExclamation,
-                        _=>IconType.StatusCircleInfo
+                        _ => IconType.StatusCircleInfo
                     };
                 }
             }
-           
 
             var icon = (IconType)value;
 
             return icon switch
             {
-                IconType.Add=> "\uE710",
-                IconType.AreaChart=> "\uE9D2",
+                IconType.Add => "\uE710",
+                IconType.AreaChart => "\uE9D2",
                 IconType.Bluetooth => "\uE76D",
-                IconType.Calendar=> "\uE787",
-                IconType.ChatBubbles=> "\uE8F2",
-                IconType.ChromeClose=> "\uE8BB",
+                IconType.Calendar => "\uE787",
+                IconType.ChatBubbles => "\uE8F2",
+                IconType.ChromeClose => "\uE8BB",
                 IconType.Connect => "\uE76D",
-                IconType.ContactInfo=> "\uE779",
-                IconType.ContactInfoMirrored=> "\uEA4A",
-                IconType.Delete=> "\uE74D",
-                IconType.Edit=> "\uE70F",
+                IconType.ContactInfo => "\uE779",
+                IconType.ContactInfoMirrored => "\uEA4A",
+                IconType.Delete => "\uE74D",
+                IconType.Edit => "\uE70F",
                 IconType.FolderHorizontal => "\uF12B",
                 IconType.GlobalNavigationButton => "\uE700",
-                IconType.OpenFile=> "\uE8E5",
-                IconType.Rename=> "\uE8AC",
-                IconType.Setting=> "\uE713",
-                IconType.Share=> "\uE72D",
-                IconType.SignOut=> "\uF3B1",
-                IconType.StatusCircleBlock=> "\uF140",
+                IconType.OpenFile => "\uE8E5",
+                IconType.Rename => "\uE8AC",
+                IconType.Setting => "\uE713",
+                IconType.Share => "\uE72D",
+                IconType.SignOut => "\uF3B1",
+                IconType.StatusCircleBlock => "\uF140",
                 IconType.StatusCircleBlock2 => "\uF141",
                 IconType.StatusCircleCheckmark => "\uF13E",
                 IconType.StatusCircleErrorX => "\uF13D",
@@ -67,29 +61,29 @@ namespace Thismaker.Goro
                 IconType.StatusTriangleInner => "\uF13A",
                 IconType.StatusTriangleOuter => "\uF139",
                 IconType.Wifi => "\uE76D",
-                IconType.Print=> "\uE749",
-                IconType.Scan=> "\uE8FE",
-                IconType.Comment=> "\uE90A",
-                IconType.MultiSelect=> "\uE762",
-                IconType.Send=> "\uE724",
-                IconType.Italic=> "\uE8DB",
-                IconType.Bold=> "\uE8DD",
-                IconType.Underline=> "\uE8DC",
-                IconType.AlignCenter=> "\uE8E3",
-                IconType.AlignLeft=> "\uE8E4",
-                IconType.AlignRight=> "\uE8E2",
-                IconType.FontDecrease=> "\uE8E7",
-                IconType.FontIncrease=> "\uE8E8",
-                IconType.FontSize=> "\uE8E9",
-                IconType.FontColor=> "\uE8D3",
-                IconType.Font=> "\uE8D2",
-                IconType.BulletedList=> "\uE8FD",
-                IconType.Strikethrough=> "\uEDE0",
-                IconType.Undo=> "\uE7A7",
-                IconType.Redo=> "\uE7A6",
-                IconType.Copy=> "\uE8C8",
-                IconType.Paste=> "\uE77F",
-                IconType.Cut=> "\uE8C6",
+                IconType.Print => "\uE749",
+                IconType.Scan => "\uE8FE",
+                IconType.Comment => "\uE90A",
+                IconType.MultiSelect => "\uE762",
+                IconType.Send => "\uE724",
+                IconType.Italic => "\uE8DB",
+                IconType.Bold => "\uE8DD",
+                IconType.Underline => "\uE8DC",
+                IconType.AlignCenter => "\uE8E3",
+                IconType.AlignLeft => "\uE8E4",
+                IconType.AlignRight => "\uE8E2",
+                IconType.FontDecrease => "\uE8E7",
+                IconType.FontIncrease => "\uE8E8",
+                IconType.FontSize => "\uE8E9",
+                IconType.FontColor => "\uE8D3",
+                IconType.Font => "\uE8D2",
+                IconType.BulletedList => "\uE8FD",
+                IconType.Strikethrough => "\uEDE0",
+                IconType.Undo => "\uE7A7",
+                IconType.Redo => "\uE7A6",
+                IconType.Copy => "\uE8C8",
+                IconType.Paste => "\uE77F",
+                IconType.Cut => "\uE8C6",
 
                 _ => "\uE76D",
             };
@@ -98,22 +92,6 @@ namespace Thismaker.Goro
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
-        }
-    }
-
-    [ValueConversion(typeof(Bitmap), typeof(BitmapImage))]
-    public class BitmapConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null) return null;
-            var image = (Bitmap)value;
-            return BitmapUtility.BitmapToBitmapImage(image);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return null;
         }
     }
 

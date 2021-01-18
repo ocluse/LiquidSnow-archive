@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>Thismaker.Aretha</AssemblyName>
+    <RootNamespace>Thismaker.Aretha</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Anubis\Anubis.csproj" />
+    <ProjectReference Include="..\Enigma\Enigma.csproj" />
+  </ItemGroup>
+
+</Project>
