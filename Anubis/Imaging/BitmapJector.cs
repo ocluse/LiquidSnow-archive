@@ -106,12 +106,12 @@ namespace Thismaker.Anubis.Imaging
 
                     var pixel = inputImage.GetPixel(x, y);
 
-                    int[] vals = UseAlpha ? new int[] { pixel.A, pixel.R, pixel.G, pixel.B }
-                    : new int[] { pixel.R, pixel.G, pixel.B }; ;
-
+                    int[] vals = new int[] { pixel.A, pixel.R, pixel.G, pixel.B };
 
                     for (int v = 0; v < vals.Length; v++)
                     {
+                        if (!UseAlpha && v == 0) continue;
+
                         var bitArray = new BitArray(new[] { vals[v] });
                         for (int i = 0; i < LsbDepth; i++)
                         {
@@ -129,8 +129,7 @@ namespace Thismaker.Anubis.Imaging
                         if (stop) break;
                     }
 
-                    pixel = UseAlpha ? Color.FromArgb(vals[0], vals[1], vals[2], vals[3])
-                        : Color.FromArgb(vals[0], vals[1], vals[2]);
+                    pixel = Color.FromArgb(vals[0], vals[1], vals[2], vals[3]);
 
                     outputImage.SetPixel(x, y, pixel);
 

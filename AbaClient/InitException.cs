@@ -20,6 +20,7 @@ namespace Thismaker.Aba.Client
         LoginFailure,
         HubException,
         NoEntitlements,
-        RegisterFailure
+        RegisterFailure,
+        ConnectionException,
     }
 }
