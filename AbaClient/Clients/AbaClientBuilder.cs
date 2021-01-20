@@ -38,13 +38,6 @@ namespace Thismaker.Aba.Client.Clients
             return this;
         }
 
-        public AbaClientBuilder<T> WithApiEndpoint(string endpoint)
-        {
-            client.ApiEndpoint = endpoint;
-
-            return this;
-        }
-
         /// <summary>
         /// Provide the context of the client
         /// </summary>

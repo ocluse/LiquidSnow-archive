@@ -8,4 +8,12 @@
     <Product>Thismaker.Mercury</Product>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Enigma\Enigma.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -77,6 +77,12 @@ namespace Thismaker.Aba.Client.Clients
         /// </summary>
         protected HubConnection HubConnection { get; set; }
 
+        #region Events
+        public event Action<Exception> HubReconnecting;
+        public event Action<string> HubReconnected;
+        public event Action<Exception> HubClosed;
+        #endregion
+
         /// <summary>
         /// Calls the HTTP GET on the server's Api
         /// </summary>
@@ -154,6 +160,28 @@ namespace Thismaker.Aba.Client.Clients
                        options.AccessTokenProvider = GetHubToken;
                    })
                    .Build();
+
+            HubConnection.Reconnected += HubConnection_Reconnected;
+            HubConnection.Reconnecting += HubConnection_Reconnecting;
+            HubConnection.Closed += HubConnection_Closed;
+        }
+
+        private Task HubConnection_Closed(Exception arg)
+        {
+            HubClosed?.Invoke(arg);
+            return Task.CompletedTask;
+        }
+
+        private Task HubConnection_Reconnecting(Exception arg)
+        {
+            HubReconnecting?.Invoke(arg);
+            return Task.CompletedTask;
+        }
+
+        private Task HubConnection_Reconnected(string arg)
+        {
+            HubReconnected?.Invoke(arg);
+            return Task.CompletedTask;
         }
 
         private Task<string> GetHubToken()
@@ -220,16 +248,44 @@ namespace Thismaker.Aba.Client.Clients
             await HubConnection.SendAsync(methodName, arg1);
         }
 
-        public void BindHub(Action action)
+        public async Task HubSend<T1, T2>(string methodName, T1 arg1, T2 arg2)
         {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
+            await HubConnection.SendAsync(methodName, arg1, arg2);
+        }
+
+        public async Task HubSend<T1,T2,T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
+        {
+            await HubConnection.SendAsync(methodName, arg1, arg2, arg3);
         }
 
         public void UnbindHub(Action action)
         {
             var name = action.Method.Name;
             HubConnection.Remove(name);
+        }
+
+        public void UnbindHub<T1>(Action<T1> action)
+        {
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
+        }
+        
+        public void UnbindHub<T1,T2>(Action<T1,T2> action)
+        {
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
+        }
+        
+        public void UnbindHub<T1,T2,T3>(Action<T1,T2,T3> action)
+        {
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
+        }
+
+        public void BindHub(Action action)
+        {
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
         }
 
         public void BindHub<T1>(Action<T1> action)
@@ -239,6 +295,12 @@ namespace Thismaker.Aba.Client.Clients
         }
 
         public void BindHub<T1,T2>(Action<T1,T2> action)
+        {
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
+        }
+
+        public void BindHub<T1,T2,T3>(Action<T1,T2,T3> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);

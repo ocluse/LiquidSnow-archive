@@ -3,6 +3,7 @@ using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Thismaker.Aba.Client.Clients
 {
@@ -39,7 +40,7 @@ namespace Thismaker.Aba.Client.Clients
         {
             get
             {
-                return $"https://{AadInstance}/tfp/{Tenant}";
+                return $"https://{AadInstance}/tfp/{Tenant}/";
             }
         }
 
@@ -61,16 +62,10 @@ namespace Thismaker.Aba.Client.Clients
         /// </summary>
         public IPublicClientApplication PublicClient { get; protected set; }
 
-        public virtual void Initialize()
-        {
-            PublicClient = PublicClientApplicationBuilder.Create(ClientID)
-                .WithB2CAuthority(AuthoritySUSI)
-                .WithRedirectUri(RedirectUri)
-                .Build();
-        }
-
         public override void Configure(IConfiguration config)
         {
+            base.Configure(config);
+
             var abaSection = config.GetSection("AbaClient");
             ClientID = abaSection.GetSection("ClientID").Value;
             AadInstance = abaSection.GetSection("AadInstance").Value;
@@ -87,10 +82,14 @@ namespace Thismaker.Aba.Client.Clients
                 ApiScopes.Add(scope.Value);
             }
 
-            Initialize();
-
-            base.Configure(config);
+            PublicClient = PublicClientApplicationBuilder.Create(ClientID)
+                .WithB2CAuthority(AuthoritySUSI)
+                .WithRedirectUri(RedirectUri)
+                .Build();
         }
+
+        public abstract Task Login();
+        public abstract Task Logout();
 
     }
 }

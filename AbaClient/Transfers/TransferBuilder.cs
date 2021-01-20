@@ -6,9 +6,16 @@ namespace Thismaker.Aba.Client.Transfers
     {
 
         readonly T transfer;
+
         public TransferBuilder()
         {
             transfer = new T();
+        }
+
+        public TransferBuilder<T> WithName(string name)
+        {
+            transfer.Name = name;
+            return this;
         }
 
         public TransferBuilder<T> WithMode(TransferMode mode)

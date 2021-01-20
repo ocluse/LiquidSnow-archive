@@ -13,7 +13,7 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public Stream Stream { get; internal set; }
 
-        internal StreamTransfer() : base()
+        public StreamTransfer() : base()
         {
 
         }
@@ -26,7 +26,7 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public string Path { get; internal set; }
 
-        internal FileTransfer() : base()
+        public FileTransfer() : base()
         {
 
         }
