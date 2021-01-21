@@ -41,10 +41,7 @@ namespace Thismaker.Anubis.Imaging
             get { return Encoding.UTF8.GetBytes(EOF); }
         }
 
-        /// <summary>
-        /// When <see cref="true"/> throws <see cref="InvalidOperationException"/> 
-        /// when the EOF cannot be written or was not read.
-        /// </summary>
+
         public bool EnsureSuccess { get; set; } = false;
 
 

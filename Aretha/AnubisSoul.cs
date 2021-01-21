@@ -223,6 +223,7 @@ namespace Thismaker.Aretha
         private static JectorType GetJectorType(string name)
         {
             if (name == "bitmap") return JectorType.Bitmap;
+            if (name == "wavefile") return JectorType.WaveFile;
             throw new InvalidCastException("Unknown Jector Type");
         }
     }

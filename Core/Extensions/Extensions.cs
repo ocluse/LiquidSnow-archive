@@ -3,10 +3,71 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 public static class GlobalExtensions
 {
+    /// <summary>
+    /// Gets the bytes of a string when encoded using the specified method
+    /// </summary>
+    /// <typeparam name="T">The type of Encoding to be used</typeparam>
+    /// <param name="str">The string whose bytes are to be returned</param>
+    /// <returns></returns>
+    public static byte[] GetBytes<T>(this string str) where T : Encoding
+    {
+        if (typeof(T) == typeof(ASCIIEncoding))
+        {
+            return Encoding.ASCII.GetBytes(str);
+        }
+        else if (typeof(T) == typeof(UTF8Encoding))
+        {
+            return Encoding.UTF8.GetBytes(str);
+        }
+        else if (typeof(T) == typeof(UTF7Encoding))
+        {
+            return Encoding.UTF7.GetBytes(str);
+        }
+        else if (typeof(T) == typeof(UTF32Encoding))
+        {
+            return Encoding.UTF32.GetBytes(str);
+        }
+        else if (typeof(T) == typeof(UnicodeEncoding))
+        {
+            return Encoding.Unicode.GetBytes(str);
+        }
+
+        throw new ArgumentException("The encoding provided is invalid");
+    }
+
+    public static string GetString<T>(this byte[] ba) where T : Encoding
+    {
+        if (typeof(T) == typeof(ASCIIEncoding))
+        {
+            return Encoding.ASCII.GetString(ba);
+        }
+        else if (typeof(T) == typeof(UTF8Encoding))
+        {
+            return Encoding.UTF8.GetString(ba);
+        }
+        else if (typeof(T) == typeof(UTF7Encoding))
+        {
+            return Encoding.UTF7.GetString(ba);
+        }
+        else if (typeof(T) == typeof(UTF32Encoding))
+        {
+            return Encoding.UTF32.GetString(ba);
+        }
+        else if (typeof(T) == typeof(UnicodeEncoding))
+        {
+            return Encoding.Unicode.GetString(ba);
+        }
+
+        throw new ArgumentException("The encoding provided is invalid");
+    }
+
+
+
     public static object GetPropValue(this object obj, string name)
     {
         foreach (string part in name.Split('.'))

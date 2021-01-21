@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Thismaker.Anubis.Imaging;
+using Thismaker.Anubis.Media;
 
 namespace Thismaker.Anubis
 {
@@ -36,6 +37,7 @@ namespace Thismaker.Anubis
             IJector result = _type.Value switch
             {
                 JectorType.Bitmap => new BitmapJector(),
+                JectorType.WaveFile=>new WaveFileJector(),
                 _ => throw new InvalidOperationException("Unknown Jector Type")
             };
 
@@ -52,6 +54,6 @@ namespace Thismaker.Anubis
 
     public enum JectorType
     {
-        Bitmap
+        Bitmap, WaveFile
     }
 }

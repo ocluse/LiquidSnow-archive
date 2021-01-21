@@ -21,6 +21,10 @@ namespace Thismaker.Anubis
         string EOF { get; set; }
 
 
+        /// <summary>
+        /// When <see cref="true"/> throws <see cref="InvalidOperationException"/> 
+        /// when the EOF cannot be written or was not read.
+        /// </summary>
         bool EnsureSuccess { get; set; }
 
         object Inject(object source, byte[] data);
