@@ -7,7 +7,15 @@ namespace Thismaker.Aretha
 {
     static class Aretha
     {
-        public static async Task Prepare(string[] args)
+
+        static TaskCompletionSource tcsSummon;
+
+        static async Task Main(string[] args)
+        {
+            await Prepare(args);
+        }
+
+        private static async Task Prepare(string[] args)
         {
             Console.ResetColor();
             if (args != null && args.Length > 0)
@@ -36,17 +44,29 @@ namespace Thismaker.Aretha
 
             if (args[0] == "summon")
             {
+                var soul = SoulFromName(args[1]);
+
+                
+
+                tcsSummon = new TaskCompletionSource();
                 if (args[1] == "anubis")
                 {
-                    await AnubisSoul.Summon("Anubis has been called",left_args.ToArray());
+                    AnubisSoul.Summon("Anubis has been called",left_args.ToArray());
+                    await tcsSummon.Task;
                 }
-                if (args[1] == "enigma")
+                else if (args[1] == "enigma")
                 {
-                    await EnigmaSoul.Summon("Anubis has been called",left_args.ToArray());
+                    //EnigmaSoul.Summon(left_args.ToArray());
+                    await tcsSummon.Task;
+                }
+                else if (args[1] == "abilities")
+                {
+                    Speak("You can currently summon the following entities: \n1.Anubis\n2.Enigma");
+                    await tcsSummon.Task;
                 }
                 else
                 {
-                    Speak("Command not recognized");
+                    Speak($"{args[0]} is not summonable. To see what is summonable, type summon abilities" );
                 }
             }
             else
@@ -70,6 +90,17 @@ namespace Thismaker.Aretha
                 Soul.Anubis => ConsoleColor.Cyan,
                 Soul.Enigma=>ConsoleColor.Green,
                 _=>ConsoleColor.White
+            };
+        }
+
+        public static Soul SoulFromName(string name)
+        {
+            return name switch
+            {
+                "aretha" => Soul.Aretha,
+                "anubis" => Soul.Anubis,
+                "enigma" => Soul.Enigma,
+                _=>throw new InvalidDataException("Unrecognized soul")
             };
         }
 

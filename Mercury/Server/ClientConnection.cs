@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TEnigma=Thismaker.Enigma.Enigma;
 
-namespace Thismaker.Mercury.Server
+namespace Thismaker.Mercury
 {
     public class ClientConnection
     {

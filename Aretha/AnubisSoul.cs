@@ -62,7 +62,7 @@ namespace Thismaker.Aretha
             return Aretha.GetPath(text, input, confirm, Soul.Anubis);
         }
 
-        public static async Task Summon(string message="Anubis has been called", string[] args=null)
+        public static async void Summon(string message="Anubis has been called", string[] args=null)
         {
             Aretha.Speak(message);
 
@@ -76,7 +76,7 @@ namespace Thismaker.Aretha
 
             if (response == "y")
             {
-                await Summon("Anubis has returned");
+                Summon("Anubis has returned");
             }
         }
 

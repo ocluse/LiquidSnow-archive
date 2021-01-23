@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -67,13 +68,16 @@ namespace Thismaker.Anubis.Media
             stream.Write(buffer, 0, buffer.Length);
 
             //write data:
+            using var bw = new BinaryWriter(stream, Encoding.Unicode, true);
             for(int i = 0; i < Channels[0].Samples.Count; i++)
             {
                 foreach(var channel in Channels)
                 {
                     buffer = channel.Samples[i].Data;
-                    Array.Reverse(buffer);
-                    stream.Write(buffer, 0, buffer.Length);
+                    var bytes = new BitArray(buffer);
+                    buffer=bytes.ToBytes();
+                    bw.Write(buffer);
+                    //stream.Write(buffer, 0, buffer.Length);
                 }
             }
         }

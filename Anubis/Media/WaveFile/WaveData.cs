@@ -57,4 +57,9 @@ namespace Thismaker.Anubis.Media
             Load(stream);
         }
     }
+
+    public struct WaveFormat
+    {
+
+    }
 }

@@ -9,26 +9,27 @@ using TEnigma = Thismaker.Enigma.Enigma;
 
 namespace Thismaker.Aretha
 {
-    static class EnigmaSoul
+    class EnigmaSoul:ISoul
     {
-        private static void Speak(string text)
+        public Soul Soul { get { return Soul.Enigma; } }
+
+        public void Speak(string text)
         {
             Aretha.Speak(text, Soul.Enigma);
         }
 
-        private static string Listen(bool isYN = false)
+        public string Listen(string question=null, bool isYN = false)
         {
             return Aretha.Listen(isYN, Soul.Enigma);
         }
 
-        private static string GetPath(string text, bool input, bool confirm = true)
+        public string GetPath(string text, bool input, bool confirm = true)
         {
             return Aretha.GetPath(text, input, confirm, Soul.Enigma);
         }
-
-        public static async Task Summon(string message="Enigma has been called", string[] args=null)
+        public async void Summon(string[] args=null)
         {
-            Aretha.Speak(message);
+            //Aretha.Speak(message);
 
             await WaitForCommand(args);
 
@@ -40,11 +41,11 @@ namespace Thismaker.Aretha
 
             if (response == "y")
             {
-                await Summon("Enigma has returned");
+                Summon();
             }
         }
 
-        public static async Task WaitForCommand(string[] args)
+        public async Task WaitForCommand(string[] args)
         {
             List<string> cmdlets;
             if (args == null || args.Length == 0)
@@ -80,7 +81,7 @@ namespace Thismaker.Aretha
             }
         }
 
-        private static Task Aes(string cmd)
+        private Task Aes(string cmd)
         {
             try
             {
@@ -114,7 +115,7 @@ namespace Thismaker.Aretha
             
         }
 
-        private static Task Playfair(string cmd)
+        private Task Playfair(string cmd)
         {
             try
             {
