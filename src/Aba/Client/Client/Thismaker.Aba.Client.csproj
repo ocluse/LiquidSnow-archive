@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Thismaker</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>AbaClient Allows you to build Server-Client based applications rapidly. Use in conjuction with Thismaker.Aba.Server for optimal performance.</Description>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>client-application</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Thismaker.Core.csproj" />
+    <ProjectReference Include="..\..\Common\Thismaker.Aba.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+</Project>
