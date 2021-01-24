@@ -18,39 +18,21 @@ namespace Thismaker.Aretha
             Aretha.Speak(text, Soul.Enigma);
         }
 
-        public string Listen(string question=null, bool isYN = false)
+        public string Ask(string question=null, bool isYN = false, bool isCase=false)
         {
-            return Aretha.Listen(isYN, Soul.Enigma);
+            return Aretha.Ask(question,isYN, Soul.Enigma, isCase);
         }
 
         public string GetPath(string text, bool input, bool confirm = true)
         {
             return Aretha.GetPath(text, input, confirm, Soul.Enigma);
         }
-        public async void Summon(string[] args=null)
-        {
-            //Aretha.Speak(message);
-
-            await WaitForCommand(args);
-
-            Aretha.Speak("Enigma dismissed. Do you want to summon Enigma again? (Y/N)");
-
-            var response = Aretha.Listen(true);
-
-            if (response == null) return;
-
-            if (response == "y")
-            {
-                Summon();
-            }
-        }
-
-        public async Task WaitForCommand(string[] args)
+        public async void WaitForCommand(string[] args=null)
         {
             List<string> cmdlets;
             if (args == null || args.Length == 0)
             {
-                var cmd = Listen();
+                var cmd = Ask();
                 if (cmd == null) return;
 
                 cmdlets = new List<string>(cmd.Split(' '));
@@ -74,7 +56,7 @@ namespace Thismaker.Aretha
                         throw new InvalidOperationException("Unknown operation");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Aretha.SoulFailed(Soul.Enigma, ex);
                 return;
@@ -92,7 +74,7 @@ namespace Thismaker.Aretha
                 if (output == null) return Task.CompletedTask;
 
                 Speak("Enter the key:");
-                var key = Listen();
+                var key = Ask();
                 if (key == null) return Task.CompletedTask;
 
                 Speak("Operation Started");
@@ -121,16 +103,16 @@ namespace Thismaker.Aretha
             {
                 Speak("Enter the input:");
 
-                var input = Listen();
+                var input = Ask();
                 if (input == null) return Task.CompletedTask;
 
                 Speak("Enter the key:");
 
-                var key = Listen();
+                var key = Ask();
                 if (key == null) return Task.CompletedTask;
 
                 Speak("Provide the character to omit:");
-                var omit = Listen();
+                var omit = Ask();
                 if (omit == null) return Task.CompletedTask;
 
                 var output = cmd == "encrypt" ?

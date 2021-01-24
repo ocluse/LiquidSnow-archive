@@ -7,9 +7,7 @@ namespace Thismaker.Aretha
 {
     static class Aretha
     {
-
         static TaskCompletionSource tcsSummon;
-
         static async Task Main(string[] args)
         {
             await Prepare(args);
@@ -24,9 +22,7 @@ namespace Thismaker.Aretha
                 return;
             }
 
-            Speak("Ready to summon");
-
-            var instruction = Listen();
+            var instruction = Ask("Ready to summon");
 
             if (instruction == null) return;
 
@@ -37,36 +33,31 @@ namespace Thismaker.Aretha
         {
             var left_args = new List<string>();
 
-            for(int i = 2; i < args.Length; i++)
+            if (args != null)
             {
-                left_args.Add(args[i]);
+                for (int i = 2; i < args.Length; i++)
+                {
+                    left_args.Add(args[i]);
+                }
             }
 
             if (args[0] == "summon")
             {
-                var soul = SoulFromName(args[1]);
-
-                
-
-                tcsSummon = new TaskCompletionSource();
-                if (args[1] == "anubis")
+                if (args[1] == "abilities" && args.Length==2)
                 {
-                    AnubisSoul.Summon("Anubis has been called",left_args.ToArray());
-                    await tcsSummon.Task;
-                }
-                else if (args[1] == "enigma")
-                {
-                    //EnigmaSoul.Summon(left_args.ToArray());
-                    await tcsSummon.Task;
-                }
-                else if (args[1] == "abilities")
-                {
-                    Speak("You can currently summon the following entities: \n1.Anubis\n2.Enigma");
-                    await tcsSummon.Task;
+                    Speak("You can currently summon the following entities: \n\t1.Anubis\n\t2.Enigma");
                 }
                 else
                 {
-                    Speak($"{args[0]} is not summonable. To see what is summonable, type summon abilities" );
+                    try
+                    {
+                        var soul = SoulFromName(args[1]);
+                        await Summon(soul, left_args.ToArray());
+                    }
+                    catch (UnknownSoulException)
+                    {
+                        Speak($"{args[1]} is not summonable. To see what is summonable, type summon abilities");
+                    }
                 }
             }
             else
@@ -77,9 +68,57 @@ namespace Thismaker.Aretha
             await Prepare(null);
         }
 
+        static async Task Summon(Soul soul, string[] args=null)
+        {
+            try
+            {
+                ISoul soulHost;
+                soulHost = soul switch
+                {
+                    Soul.Anubis => new AnubisSoul(),
+                    Soul.Enigma => new EnigmaSoul(),
+                    _ => throw new UnknownSoulException()
+                };
+                tcsSummon = new TaskCompletionSource();
+                Speak($"{soul} has been summoned");
+                soulHost.WaitForCommand(args);
+                await tcsSummon.Task;
+            }
+            catch (UnknownSoulException)
+            {
+                Speak("Soul is not known or cannot be summoned");
+            }
+            catch(TaskCanceledException)
+            {
+                tcsSummon = null;
+                var response=Ask($"{soul} dismissed. Do you want to summon {soul} again? (Y/N)", true);
+                
+                if (response == "y")
+                {
+                    await Summon(soul);
+                }
+            }
+            catch (SummonFailedException ex)
+            {
+                Speak($"{soul} was unable to executed your command: {ex.Message}");
+                var response = Ask( $"Do you want to summon {soul} again? (Y/N)");
+
+                if (response == "y")
+                {
+                    await Summon(soul);
+                }
+            }
+
+        }
+
         public static void SoulFailed(Soul soul, Exception ex)
         {
-            Speak($"{soul} was unable to executed your command: {ex.Message}");
+            tcsSummon.TrySetException(new SummonFailedException(soul,ex.Message));
+        }
+
+        public static void SoulSucceeded(Soul soul)
+        {
+            tcsSummon.TrySetResult();
         }
 
         public static ConsoleColor SoulColor(Soul soul)
@@ -100,7 +139,7 @@ namespace Thismaker.Aretha
                 "aretha" => Soul.Aretha,
                 "anubis" => Soul.Anubis,
                 "enigma" => Soul.Enigma,
-                _=>throw new InvalidDataException("Unrecognized soul")
+                _=>throw new UnknownSoulException()
             };
         }
 
@@ -113,69 +152,62 @@ namespace Thismaker.Aretha
             Console.WriteLine();
         }
 
-        public static string Listen(bool isYN = false, Soul soul=Soul.Aretha)
+        public static string Ask(string question=null, bool isYN = false, Soul soul=Soul.Aretha, bool isCase=false)
         {
+            if (!string.IsNullOrEmpty(question))
+            {
+                Speak(question, soul);
+            }
+
             Console.ForegroundColor = SoulColor(soul);
             Console.Write(">> ");
             Console.ResetColor();
-            var instruction = Console.ReadLine().ToLower();
 
-            if (instruction == "@aretha exit")
-            {
-                Environment.Exit(0);
-            }
-
-            if (instruction == "@aretha dismiss")
-            {
-                return null;
-            }
-
-            if (isYN)
-            {
-                if (instruction != "y" && instruction != "n")
-                {
-                    Speak("This response requires a Y (For Yes) or N (For No). Try again.");
-                    return Listen(isYN);
-                }
-            }
-
-            return instruction;
-        }
-
-        public static string ListenCS(bool isYN = false, Soul soul = Soul.Aretha)
-        {
-            Console.ForegroundColor = SoulColor(soul);
-            Console.Write(">> ");
-            Console.ResetColor();
             var instruction = Console.ReadLine();
-
-            if (instruction.ToLower() == "@aretha exit")
+            var lower = instruction.ToLower();
+            var cancelled = false;
+            if (lower.StartsWith("@aretha ") || soul == Soul.Aretha)
             {
-                Environment.Exit(0);
-            }
+                var args = lower.Replace("@aretha ", null).Split(' ');
 
-            if (instruction.ToLower() == "@aretha dismiss")
-            {
-                return null;
-            }
+                if (args.Length == 0)
+                {
+                    Speak("Command cannot be empty");
+                    return Ask(question, isYN, soul, isCase);
+                }
 
+                if (args[0] == "dismiss" && args.Length==1)
+                {
+                    tcsSummon.TrySetCanceled();
+                    cancelled = true;
+                }
+                else if (args[0] == "exit" && args.Length == 1)
+                {
+                    Environment.Exit(0);
+                }
+                else if(soul!=Soul.Aretha)
+                {
+                    Speak("Unknown Aretha command or command cannot be executed at the current time.");
+                    return Ask(question, isYN, soul, isCase);
+                }
+
+            }
             if (isYN)
             {
-                if (instruction.ToLower() != "y" && instruction.ToLower() != "n")
+
+                if (lower != "y" && lower != "n" && !cancelled)
                 {
                     Speak("This response requires a Y (For Yes) or N (For No). Try again.");
-                    return Listen(isYN);
+                    return Ask(question, isYN, soul, isCase);
                 }
             }
 
-            return instruction;
+            return isCase ? instruction : lower;
         }
 
         public static string GetPath(string text, bool input, bool confirm = true, Soul soul=Soul.Aretha)
         {
-            Speak(text, soul);
-            var response = ListenCS(false, soul);
-            if (response == null) return null;
+            var response=Ask(text, false, soul, true);
 
             var path = response.Trim();
             path = path.Trim('\"');
@@ -189,8 +221,8 @@ namespace Thismaker.Aretha
                 else if (!input && File.Exists(path))
                 {
                     Speak("This file already exists. Are you sure you want to overwrite it? (Y/N)", soul);
-                    response = Listen(true, soul);
-                    if (response == null) return null;
+                    
+                    response = Ask(text,true, soul);
 
                     if (response != "y") return GetPath(text, input, confirm, soul);
                 }
@@ -201,5 +233,24 @@ namespace Thismaker.Aretha
     }
 
     enum Soul {Aretha, Anubis, Enigma }
+
+    public class UnknownSoulException:Exception
+    {
+        public UnknownSoulException(string msg) : base(msg)
+        {
+
+        }
+
+        public UnknownSoulException() : base() { }
+    }
+
+    internal class SummonFailedException:Exception
+    {
+        public Soul Soul { get; set; }
+        public SummonFailedException(Soul soul,string msg):base(msg)
+        {
+            Soul = soul;
+        }
+    }
 
 }

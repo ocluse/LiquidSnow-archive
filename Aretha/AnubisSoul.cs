@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Thismaker.Aretha
 {
-    static class AnubisSoul
+    class AnubisSoul : ISoul
     {
        
+        public Soul Soul { get { return Soul.Anubis; } }
+
         private static Progress<float> WriteProgress()
         {
             var progress = new Progress<float>();
@@ -47,116 +49,85 @@ namespace Thismaker.Aretha
             return progress;
         }
 
-        private static void Speak(string text)
+        public void Speak(string text)
         {
             Aretha.Speak(text, Soul.Anubis);
         }
 
-        private static string Listen(bool isYN = false)
+        public string Ask(string question=null,bool isYN = false, bool isCase=false)
         {
-            return Aretha.Listen(isYN, Soul.Anubis);
+            return Aretha.Ask(question,isYN, Soul.Anubis, isCase);
         }
 
-        private static string GetPath(string text, bool input, bool confirm=true)
+        public string GetPath(string text, bool input, bool confirm=true)
         {
             return Aretha.GetPath(text, input, confirm, Soul.Anubis);
         }
 
-        public static async void Summon(string message="Anubis has been called", string[] args=null)
+        public async void WaitForCommand(string[] args=null)
         {
-            Aretha.Speak(message);
-
-            await WaitForCommand(args);
-
-            Aretha.Speak("Anubis dismissed. Do you want to summon Anubis again? (Y/N)");
-
-            var response=Aretha.Listen(true);
-
-            if (response == null) return;
-
-            if (response == "y")
+            try
             {
-                Summon("Anubis has returned");
-            }
-        }
+                List<string> cmdlets;
+                if (args == null || args.Length == 0)
+                {
+                    var cmd = Ask();
+                    if (cmd == null) return;
 
-        public static async Task WaitForCommand(string[] args)
-        {
-            List<string> cmdlets;
-            if (args == null || args.Length == 0)
-            {
-                var cmd = Listen();
-                if (cmd == null) return;
+                    cmdlets = new List<string>(cmd.Split(' '));
+                }
+                else
+                {
+                    cmdlets = new List<string>(args);
+                }
 
-                cmdlets = new List<string>(cmd.Split(' '));
-            }
-            else
-            {
-                cmdlets = new List<string>(args);
-            }
+                IJector jector;
 
-            IJector jector;
+                var type = GetJectorType(cmdlets[0]);
 
-            var type = GetJectorType(cmdlets[0]);
+                //make the jector:
+                var jectorBuilder = new JectorBuilder().WithType(type);
 
-            //make the jector:
-            var jectorBuilder = new JectorBuilder().WithType(type);
+                var response = Ask("Do you want to ensure a successful write? (Y/N)", true);
 
-            Speak("Do you want to ensure a successful write? (Y/N)");
-
-            var response = Listen(true);
-            if (response == null) return;
-
-            if (response=="y")
-            {
-                jectorBuilder.WithRequiredSuccess();
-            }
-
-            Speak("Do you want to use the default end of file marker? (Y/N)");
-            response = Listen(true);
-            if (response == null) return;
-
-            if (response == "n")
-            {
-                Speak("What end of file marker would you like to use?");
-                response = Listen();
                 if (response == null) return;
 
-                jectorBuilder.WithEOF(response);
-            }
+                if (response == "y")
+                {
+                    jectorBuilder.WithRequiredSuccess();
+                }
 
-            jector = jectorBuilder.Build();
+                response = Ask("Do you want to use the default end of file marker? (Y/N)", true);
+                if (response == null) return;
 
-            if (cmdlets[1].ToLower() == "inject")
-            {
-                try
+                if (response == "n")
+                {
+                    response = Ask("What end of file marker would you like to use?", false, true);
+                    if (response == null) return;
+
+                    jectorBuilder.WithEOF(response);
+                }
+
+                jector = jectorBuilder.Build();
+
+                if (cmdlets[1].ToLower() == "inject")
                 {
                     await Inject(jector);
+
                 }
-                catch(Exception ex)
-                {
-                    Aretha.SoulFailed(Soul.Anubis, ex);
-                    return;
-                    
-                }
-                
-            }
-            else if (cmdlets[1].ToLower() == "eject")
-            {
-                try
+                else if (cmdlets[1].ToLower() == "eject")
                 {
                     await Eject(jector);
                 }
-                catch(Exception ex)
-                {
-                    Aretha.SoulFailed(Soul.Anubis, ex);
-                    return;
-                }
             }
-            
+            catch(Exception ex)
+            {
+                Aretha.SoulFailed(Soul.Anubis, ex);
+                return;
+            }
         }
 
-        public static async Task Inject(IJector jector)
+        public async Task Inject(IJector jector)
         {
             var inputPath = GetPath("Provide path to file to be written into:", true);
             if (inputPath == null) return;
@@ -193,7 +164,7 @@ namespace Thismaker.Aretha
             Speak($"Command Executed Successfully!");
         }
 
-        public static async Task Eject(IJector jector)
+        public async Task Eject(IJector jector)
         {
             var inputPath = GetPath("Provide a path to file containing hidden data:", true);
 

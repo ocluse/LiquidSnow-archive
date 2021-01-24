@@ -9,9 +9,9 @@ namespace Thismaker.Aretha
     internal interface ISoul
     {
         Soul Soul { get;}
-        void Summon(string[] args);
+        void WaitForCommand(string[] args);
         void Speak(string text);
-        string Listen(string question, bool isYN);
+        string Ask(string question, bool isYN, bool isCase);
         string GetPath(string question, bool input, bool confirm);
     }
 }
