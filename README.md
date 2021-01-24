@@ -13,6 +13,8 @@ Perhaps my favourite, it is just basically Encryption. Enigma allows for fanatic
 ## 3. Goro
 A super interesting one, one that came about by my need of creating nice UIs that are standardized. Goro is the WPF developers pie, it supports themes(accent colors, darkmode/lightmode), contains custom controls and has several useful utilities, such as those that convert `Bitmaps` to `BitmapImages`, and so many more. It provides skinning and styles for several wpf controls, and provides basic colors to get you started. This can only be used, unfortunately, in a .NET WPF project, it's for designing so duh? Also also, Goro is 'Drawing' in my native language, if you ever wonder where the name came from.
 
+To see how you can use goro in your project, view the project's [Readme](https://github.com/thismaker/LiquidSnow/blob/main/Goro/Readme.md)
+
 ## 4. Mercury
 Just like the Roman god Mercury, this assembly is useful for those intending to send messages. It provides a Server-Client infrastructure that the dotnet developer can use to make his/her life very easy. This project is currently in cooldown mode as I focus on other projects in the framework. Expect a load of updates. It's usefulness is also limited, in part, by the existence of the greater Aba.
 
