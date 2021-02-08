@@ -1,139 +1,62 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using System.Windows.Data;
+using System.Windows.Markup;
+using System.Windows.Media;
 
 namespace Thismaker.Goro
 {
-    [ValueConversion(typeof(IconType), typeof(string))]
-    public class IconConverter : IValueConverter
+    class IconConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null) return null;
-            if (parameter != null)
+            if (parameter == null) return null;
+
+            if (parameter.GetType() == typeof(string))
             {
                 if ((string)parameter == "Status")
                 {
                     var status = (StatusInfo)value;
                     return status switch
                     {
-                        StatusInfo.Error => IconType.StatusCircleErrorX,
-                        StatusInfo.Information => IconType.StatusCircleInfo,
-                        StatusInfo.Success => IconType.StatusCircleCheckmark,
-                        StatusInfo.Warning => IconType.StatusCircleExclamation,
-                        _ => IconType.StatusCircleInfo
+                        StatusInfo.Error => Icon.Error,
+                        StatusInfo.Information => Icon.Info,
+                        StatusInfo.Success => Icon.Done,
+                        StatusInfo.Warning => Icon.Warning,
+                        _ => Icon.Info
                     };
+                }
+
+                //We don't know the request made here. Just return null
+                return null;
+            }
+
+            //Get the type of parameter we are dealing with:
+            if (parameter.GetType() == typeof(IconDesign))
+            {
+                var icon = (Icon)value;
+                var scheme = (IconDesign)parameter;
+
+                if (icon == Icon.None) return null;
+
+                //SchemeBasedIcon:
+                if (scheme == IconDesign.Segoe)
+                {
+                    return icon.ToSegoeCode();
+                }
+                else
+                {
+                    return IconManager.LoadIconAsBrush(icon, scheme);
                 }
             }
 
-            var icon = (IconType)value;
-
-            return icon switch
-            {
-                IconType.Add => "\uE710",
-                IconType.AreaChart => "\uE9D2",
-                IconType.Bluetooth => "\uE76D",
-                IconType.Calendar => "\uE787",
-                IconType.ChatBubbles => "\uE8F2",
-                IconType.ChromeClose => "\uE8BB",
-                IconType.Connect => "\uE76D",
-                IconType.ContactInfo => "\uE779",
-                IconType.ContactInfoMirrored => "\uEA4A",
-                IconType.Delete => "\uE74D",
-                IconType.Edit => "\uE70F",
-                IconType.FolderHorizontal => "\uF12B",
-                IconType.GlobalNavigationButton => "\uE700",
-                IconType.OpenFile => "\uE8E5",
-                IconType.Rename => "\uE8AC",
-                IconType.Setting => "\uE713",
-                IconType.Share => "\uE72D",
-                IconType.SignOut => "\uF3B1",
-                IconType.StatusCircleBlock => "\uF140",
-                IconType.StatusCircleBlock2 => "\uF141",
-                IconType.StatusCircleCheckmark => "\uF13E",
-                IconType.StatusCircleErrorX => "\uF13D",
-                IconType.StatusCircleExclamation => "\uF13C",
-                IconType.StatusCircleInfo => "\uF13F",
-                IconType.StatusCircleInner => "\uF137",
-                IconType.StatusCircleQuestionMark => "\uF142",
-                IconType.StatusCircleRing => "\uF138",
-                IconType.StatusTriangleExclamation => "\uF13B",
-                IconType.StatusTriangleInner => "\uF13A",
-                IconType.StatusTriangleOuter => "\uF139",
-                IconType.Wifi => "\uE76D",
-                IconType.Print => "\uE749",
-                IconType.Scan => "\uE8FE",
-                IconType.Comment => "\uE90A",
-                IconType.MultiSelect => "\uE762",
-                IconType.Send => "\uE724",
-                IconType.Italic => "\uE8DB",
-                IconType.Bold => "\uE8DD",
-                IconType.Underline => "\uE8DC",
-                IconType.AlignCenter => "\uE8E3",
-                IconType.AlignLeft => "\uE8E4",
-                IconType.AlignRight => "\uE8E2",
-                IconType.FontDecrease => "\uE8E7",
-                IconType.FontIncrease => "\uE8E8",
-                IconType.FontSize => "\uE8E9",
-                IconType.FontColor => "\uE8D3",
-                IconType.Font => "\uE8D2",
-                IconType.BulletedList => "\uE8FD",
-                IconType.Strikethrough => "\uEDE0",
-                IconType.Undo => "\uE7A7",
-                IconType.Redo => "\uE7A6",
-                IconType.Copy => "\uE8C8",
-                IconType.Paste => "\uE77F",
-                IconType.Cut => "\uE8C6",
-                
-                IconType.Battery0=> "\uE850",
-                IconType.Battery1 => "\uE851",
-                IconType.Battery2 => "\uE852",
-                IconType.Battery3 => "\uE853",
-                IconType.Battery4 => "\uE854",
-                IconType.Battery5 => "\uE855",
-                IconType.Battery6 => "\uE856",
-                IconType.Battery7 => "\uE857",
-                IconType.Battery8 => "\uE858",
-                IconType.Battery9 => "\uE859",
-                IconType.Battery10=> "\uE83F",
-                IconType.BatteryCharging0 => "\uE85A",
-                IconType.BatteryCharging1 => "\uE85B",
-                IconType.BatteryCharging2 => "\uE85C",
-                IconType.BatteryCharging3 => "\uE85D",
-                IconType.BatteryCharging4 => "\uE85E",
-                IconType.BatteryCharging5 => "\uE85F",
-                IconType.BatteryCharging6 => "\uE860",
-                IconType.BatteryCharging7 => "\uE861",
-                IconType.BatteryCharging8 => "\uE862",
-                IconType.BatteryCharging9 => "\uE83E",
-                IconType.BatteryCharging10 => "\uEA93",
-                IconType.BatteryUnknown=> "\uE996",
-                
-                IconType.BatteryVertical0 => "\uF5F2",
-                IconType.BatteryVertical1 => "\uF5F3",
-                IconType.BatteryVertical2 => "\uF5F4",
-                IconType.BatteryVertical3 => "\uF5F5",
-                IconType.BatteryVertical4 => "\uF5F6",
-                IconType.BatteryVertical5 => "\uF5F7",
-                IconType.BatteryVertical6 => "\uF5F8",
-                IconType.BatteryVertical7 => "\uF5F9",
-                IconType.BatteryVertical8 => "\uF5FA",
-                IconType.BatteryVertical9 => "\uF5FB",
-                IconType.BatteryVertical10 => "\uF5FC",
-                IconType.BatteryVerticalCharging0 => "\uF5FD",
-                IconType.BatteryVerticalCharging1 => "\uF5FE",
-                IconType.BatteryVerticalCharging2 => "\uF5FF",
-                IconType.BatteryVerticalCharging3 => "\uF600",
-                IconType.BatteryVerticalCharging4 => "\uF601",
-                IconType.BatteryVerticalCharging5 => "\uF602",
-                IconType.BatteryVerticalCharging6 => "\uF603",
-                IconType.BatteryVerticalCharging7 => "\uF604",
-                IconType.BatteryVerticalCharging8 => "\uF605",
-                IconType.BatteryVerticalCharging9 => "\uF606",
-                IconType.BatteryVerticalCharging10 => "\uF607",
-                IconType.BatteryVerticalUnknown => "\uF608",
-                _ => "\uE76D",
-            };
+            //Return null since we dont know what parameter we've been given:
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -141,110 +64,4 @@ namespace Thismaker.Goro
             throw new NotImplementedException();
         }
     }
-
-    public enum IconType
-    {
-        Add,
-        AreaChart,
-        Bluetooth,
-        Calendar,
-        ChatBubbles,
-        ChromeClose,
-        Connect,
-        ContactInfo,
-        ContactInfoMirrored,
-        Delete,
-        Edit,
-        FolderHorizontal,
-        GlobalNavigationButton,
-        OpenFile,
-        Rename,
-        Setting,
-        Share,
-        SignOut,
-        StatusCircleBlock,
-        StatusCircleBlock2,
-        StatusCircleCheckmark,
-        StatusCircleErrorX,
-        StatusCircleExclamation,
-        StatusCircleInfo,
-        StatusCircleInner,
-        StatusCircleQuestionMark,
-        StatusCircleRing,
-        StatusTriangleExclamation,
-        StatusTriangleInner,
-        StatusTriangleOuter,
-        Wifi,
-        Print,
-        Scan,
-        Comment,
-        MultiSelect,
-        Send,
-        Bold,
-        Italic,
-        Underline,
-        AlignRight,
-        AlignCenter,
-        AlignLeft,
-        FontDecrease,
-        FontIncrease,
-        FontSize,
-        Font,
-        FontColor,
-        BulletedList,
-        Strikethrough,
-        Undo,
-        Redo,
-        Copy,
-        Cut,
-        Paste,
-        Battery0,
-        Battery1,
-        Battery2,
-        Battery3,
-        Battery4,
-        Battery5,
-        Battery6,
-        Battery7,
-        Battery8,
-        Battery9,
-        Battery10,
-        BatteryCharging0,
-        BatteryCharging1,
-        BatteryCharging2,
-        BatteryCharging3,
-        BatteryCharging4,
-        BatteryCharging5,
-        BatteryCharging6,
-        BatteryCharging7,
-        BatteryCharging8,
-        BatteryCharging9,
-        BatteryCharging10,
-        BatteryUnknown,
-        BatteryVertical0,
-        BatteryVertical1,
-        BatteryVertical2,
-        BatteryVertical3,
-        BatteryVertical4,
-        BatteryVertical5,
-        BatteryVertical6,
-        BatteryVertical7,
-        BatteryVertical8,
-        BatteryVertical9,
-        BatteryVertical10,
-        BatteryVerticalCharging0,
-        BatteryVerticalCharging1,
-        BatteryVerticalCharging2,
-        BatteryVerticalCharging3,
-        BatteryVerticalCharging4,
-        BatteryVerticalCharging5,
-        BatteryVerticalCharging6,
-        BatteryVerticalCharging7,
-        BatteryVerticalCharging8,
-        BatteryVerticalCharging9,
-        BatteryVerticalCharging10,
-        BatteryVerticalUnknown,
-
-    }
 }
-

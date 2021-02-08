@@ -1,0 +1,12 @@
+﻿<DrawingGroup xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <DrawingGroup x:Name="DrawingLayer">
+    <DrawingGroup.ClipGeometry>
+      <RectangleGeometry Rect="0,0,24,24" />
+    </DrawingGroup.ClipGeometry>
+    <GeometryDrawing Brush="#FFFFFFFF">
+      <GeometryDrawing.Geometry>
+        <PathGeometry FillRule="Nonzero" Figures="M18.99,5C18.99,3.9,18.1,3,17,3L10,3 7.66,5.34 19,16.68 18.99,5z M3.65,3.88L2.38,5.15 5,7.77 5,19C5,20.1,5.9,21,7,21L17.01,21C17.36,21,17.68,20.9,17.97,20.74L19.85,22.62 21.12,21.35 3.65,3.88z" />
+      </GeometryDrawing.Geometry>
+    </GeometryDrawing>
+  </DrawingGroup>
+</DrawingGroup>

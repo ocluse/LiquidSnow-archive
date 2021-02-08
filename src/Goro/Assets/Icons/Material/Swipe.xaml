@@ -1,0 +1,21 @@
+﻿<DrawingGroup xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <DrawingGroup x:Name="DrawingLayer">
+    <DrawingGroup.ClipGeometry>
+      <RectangleGeometry Rect="0,0,24,24" />
+    </DrawingGroup.ClipGeometry>
+    <DrawingGroup>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#FFFFFFFF">
+          <GeometryDrawing.Geometry>
+            <PathGeometry FillRule="Nonzero" Figures="M18.89,14.75L14.8,12.71C14.52,12.57,14.22,12.5,13.91,12.5L13,12.5 13,6.5C13,5.67 12.33,5 11.5,5 10.67,5 10,5.67 10,6.5L10,17.24 6.75,16.5C6.42,16.43,6.07,16.53,5.83,16.78L5,17.62 9.54,22.41C9.92,22.79,10.68,23,11.21,23L17.37,23C18.37,23,19.21,22.27,19.35,21.28L19.98,16.82C20.1,15.97,19.66,15.14,18.89,14.75z" />
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+        <GeometryDrawing Brush="#FFFFFFFF">
+          <GeometryDrawing.Geometry>
+            <PathGeometry FillRule="Nonzero" Figures="M20.13,3.87C18.69,2.17 15.6,1 12,1 8.4,1 5.31,2.17 3.87,3.87L2,2 2,7 7,7 4.93,4.93C5.93,3.64 8.63,2.5 12,2.5 15.37,2.5 18.07,3.64 19.07,4.93L17,7 22,7 22,2 20.13,3.87z" />
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingGroup>
+  </DrawingGroup>
+</DrawingGroup>

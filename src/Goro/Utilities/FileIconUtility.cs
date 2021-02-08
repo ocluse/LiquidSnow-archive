@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-
+using SIcon = System.Drawing.Icon;
 namespace Thismaker.Goro.Utilities
 {
     public static class FileIconUtility
@@ -38,7 +38,7 @@ namespace Thismaker.Goro.Utilities
         /// <summary>
         /// http://stackoverflow.com/a/6580799/1943849
         /// </summary>     
-        static ImageSource ToImageSource(this Icon icon)
+        static ImageSource ToImageSource(this SIcon icon)
         {
             var imageSource = Imaging.CreateBitmapSourceFromHIcon(
                 icon.Handle,
@@ -75,7 +75,7 @@ namespace Thismaker.Goro.Utilities
             /// <param name="size">Large or small</param>
             /// <param name="linkOverlay">Whether to include the link icon</param>
             /// <returns>System.Drawing.Icon</returns>
-            public static Icon GetFileIcon(string name, IconSize size, bool linkOverlay)
+            public static SIcon GetFileIcon(string name, IconSize size, bool linkOverlay)
             {
                 var shfi = new Shell32.Shfileinfo();
                 var flags = Shell32.ShgfiIcon | Shell32.ShgfiUsefileattributes;
@@ -91,7 +91,7 @@ namespace Thismaker.Goro.Utilities
                     (uint)Marshal.SizeOf(shfi),
                     flags);
                 // Copy (clone) the returned icon to a new object, thus allowing us to clean-up properly
-                var icon = (Icon)Icon.FromHandle(shfi.hIcon).Clone();
+                var icon = (SIcon)SIcon.FromHandle(shfi.hIcon).Clone();
                 User32.DestroyIcon(shfi.hIcon);     // Cleanup
                 return icon;
             }

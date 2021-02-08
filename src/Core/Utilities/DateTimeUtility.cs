@@ -7,6 +7,12 @@ namespace Thismaker.Core.Utilities
 {
     public static class DateTimeUtility
     {
+        /// <summary>
+        /// Returns the first date of a week in a year.
+        /// </summary>
+        /// <param name="year">The year whose date we need</param>
+        /// <param name="weekOfYear">The week itself, such as week 13</param>
+        /// <returns></returns>
         public static DateTime FirstDateOfWeek(int year, int weekOfYear)
         {
             DateTime jan1 = new DateTime(year, 1, 1);

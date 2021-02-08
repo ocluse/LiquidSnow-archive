@@ -6,6 +6,10 @@ using System.Text;
 
 namespace Thismaker.Core.Utils
 {
+    /// <summary>
+    /// A see <see cref="Stack{T}"/> that raises events when changed. Useful for binding and stuff
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ObservableStack<T> : Stack<T>, INotifyPropertyChanged, INotifyCollectionChanged
     {
         public ObservableStack(int capacity) : base(capacity) { }

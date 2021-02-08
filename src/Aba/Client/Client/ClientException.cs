@@ -12,6 +12,11 @@ namespace Thismaker.Aba.Client
         {
             Kind = kind;
         }
+
+        public ClientException(string msg, ExceptionKind kind, Exception innerException):base(msg, innerException) 
+        {
+            Kind = kind;
+        }
     }
 
     public enum ExceptionKind

@@ -1,0 +1,40 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Thismaker.Goro"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    
+    <FontFamily x:Key="Password">#Password</FontFamily>
+    <Thickness x:Key="HeaderMargin" Left="0" Top="0" Right="0" Bottom="8"/>
+    <!--#region Image Resources-->
+    <BitmapImage x:Key="DefaultDP" UriSource="/Assets/defaultprofile.png"/>
+    <!--#endregion-->
+
+    <!--#region  Colors-->
+    <LinearGradientBrush x:Key="AccentGradient">
+        <GradientStop Color="#39B54A" Offset="0"/>
+        <GradientStop Color="#299979" Offset="1"/>
+    </LinearGradientBrush>
+
+    <local:BitmapConverter x:Key="bitmapConverter"/>
+    <local:DateTimeConverter x:Key="dateTimeConverter"/>
+    <SolidColorBrush x:Key="Accent" Color="#39B54A"/>
+    <SolidColorBrush x:Key="AccentLight" Color="#9CE5A3"/>
+    <SolidColorBrush x:Key="AccentDark" Color="#1C5421"/>
+    <SolidColorBrush x:Key="AccentLightDynamic" Color="#9CE5A3"/>
+    <SolidColorBrush x:Key="AccentDarkDynamic" Color="#1C5421"/>
+    <SolidColorBrush x:Key="AccentTransparent" Color="#39B54A" Opacity="0.4"/>
+    <SolidColorBrush x:Key="AccentDisabled" Color="#4D4D4D"/>
+
+    <SolidColorBrush x:Key="PanelForeground" Color="#1A1A1A"/>
+    <SolidColorBrush x:Key="PanelGray" Color="#4D4D4D"/>
+    <SolidColorBrush x:Key="PanelGrayDark" Color="#FF3F3F3F"/>
+    <SolidColorBrush x:Key="PanelBackground" Color="White"/>
+    <SolidColorBrush x:Key="PanelSecondary" Color="#999999"/>
+    <SolidColorBrush x:Key="PanelPositive" Color="#41B568"/>
+    <SolidColorBrush x:Key="PanelNegative" Color="#D82B72"/>
+    <SolidColorBrush x:Key="PanelHighlight" Color="#666666" Opacity="0.4"/>
+    <sys:Double x:Key="InactiveOpacity">0.4</sys:Double>
+    <CornerRadius x:Key="CornerRadius">4</CornerRadius>
+    
+    <!--#endregion-->
+</ResourceDictionary>

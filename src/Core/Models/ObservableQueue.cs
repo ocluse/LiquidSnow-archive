@@ -6,6 +6,10 @@ using System.Text;
 
 namespace Thismaker.Core.Utils
 {
+    /// <summary>
+    /// A <see cref="Queue{T}"/> that raises events whenenevr it changes. Useful for binding scenarios
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ObservableQueue<T>:Queue<T>,INotifyPropertyChanged,INotifyCollectionChanged
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;

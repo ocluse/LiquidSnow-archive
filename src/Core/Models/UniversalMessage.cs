@@ -5,6 +5,11 @@ using System.Text;
 
 namespace Thismaker.Core.Models
 {
+    /// <summary>
+    /// A template that can be used for univeral messages.
+    /// I thought I'd just throw this there, it may be useful, you never know.
+    /// It is Binding ready, and notifies whenever there are changes.
+    /// </summary>
     public class UniversalMessage : BindableBase
     {
 

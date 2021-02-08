@@ -21,12 +21,20 @@ namespace Thismaker.Goro
         }
 
         public static readonly DependencyProperty IconProperty
-            = DependencyProperty.Register("Icon", typeof(IconType), typeof(CheckboxIcon), new PropertyMetadata(IconType.GlobalNavigationButton));
+            = DependencyProperty.Register(nameof(Icon), typeof(Icon), typeof(CheckboxIcon), new PropertyMetadata(Icon.None));
+        public static readonly DependencyProperty DesignProperty
+            = DependencyProperty.Register(nameof(Design), typeof(IconDesign), typeof(CheckboxIcon), new PropertyMetadata(IconDesign.Segoe));
 
-        public IconType Icon
+        public Icon Icon
         {
-            get { return (IconType)GetValue(IconProperty); }
+            get { return (Icon)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
+        }
+
+        public IconDesign Design
+        {
+            get { return (IconDesign)GetValue(DesignProperty); }
+            set { SetValue(DesignProperty, value); }
         }
     }
 }

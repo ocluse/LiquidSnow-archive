@@ -19,29 +19,6 @@ namespace Thismaker.Aba.Client
         }
 
         /// <summary>
-        /// Configures the app using the provided Configuration, calling <see cref="MsalClient{T}.MakeApp"/> once done.
-        /// Use this to quickly assign values to the msal client. The configuration section must be named "AbaClient"
-        /// </summary>
-        public static void Configure<T>(this MsalClient<T> client, IConfiguration config) where T : MsalClient<T>
-        {
-            config.Bind("AbaClient", client);
-
-            var abaSection = config.GetSection("AbaClient");
-
-            //Api Scopes
-            client.ApiScopes = new List<string>();
-
-            var scopes = abaSection.GetSection("Scopes").GetChildren();
-
-            foreach (var scope in scopes)
-            {
-                client.ApiScopes.Add(scope.Value);
-            }
-
-            client.MakeApp();
-        }
-
-        /// <summary>
         /// Configures the app using the provided Configuration, calling <see cref="ClientBase{T}.MakeApp"/> once done.
         /// Use this to quickly assign values to the msal client. The configuration section must be named "AbaClient"
         /// </summary>

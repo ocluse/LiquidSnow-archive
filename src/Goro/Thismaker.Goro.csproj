@@ -15,7 +15,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Core\Thismaker.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Assets\defaultprofile.png" />
+    <EmbeddedResource Include="Assets\Icons\Material\*.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\Icons\Material\" />
+    <Folder Include="Assets\Icons\Aretha\" />
   </ItemGroup>
 
 </Project>

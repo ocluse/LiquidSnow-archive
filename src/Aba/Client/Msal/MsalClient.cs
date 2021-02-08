@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Thismaker.Aba.Client
+namespace Thismaker.Aba.Client.Msal
 {
     /// <summary>
     /// A base class that inherits from <see cref="ClientBase"/>.
@@ -12,6 +12,10 @@ namespace Thismaker.Aba.Client
     public abstract class MsalClient<T>:ClientBase<T> where T:MsalClient<T>
     {
         #region Properties
+
+        ///<inheritdoc/>
+        public new IMsalContext Context { get; set; }
+
         /// <summary>
         /// The identifier of the client, Provided in the Azure Portal.
         /// </summary>

@@ -17,7 +17,7 @@ namespace Thismaker.Aba.Client
         private AccessToken accessToken;
 
         #region Properties
-        public IContext Context { get; set; }
+        public virtual IContext Context { get; set; }
 
         public static T Instance { get; private set; }
 
@@ -29,7 +29,7 @@ namespace Thismaker.Aba.Client
         /// <summary>
         /// Represents the base url address to the server api endpoint e.g www.liquidsnow.com
         /// </summary>
-        public string BaseAddress { get; protected set; }
+        public string BaseAddress { get; set; }
 
         /// <summary>
         /// The default address where the Api calls will be made. 
@@ -346,6 +346,7 @@ namespace Thismaker.Aba.Client
             HubConnection.On(name, action);
         }
 
+        [Obsolete("Still under construction", true)]
         public async Task<Result> CallHubAsync<Result>(string methodName)
         {
             var tcs = new TaskCompletionSource<Result>();
@@ -359,7 +360,8 @@ namespace Thismaker.Aba.Client
             return await tcs.Task;
         }
 
-        public async Task<Result> CallHubAsync<Result>(IPackage package, [CallerMemberName] string methodName = null)
+        [Obsolete("Still under construction", true)]
+        public async Task<Result> CallHubAsync<Result, TPack>(IAbaPackage<TPack> package, [CallerMemberName] string methodName = null)
         {
             var tcs = new TaskCompletionSource<Result>();
             HubConnection.On<Result>(methodName, result =>

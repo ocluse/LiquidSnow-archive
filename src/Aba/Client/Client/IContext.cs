@@ -15,12 +15,6 @@ namespace Thismaker.Aba.Client
         void Start();
 
         /// <summary>
-        /// A handle to get the MainWindow of the class
-        /// </summary>
-        /// <returns></returns>
-        object GetMainWindow();
-
-        /// <summary>
         /// Called by the derived class so that any leftover cleanup can be made in the impelemnting class
         /// </summary>
         void Shutdown();

@@ -65,7 +65,7 @@ namespace Thismaker.Aba.Server.Authentication
                 var principal = tokenHander.ValidateToken(token, validationParameters, out _);
                 return principal;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

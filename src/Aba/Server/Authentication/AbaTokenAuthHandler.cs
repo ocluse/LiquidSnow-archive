@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
@@ -17,6 +18,32 @@ namespace Thismaker.Aba.Server.Authentication
 
     public class AbaTokenAuthHandler : AuthenticationHandler<AbaTokenOptions>
     {
+
+        private static List<string> hubPatterns;
+
+        public static void AddHubPattern(string pattern)
+        {
+            if(hubPatterns==null) hubPatterns = new List<string>();
+            hubPatterns.Add(pattern);
+        }
+
+        public static void RemoveHubPattern(string pattern)
+        {
+            if (hubPatterns == null) return;
+            hubPatterns.Remove(pattern);
+        }
+
+        private static bool ContainsHubPattern(PathString path)
+        {
+            if (hubPatterns == null) return false;
+
+            foreach(var pattern in hubPatterns)
+            {
+                if (path.StartsWithSegments(pattern)) return true;
+            }
+            return false;
+        }
+
         private readonly AbaTokenManager _manager;
         private List<string> _requiredClaims;
         private readonly IAbaTokenKeeper _keeper;
@@ -40,7 +67,7 @@ namespace Thismaker.Aba.Server.Authentication
             bool isHub = false;
             var accessToken = Context.Request.Query["access_token"];
             var path = Context.Request.Path;
-            if(!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/ScopedHub")))
+            if(!string.IsNullOrEmpty(accessToken) && (ContainsHubPattern(path)))
             {
                 token = accessToken;
                 isHub = true;
