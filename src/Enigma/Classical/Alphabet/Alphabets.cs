@@ -47,7 +47,7 @@ namespace Thismaker.Enigma.Classical
             AlphaNumeric.AutoDimensions();
             ASCII.AutoDimensions();
             ASCIIPerfect.AutoDimensions();
-            
+            CodePage437.AutoDimensions();
         }
 
         private static void CreateASCII()

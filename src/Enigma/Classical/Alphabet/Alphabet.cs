@@ -65,6 +65,11 @@ namespace Thismaker.Enigma.Classical
 
         #region LogicMethods
 
+        public void Shuffle()
+        {
+            items.Shuffle();
+        }
+
         public void AutoDimensions()
         {
             //Prioritize Sqrt:
@@ -110,6 +115,10 @@ namespace Thismaker.Enigma.Classical
         {
             var index = IndexOf(item);
 
+            if (index == -1)
+            {
+                throw new NullReferenceException("Not found in alphabet");
+            }
             var x = index % Dimensions.X;
             var y = index / Dimensions.X;
 

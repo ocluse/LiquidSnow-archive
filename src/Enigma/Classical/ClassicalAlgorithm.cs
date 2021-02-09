@@ -7,7 +7,7 @@ namespace Thismaker.Enigma.Classical
 {
     public abstract class ClassicalAlgorithm : DictionaryAttackerBase
     {
-		public Alphabet Alphabet { get; set; }
+		public virtual Alphabet Alphabet { get; set; }
 
 		public virtual string Key { get; set; }
 
@@ -35,13 +35,13 @@ namespace Thismaker.Enigma.Classical
         {
 			var storedKey = Key;
 			var result = new List<AttackPossibility>();
-			try
+            try
             {
 				if (!dictLoaded) throw new InvalidOperationException("Dictionary not loaded");
 
 				input = input.Prepare();
 
-				
+
 				foreach (var key in KeyDictionary)
 				{
 					Key = key;
@@ -56,7 +56,7 @@ namespace Thismaker.Enigma.Classical
             catch
             {
 				throw;
-            }
+			}
             finally
             {
 				Key = storedKey;

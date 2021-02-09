@@ -13,11 +13,10 @@ namespace Test.Enigma.NetCore
 
             var plain = Console.ReadLine();
 
-            var ceasar = new Playfair()
-            {
-                Key = key,
-                Alphabet = Alphabets.ASCIIPerfect
-            };
+            var ceasar = StandardEnigmaMachines.A133;
+            ceasar.Key = key;
+            ceasar.AutoReset = true;
+            ceasar.ResetRotors();
 
             var vig = new Vigenere()
             {
