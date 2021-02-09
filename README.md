@@ -1,3 +1,6 @@
+# :heavy_exclamation_mark: __Warning__
+The framework is currently under migratory construction. Most of the details written here might not work, and some functions may not work as intended. Please only use it in an experimental environment until  create a release, which should be very soon.
+
 # LiquidSnow
 The LiquidSnow is a collection of .NET assemblies that you can use to make your .NET development work easy. Although it's still in development and is highly unstable, it is super conveneint for various tasks that trouble the .NET developer even in it's current state. Below is a preview of what each of the assemblies do:
 
