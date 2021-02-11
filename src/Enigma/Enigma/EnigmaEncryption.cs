@@ -48,7 +48,7 @@ namespace Thismaker.Enigma
         }
 
         /// <summary>
-        /// Encrypts byte data using the specified algrithm and configuration
+        /// Encrypts byte data using the specified algorithm and configuration
         /// </summary>
         /// <typeparam name="TAlg">A <see cref="SymmetricAlgorithm"/> that will be used in the Encryption Process</typeparam>
         /// <param name="input">The data to be encrypted</param>

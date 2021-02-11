@@ -5,11 +5,21 @@ using System.Text;
 
 namespace Thismaker.Enigma.Classical
 {
+	/// <summary>
+	/// The playfair is a form of subsitution cipher that normally uses a grid to gauge its subsitution.
+	/// It would normally require a 5x5 grid, but my implementation allows for any grid size.
+	/// </summary>
     public class Playfair : ClassicalAlgorithm
     {
+		/// <summary>
+		/// Normally, conficts may arise where the diagraphs are the same e.g CC. In such a case, 
+		/// this setting allows the user to decide whether to treat the collisions as having occurred
+		/// in the same row(horizontal), or same column(vertical)
+		/// </summary>
 		public PrefferredOrientation PrefferredOrientation { get; set; }
 		= PrefferredOrientation.Horizontal;
 
+		///<inheritdoc/>
 		public override string Run(string input, bool forward)
         {
             var keytable = new Alphabet(Alphabet.ToString())
@@ -78,7 +88,14 @@ namespace Thismaker.Enigma.Classical
 
 	public enum PrefferredOrientation
 	{
+		/// <summary>
+		/// Conficts will be treated as if they occurred in the same row.
+		/// </summary>
 		Horizontal,
+
+		/// <summary>
+		/// Conflicts will be treated as if they occurred in the same column
+		/// </summary>
 		Vertical
 	}
 }

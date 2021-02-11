@@ -65,6 +65,11 @@ namespace Thismaker.Enigma.Classical
 
         #region LogicMethods
 
+        public void Rotate(int offset)
+        {
+            items.Rotate(offset);
+        }
+
         public void Shuffle()
         {
             items.Shuffle();
@@ -167,23 +172,14 @@ namespace Thismaker.Enigma.Classical
 
             if (index == -1) throw new InvalidOperationException("Character not found in alphabet");
 
-            index += steps;
-            while (index >= Count)
-            {
-                index -= Count;
-            }
-            while (index < 0)
-            {
-                index += Count;
-            }
+            index = (index + steps) % Count;
 
             return this[index];
         }
 
         public void Move(char item, int newIndex)
         {
-            RemoveAt(IndexOf(item));
-            Insert(newIndex, item);
+            items.Move(item, newIndex);
         }
 
         #endregion
@@ -206,11 +202,8 @@ namespace Thismaker.Enigma.Classical
 
         public void Limit(int max_x, int max_y)
         {
-            while (X >= max_x) X -= max_x;
-            while (Y >= max_y) Y -= max_y;
-
-            while (X < 0) X -= max_x;
-            while (Y < 0) Y -= max_y;
+            X %= max_x;
+            Y %= max_y;
         }
 
         public bool Equals(Dimensions other)

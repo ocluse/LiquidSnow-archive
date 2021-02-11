@@ -192,6 +192,8 @@ namespace System.Collections.ObjectModel
                     collection.Move(oldIndex, newIndex);
             }
         }
+
+       
     }
 }
 
@@ -200,6 +202,36 @@ namespace System.Collections.Generic
 
     public static class GenericCollectionsExtensions
     {
+        public static void Move<T>(this List<T> list, int oldIndex, int newIndex)
+        {
+            var item = list[oldIndex];
+
+            list.RemoveAt(oldIndex);
+
+            if (newIndex > oldIndex) newIndex--;
+            // the actual index could have shifted due to the removal
+
+            list.Insert(newIndex, item);
+        }
+
+        public static void Move<T>(this List<T> list, T item, int newIndex)
+        {
+            if (item != null)
+            {
+                var oldIndex = list.IndexOf(item);
+                if (oldIndex > -1)
+                {
+                    list.RemoveAt(oldIndex);
+
+                    if (newIndex > oldIndex) newIndex--;
+                    // the actual index could have shifted due to the removal
+
+                    list.Insert(newIndex, item);
+                }
+            }
+
+        }
+
         public static IEnumerable<T[]> SearchPattern<T>(this IEnumerable<T> seq, params Func<T[], T, bool>[] matches)
         {
             Contract.Requires(seq != null);
@@ -241,6 +273,46 @@ namespace System.Collections.Generic
                 ts[r] = tmp;
             }
         }
+
+        /// <summary>
+        /// Rotates the items on a list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static List<T> Rotate<T>(this List<T> list, int offset)
+        {
+            if (offset >= 0)
+            {
+                for (; offset > 0; offset--)
+                {
+                    T first = list[0];
+                    list.RemoveAt(0);
+                    list.Add(first);
+                }
+
+            }
+            else
+            {
+                for (; offset <= 0; offset++)
+                {
+                    var index = list.Count - 1;
+                    T last = list[index];
+                    list.RemoveAt(index);
+                    list.Insert(0, last);
+                }
+            }
+
+            return list;
+            
+        }
+
+        public static List<T> RotateLinquish<T>(this List<T> list, int offset)
+        {
+            return list.Skip(offset).Concat(list.Take(offset)).ToList();
+        }
+
     }
 }
 

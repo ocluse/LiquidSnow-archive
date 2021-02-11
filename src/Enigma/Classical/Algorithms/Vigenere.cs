@@ -4,8 +4,13 @@ using System.Text;
 
 namespace Thismaker.Enigma.Classical
 {
+	/// <summary>
+	/// A superior form of subsitution cipher. 
+	/// Similar to the ceasar cipher only that the offset for each character is individualised.
+	/// </summary>
     public class Vigenere : ClassicalAlgorithm
     {
+		///<inheritdoc/>
 		public override string Run(string input, bool forward)
         {
 			var output = new StringBuilder();

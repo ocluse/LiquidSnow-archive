@@ -37,7 +37,7 @@ namespace Thismaker.Enigma.Classical
 
         public void Add(char item)
         {
-            if (items.Contains(item)) return;
+            if (Contains(item)) return;
             items.Add(item);
         }
 

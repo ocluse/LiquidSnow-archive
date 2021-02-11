@@ -7,29 +7,44 @@ namespace Test.Enigma.NetCore
     {
         static void Main(string[] args)
         {
+            var enigma = StandardEnigmaMachines.RandomASCII;
+
             Console.WriteLine("Enter a Key:");
             var key = Console.ReadLine();
             Console.WriteLine("Enter a PlainText");
 
             var plain = Console.ReadLine();
 
-            var ceasar = StandardEnigmaMachines.A133;
-            ceasar.Key = key;
-            ceasar.AutoReset = true;
-            ceasar.ResetRotors();
+            //var ceasar = new EnigmaMachine
+            //{
+            //    Key = key,
+            //    Alphabet = new Alphabet("ABCD"),
+            //    DoubleStep = false,
+            //    Reflector = new EMWheel("CDAB"),
+            //    Stator = new EMWheel("ABCD"),
+            //    Rotors = new System.Collections.Generic.List<Rotor>
+            //    {
+            //        new Rotor("CBDA", 'D'),
+            //        new Rotor("DACB", 'D'),
+            //        new Rotor("CABD", 'D')
+            //    },
+            //    AutoReset=true
+            //};
 
-            var vig = new Vigenere()
-            {
-                Key = key,
-                Alphabet = Alphabets.ASCII
-            };
+            
 
-            var outVig = vig.Encrypt(plain);
-            var outCs = ceasar.Encrypt(plain);
+            enigma.Key = key;
+            enigma.AutoReset = true;
+            enigma.ResetRotors();
 
-            Console.WriteLine($"Ceasar Cipher: {outCs}\nVigenere Cipher: {outVig}");
+            
+            var output = enigma.Encrypt(plain);
 
-            Console.WriteLine($"Ceasar Decipher: {ceasar.Decrypt(outCs)}\nVigenere Decipher: {vig.Decrypt(outVig)}");
+            Console.WriteLine($"Cipher: {output}");
+
+            Console.WriteLine($"Decipher: {enigma.Decrypt(output)}");
+
+            Main(args);
         }
     }
 }

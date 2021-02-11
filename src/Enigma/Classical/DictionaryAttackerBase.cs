@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Thismaker.Enigma.Classical
 {
@@ -9,17 +11,20 @@ namespace Thismaker.Enigma.Classical
     {
 		protected bool dictLoaded = false;
 
-		public int MatchLength { get; set; } = 3;
+        #region Properties
+        public int MatchLength { get; set; } = 3;
 		public List<string> KeyDictionary { get; set; }
 		public List<string> LanguageDictionary { get; set; }
+        #endregion
 
-		/// <summary>
-		/// Loads a dictionary to be used for attack.
-		/// </summary>
-		/// <param name="path">The path to the file containing the words.
-		/// This should be a text file with each line containing a single word</param>
-		/// <param name="type">The type of dictionary. See DictionaryType for more info</param>
-		public void LoadDictionary(string path, DictionaryType type)
+        #region Dictionary Methods
+        /// <summary>
+        /// Loads a dictionary to be used for attack.
+        /// </summary>
+        /// <param name="path">The path to the file containing the words.
+        /// This should be a text file with each line containing a single word</param>
+        /// <param name="type">The type of dictionary. See DictionaryType for more info</param>
+        public void LoadDictionary(string path, DictionaryType type)
 		{
 			using var msLoad = new MemoryStream(File.ReadAllBytes(path));
 			LoadDictionary(msLoad, type);
@@ -83,5 +88,26 @@ namespace Thismaker.Enigma.Classical
 			}
 			return false;
 		}
-	}
+        #endregion
+
+        #region Abstract Methods
+
+        /// <summary>
+        /// When overriden in a derived class, perfroms a dictionary attack on the specified input.
+        /// </summary>
+        /// <param name="input">The input to attack</param>
+        /// <returns>A list of all possible attacks</returns>
+        public abstract List<AttackPossibility> Hack(string input);
+
+		/// <summary>
+		/// When overriden in a derived class, async attack that is useful where the dictionary is large
+		/// </summary>
+		/// <param name="input">The input to attack, i.e ciphertext</param>
+		/// <param name="cancellationToken">The cancellation token that will request cancellation of the attack</param>
+		/// <param name="progress">If provided, reports on the overall progress of the process</param>
+		/// <returns>A list of all possible attacks </returns>
+		public abstract Task<List<AttackPossibility>> HackAsync(string input, CancellationToken cancellationToken = default, IProgress<float> progress = null);
+
+        #endregion
+    }
 }
