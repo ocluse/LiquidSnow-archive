@@ -8,6 +8,7 @@ namespace Thismaker.Aretha
     static class Aretha
     {
         static TaskCompletionSource tcsSummon;
+        
         static async Task Main(string[] args)
         {
             await Prepare(args);

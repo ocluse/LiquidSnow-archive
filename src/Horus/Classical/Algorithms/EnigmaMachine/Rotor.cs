@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
-    public class Rotor : EMWheel
+    public class Rotor : EnigmaWheel
     {
         #region Constructors
         /// <summary>

@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using Media = System.Windows.Media;
 using System.Linq;
 using Thismaker.Goro.Controls;
+using System.IO;
 
 namespace Thismaker.Goro
 {
@@ -35,5 +36,31 @@ namespace Thismaker.Goro
 
         public static readonly DependencyProperty DesignProperty =
             DependencyProperty.Register(nameof(Design), typeof(IconDesign), typeof(DocumentEditor));
+
+        public void Save(Stream stream)
+        {
+            try
+            {
+                var range = new TextRange(Doc.Document.ContentStart, Doc.Document.ContentEnd);
+                range.Save(stream, DataFormats.Rtf);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public void Load(Stream stream)
+        {
+            try
+            {
+                var range = new TextRange(Doc.Document.ContentStart, Doc.Document.ContentEnd);
+                range.Load(stream, DataFormats.Rtf);
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

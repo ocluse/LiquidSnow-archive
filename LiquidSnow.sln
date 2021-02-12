@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Core", "src\Core\Thismaker.Core.csproj", "{AA55CE09-1259-4825-9954-87F2F837A9EB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Enigma", "src\Enigma\Thismaker.Enigma.csproj", "{A69B5263-7B37-4DFD-AE7F-0CA53E4A3E7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Horus", "src\Horus\Thismaker.Horus.csproj", "{A69B5263-7B37-4DFD-AE7F-0CA53E4A3E7C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Lansique", "src\Lansique\Thismaker.Lansique.csproj", "{984E9C0E-9AB9-4E37-8175-1CFECA4FCD59}"
 EndProject

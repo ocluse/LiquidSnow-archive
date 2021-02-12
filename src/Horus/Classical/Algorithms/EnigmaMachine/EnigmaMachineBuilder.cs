@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
     /// <summary>
     /// A builder for <see cref="EnigmaMachine"/>
@@ -15,8 +15,8 @@ namespace Thismaker.Enigma.Classical
         private Alphabet _alphabet = Alphabets.ASCII;
         private IEnumerable<Rotor> _rotors;
         private bool  _autoReset=false;
-        private EMWheel _stator;
-        private EMWheel _reflector;
+        private EnigmaWheel _stator;
+        private EnigmaWheel _reflector;
         
         /// <summary>
         /// If provided, the rotors will be created with the specified notches.
@@ -60,7 +60,7 @@ namespace Thismaker.Enigma.Classical
         /// </summary>
         /// <param name="stator"></param>
         /// <returns></returns>
-        public EnigmaMachineBuilder WithStator(EMWheel stator)
+        public EnigmaMachineBuilder WithStator(EnigmaWheel stator)
         {
             _stator = stator;
             return this;
@@ -72,7 +72,7 @@ namespace Thismaker.Enigma.Classical
         /// </summary>
         /// <param name="reflector"></param>
         /// <returns></returns>
-        public EnigmaMachineBuilder WithReflector(EMWheel reflector)
+        public EnigmaMachineBuilder WithReflector(EnigmaWheel reflector)
         {
             _reflector = reflector;
             return this;
@@ -114,14 +114,14 @@ namespace Thismaker.Enigma.Classical
 
             //the stator:
             var stator = _stator;
-            if(stator==null)stator= new EMWheel(_alphabet.ToString(), _alphabet.ToString());
+            if(stator==null)stator= new EnigmaWheel(_alphabet.ToString(), _alphabet.ToString());
 
             //the reflector
             var reflector = _reflector;
             if (reflector == null)
             {
                 shuffle.Shuffle();
-                reflector = new EMWheel(_alphabet.ToString(), shuffle.ToString());
+                reflector = new EnigmaWheel(_alphabet.ToString(), shuffle.ToString());
                 reflector.Reflect();
             }
 
@@ -139,7 +139,7 @@ namespace Thismaker.Enigma.Classical
                         char c;
                         do
                         {
-                            int rnd = Enigma.Random(0, _alphabet.Count);
+                            int rnd = Horus.Random(0, _alphabet.Count);
                             c = _alphabet[rnd];
                         } while (notches.Contains(c));
 

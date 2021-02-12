@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
     public abstract class DictionaryAttackerBase
     {
@@ -47,7 +47,7 @@ namespace Thismaker.Enigma.Classical
 				var str = strReader.ReadLine();
 				if (str == null) break;
 
-				str = str.Prepare();
+				str = str.CapitalizeAndCompress();
 
 				if (type == DictionaryType.Key || type == DictionaryType.Combined)
 				{

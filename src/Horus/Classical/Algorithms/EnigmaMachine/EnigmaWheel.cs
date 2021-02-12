@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
     /// <summary>
     /// Represents one of the parts of an Enigma Machine that has scrambled input and output
     /// </summary>
-    public class EMWheel : ICloneable
+    public class EnigmaWheel : ICloneable
     {
         /// <summary>
         /// In a real enigma machine, this was used to index pins of the wheel, e.g. ABCDE
@@ -21,14 +21,14 @@ namespace Thismaker.Enigma.Classical
         /// <summary>
         /// Creates a new wheel with everything null
         /// </summary>
-        public EMWheel() { }
+        public EnigmaWheel() { }
 
         /// <summary>
         /// Creates a wheel from the specified indexing and wiring
         /// </summary>
         /// <param name="indexing">The index etchings</param>
         /// <param name="wiring">The scrambled of the indexing</param>
-        public EMWheel(Alphabet indexing, Alphabet wiring)
+        public EnigmaWheel(Alphabet indexing, Alphabet wiring)
         {
             Indexing = indexing;
             Wiring = wiring;
@@ -39,7 +39,7 @@ namespace Thismaker.Enigma.Classical
         /// </summary>
         /// <param name="indexing">The index etchings</param>
         /// <param name="wiring">The scrambled of the indexing</param>
-        public EMWheel(string indexing, string wiring)
+        public EnigmaWheel(string indexing, string wiring)
         {
             Indexing = new Alphabet(indexing);
             Wiring = new Alphabet(wiring);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
 	/// <summary>
 	/// A superior form of subsitution cipher. 

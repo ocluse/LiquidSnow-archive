@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
     /// <summary>
     /// A collection of well know Enigma Machines at their default configurations.
@@ -165,13 +165,13 @@ namespace Thismaker.Enigma.Classical
     public static class StandardWheels
     {
         #region Enigma B - A133
-        public static EMWheel A133_ETW 
+        public static EnigmaWheel A133_ETW 
         { 
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVXYZÅÄÖ", "ABCDEFGHIJKLMNOPQRSTUVXYZÅÄÖ");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVXYZÅÄÖ", "ABCDEFGHIJKLMNOPQRSTUVXYZÅÄÖ");
         }
-        public static EMWheel A133_UKW 
+        public static EnigmaWheel A133_UKW 
         { 
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVXYZÅÄÖ","LDGBÄNCPSKJAVFZHXUIÅRMQÖOTEY"); 
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVXYZÅÄÖ","LDGBÄNCPSKJAVFZHXUIÅRMQÖOTEY"); 
         }
         public static Rotor A133_I 
         { 
@@ -189,13 +189,13 @@ namespace Thismaker.Enigma.Classical
 
         #region Enigma D - A26
 
-        public static EMWheel A26_ETW
+        public static EnigmaWheel A26_ETW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "QWERTZUIOASDFGHJKPYXCVBNML");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "QWERTZUIOASDFGHJKPYXCVBNML");
         }
-        public static EMWheel A26_UKW
+        public static EnigmaWheel A26_UKW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "IMETCGFRAYSQBZXWLHKDVUPOJN");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "IMETCGFRAYSQBZXWLHKDVUPOJN");
         }
 
         public static Rotor A26_I
@@ -217,23 +217,23 @@ namespace Thismaker.Enigma.Classical
 
         #region Enigma I
 
-        public static EMWheel E1_ETW
+        public static EnigmaWheel E1_ETW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         }
-        public static EMWheel E1_UKW_A
+        public static EnigmaWheel E1_UKW_A
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "EJMZALYXVBWFCRQUONTSPIKHGD");
-        }
-
-        public static EMWheel E1_UKW_B
-        {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "YRUHQSLDPXNGOKMIEBFZCWVJAT");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "EJMZALYXVBWFCRQUONTSPIKHGD");
         }
 
-        public static EMWheel E1_UKW_C
+        public static EnigmaWheel E1_UKW_B
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "FVPJIAOYEDRZXWGCTKUQSBNMHL");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "YRUHQSLDPXNGOKMIEBFZCWVJAT");
+        }
+
+        public static EnigmaWheel E1_UKW_C
+        {
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "FVPJIAOYEDRZXWGCTKUQSBNMHL");
         }
 
         public static Rotor E1_I
@@ -265,13 +265,13 @@ namespace Thismaker.Enigma.Classical
 
         #region Norenigma
         //Norway Enigma
-        public static EMWheel NE_ETW
+        public static EnigmaWheel NE_ETW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         }
-        public static EMWheel NE_UKW
+        public static EnigmaWheel NE_UKW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "MOWJYPUXNDSRAIBFVLKZGQCHET");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "MOWJYPUXNDSRAIBFVLKZGQCHET");
         }
 
         public static Rotor NE_I
@@ -303,13 +303,13 @@ namespace Thismaker.Enigma.Classical
 
         #region Sondermaschine
         //Sonder Enigma
-        public static EMWheel SE_ETW
+        public static EnigmaWheel SE_ETW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         }
-        public static EMWheel SE_UKW
+        public static EnigmaWheel SE_UKW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "CIAGSNDRBYTPZFULVHEKOQXWJM");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "CIAGSNDRBYTPZFULVHEKOQXWJM");
         }
 
         public static Rotor SE_I
@@ -330,19 +330,19 @@ namespace Thismaker.Enigma.Classical
 
         #region Enigma M3
 
-        public static EMWheel M3_ETW
+        public static EnigmaWheel M3_ETW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         }
 
-        public static EMWheel M3_UKW_B
+        public static EnigmaWheel M3_UKW_B
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "YRUHQSLDPXNGOKMIEBFZCWVJAT");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "YRUHQSLDPXNGOKMIEBFZCWVJAT");
         }
 
-        public static EMWheel M3_UKW_C
+        public static EnigmaWheel M3_UKW_C
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "FVPJIAOYEDRZXWGCTKUQSBNMHL");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "FVPJIAOYEDRZXWGCTKUQSBNMHL");
         }
 
         public static Rotor M3_I
@@ -388,29 +388,29 @@ namespace Thismaker.Enigma.Classical
 
         #region Enigma M4
 
-        public static EMWheel M4_ETW
+        public static EnigmaWheel M4_ETW
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         }
 
-        public static EMWheel M4_UKW_Beta
+        public static EnigmaWheel M4_UKW_Beta
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "LEYJVCNIXWPBQMDRTAKZGFUHOS");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "LEYJVCNIXWPBQMDRTAKZGFUHOS");
         }
 
-        public static EMWheel M4_UKW_Gamma
+        public static EnigmaWheel M4_UKW_Gamma
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "FSOKANUERHMBTIYCWLQPZXVGJD");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "FSOKANUERHMBTIYCWLQPZXVGJD");
         }
 
-        public static EMWheel M4_UKW_B
+        public static EnigmaWheel M4_UKW_B
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ENKQAUYWJICOPBLMDXZVFTHRGS");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ENKQAUYWJICOPBLMDXZVFTHRGS");
         }
 
-        public static EMWheel M4_UKW_C
+        public static EnigmaWheel M4_UKW_C
         {
-            get => new EMWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "RDOBJNTKVEHMLFCWZAXGYIPSUQ");
+            get => new EnigmaWheel("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "RDOBJNTKVEHMLFCWZAXGYIPSUQ");
         }
 
         public static Rotor M4_I

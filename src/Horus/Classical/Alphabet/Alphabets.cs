@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
     /// <summary>
     /// A collection of basic common alphabets to get you started

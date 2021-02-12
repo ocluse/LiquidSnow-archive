@@ -3,19 +3,17 @@ using System.Text;
 using System.IO.Compression;
 using System.IO;
 using System.Xml.Serialization;
-using SysPath = System.IO.Path;
-using System.Runtime.Serialization;
-using System;
-using System.Data.SqlTypes;
 using Thismaker.Core.Utilities;
+using System;
+using System.Threading.Tasks;
 
-namespace Thismaker.Enigma
+namespace Thismaker.Horus
 {
     /// <summary>
     /// An Enigma Container is a self-managing collection for storing, accessing and updating files. 
     /// Files within are encrypted using a common password
     /// </summary>
-    public sealed class EnigmaContainer : IDisposable
+    public sealed class CryptoContainer : IDisposable
     {
         #region Properties
 
@@ -42,7 +40,7 @@ namespace Thismaker.Enigma
         /// <param name="password">The password used to encrypt the contents of the Enigma Container</param>
         /// <param name="access">The access mode, if Open, an exception is throw if the file doesn't exist, 
         /// if Create, an exception is thrown if container exists. If CreateOrOpen, no exception thrown related to accessing</param>
-        public EnigmaContainer(string path, string password, ContainerAccess access)
+        public CryptoContainer(string path, string password, ContainerAccess access)
         {
             Password = password;
             Path = path;
@@ -96,12 +94,10 @@ namespace Thismaker.Enigma
             Files.AddRange(files);
         }
 
-        private void AddStream(Stream stream, string name)
+        private async Task AddAsync(Stream stream, string name)
         {
             var obj = new ContainerObject(name);
-            var efAdd = new EnigmaFile(Password);
-            efAdd.SetData(stream);
-
+           
             //Open zipFile:
             using var fsContainer = new FileStream(Path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             using var zaContainer = new ZipArchive(fsContainer, ZipArchiveMode.Update);
@@ -120,7 +116,8 @@ namespace Thismaker.Enigma
                 zaeEdit = zaContainer.CreateEntry(obj.EntryName);
             }
             using var s=zaeEdit.Open();
-            efAdd.Save(s);
+            using var efAdd = new CryptoFile(s, Password);
+            await efAdd.WriteAsync(stream);
 
             zaContainer.Dispose();
             fsContainer.Close();
@@ -131,7 +128,7 @@ namespace Thismaker.Enigma
         private void GetStream(Stream stream, string name)
         {
             
-            var efGet = new EnigmaFile(Password);
+            var efGet = new CryptoFile(Password);
             var coGet = Files.Find((x) => x.PlainName == name);
 
             if(coGet==null)
@@ -183,11 +180,11 @@ namespace Thismaker.Enigma
         /// </summary>
         /// <param name="key">The name of the resident</param>
         /// <returns>EnigmaFile</returns>
-        public EnigmaFile this[string key]
+        public CryptoFile this[string key]
         {
             get
             {
-                var ef = new EnigmaFile(Password);
+                var ef = new CryptoFile(Password);
                 using var msGet = new MemoryStream();
                 Get(msGet, key);
                 ef.SetData(msGet);
@@ -374,7 +371,7 @@ namespace Thismaker.Enigma
         public ContainerObject(string name)
         {
             PlainName = name;
-            EntryName = Enigma.GenerateID();
+            EntryName = Horus.GenerateID();
         }
     }
 

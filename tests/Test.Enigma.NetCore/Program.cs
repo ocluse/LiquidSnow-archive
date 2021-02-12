@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
-using Thismaker.Enigma.Classical;
+using System.Text;
+using Thismaker.Horus.Classical;
+using Thismaker.Horus.Symmetrics;
 
 namespace Test.Enigma.NetCore
 {
@@ -8,6 +10,30 @@ namespace Test.Enigma.NetCore
     {
         static EnigmaMachine enigma;
         static void Main(string[] args)
+        {
+            Console.WriteLine("Enter a Key: ");
+            var key = Console.ReadLine().GetBytes<UTF8Encoding>();
+
+            Console.WriteLine("Enter a plaintext");
+            var input = Console.ReadLine().GetBytes<UTF8Encoding>();
+
+            var crypter = PredefinedSymmetric.AesFixed;
+
+            using var msInput = new MemoryStream(input);
+            using var msOutput = new MemoryStream();
+            crypter.Run(msInput, msOutput, key, true);
+
+            var output = msOutput.ToArray();
+
+            var input2 = new MemoryStream(output);
+            var output2 = new MemoryStream();
+
+            crypter.Run(input2, output2, key, false);
+
+            Console.WriteLine($"Output: {output2.ToArray().GetString<UTF8Encoding>()}");
+        }
+
+        static void Mainx(string[] args)
         {
             Console.WriteLine("Do you wish to create a new machine? [Y/N] ");
             var input = Console.ReadLine();
@@ -58,7 +84,9 @@ namespace Test.Enigma.NetCore
 
         private static void Work()
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("The EnigmaMachine is now Activated. Any Key you pressed will be remapped. Pressing escape will allow you to exit.");
+            Console.ResetColor();
             while (true)
             {
                 var input = Console.ReadKey(true);
@@ -66,7 +94,10 @@ namespace Test.Enigma.NetCore
                 if (input.Key == ConsoleKey.Escape)
                 {
                     Console.WriteLine();
-                    continue;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Machine Exited");
+                    Console.ResetColor();
+                    break;
                 }
                 if (input.Key == ConsoleKey.Enter)
                 {

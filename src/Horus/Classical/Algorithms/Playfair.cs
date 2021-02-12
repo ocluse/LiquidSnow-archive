@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
 	/// <summary>
 	/// The playfair is a form of subsitution cipher that normally uses a grid to gauge its subsitution.

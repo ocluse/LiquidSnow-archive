@@ -2,11 +2,11 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Thismaker.Enigma
+namespace Thismaker.Horus
 {
 	static class Extensions
 	{
-		public static string Prepare(this string strInput)
+		public static string CapitalizeAndCompress(this string strInput)
 		{
 			strInput = Regex.Replace(strInput, @"\s+", "");
 			strInput = strInput.Trim();

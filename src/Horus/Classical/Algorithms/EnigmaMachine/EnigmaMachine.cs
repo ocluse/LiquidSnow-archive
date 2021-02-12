@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
     /// <summary>
     /// Represents an Enigma Machine, true to the physical device.
@@ -16,7 +16,7 @@ namespace Thismaker.Enigma.Classical
     /// This is what inspired me to create the entire Enigma library, and by extension Liquid Snow.
     /// So glad that this thing actually works, like the real machine :) Enjoy
     /// </summary>
-    public class EnigmaMachine : ClassicalAlgorithm
+    public partial class EnigmaMachine : ClassicalAlgorithm
     {
         #region Private Fields
         #endregion
@@ -61,7 +61,6 @@ namespace Thismaker.Enigma.Classical
         }
         #endregion
 
-
         #region Properties
 
         /// <summary>
@@ -86,12 +85,12 @@ namespace Thismaker.Enigma.Classical
         /// <summary>
         /// The entry point of the current. The Germans called it sth sth(ETW in short)
         /// </summary>
-        public EMWheel Stator { get; set; }
+        public EnigmaWheel Stator { get; set; }
 
         /// <summary>
         /// Reflects the current back through the wheels. Is what causes the Enigma to be able to decrypt the message properly
         /// </summary>
-        public EMWheel Reflector { get; set; }
+        public EnigmaWheel Reflector { get; set; }
 
         /// <summary>
         /// The current rotation of each of the rotors
@@ -166,22 +165,6 @@ namespace Thismaker.Enigma.Classical
                 rotor.Reset(window);
                 i++;
             }
-        }
-
-        public void Save(Stream stream)
-        {
-            var str= JsonSerializer.Serialize(this);
-            using var sw = new StreamWriter(stream);
-            sw.Write(str);
-        }
-
-        public static EnigmaMachine Load(Stream stream)
-        {
-            using var sw = new StreamReader(stream);
-            var str = sw.ReadToEnd();
-            var result = JsonSerializer.Deserialize<EnigmaMachine>(str);
-
-            return result;
         }
 
         #endregion

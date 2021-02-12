@@ -9,6 +9,12 @@ using System.Text.RegularExpressions;
 
 public static class GlobalExtensions
 {
+    public static bool IsString(this char[] chars, string value)
+    {
+        var test = new string(chars);
+        return test == value;
+    }
+
     public static bool IsPerfectSquare(this double input)
     {
         var sqrt = Math.Sqrt(input);

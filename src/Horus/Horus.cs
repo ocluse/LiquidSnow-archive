@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
-namespace Thismaker.Enigma
+namespace Thismaker.Horus
 {
-    public static partial class Enigma
+    public class Horus
     {
         /// <summary>
         /// Generates an arguably unique string of characters to be used for unique identification. 
@@ -63,6 +65,64 @@ namespace Thismaker.Enigma
             var start = GenerateID();
             return GetHashString(start);
         }
+
+        #region Randomnization
+        private static readonly Random _random = new Random();
+
+        public static string Random(int size = 8, bool lowerCase = false)
+        {
+            var builder = new StringBuilder(size);
+
+            char offset = lowerCase ? 'a' : 'A';
+            const int lettersOffset = 26;
+            for (var i = 0; i < size; i++)
+            {
+                var @char = (char)_random.Next(offset, offset + lettersOffset);
+                builder.Append(@char);
+            }
+            return lowerCase ? builder.ToString().ToLower() : builder.ToString();
+
+        }
+
+        public static int Random(int min, int max)
+        {
+            return _random.Next(min, max);
+        }
+
+        #endregion
+
+        #region Misc
+        public static string ComputeFileHash(string path)
+        {
+            using var alSHA = SHA256.Create();
+            using var stream = File.OpenRead(path);
+            var bytes = alSHA.ComputeHash(stream);
+            string result = "";
+            foreach (var b in bytes) result += b.ToString("X2");
+            return result;
+        }
+
+        public static byte[] GetHash(byte[] inputData)
+        {
+            using var alSHA = SHA256.Create();
+            return alSHA.ComputeHash(inputData);
+        }
+
+        public static byte[] GetHash(string inputString)
+        {
+            return GetHash(Encoding.UTF8.GetBytes(inputString));
+        }
+
+        public static string GetHashString(string inputString)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in GetHash(inputString))
+                sb.Append(b.ToString("X2"));
+
+            return sb.ToString();
+        }
+
+        #endregion
     }
 
     public enum IDKind

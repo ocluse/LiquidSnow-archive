@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
 
-namespace Thismaker.Enigma.Classical
+namespace Thismaker.Horus.Classical
 {
     public partial class Alphabet 
     {
@@ -15,31 +15,38 @@ namespace Thismaker.Enigma.Classical
             items = new List<char>();
         }
 
-        public Dimensions Dimensions { get; set; }
-
-        public bool IsPerfectSquare => ((double)items.Count).IsPerfectSquare();
-
         public Alphabet(string characters)
         {
             items = new List<char>();
 
-            foreach(var ch in characters)
-            {
-                if (items.Contains(ch)) continue;
-
-                items.Add(ch);
-            }
+            AddAll(characters);
         }
+
+        public Alphabet(IEnumerable<char> characters)
+        {
+            items = new List<char>();
+            AddAll(characters);
+
+        }
+
+        public Dimensions Dimensions { get; set; }
+
+        public bool IsPerfectSquare => ((double)items.Count).IsPerfectSquare();
 
         #region Common
 
-
-        public void AddAll(string characters)
+        public void AddAll(IEnumerable<char> characters)
         {
-            foreach(var c in characters)
+            foreach (var c in characters)
             {
                 Add(c);
             }
+        }
+
+        public void AddAll(string characters)
+        {
+            AddAll(characters.ToCharArray());
+            
         }
 
         public void RemoveAll(string characters)

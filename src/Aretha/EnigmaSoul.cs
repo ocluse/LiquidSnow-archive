@@ -46,12 +46,13 @@ namespace Thismaker.Aretha
             {
                 switch (cmdlets[0])
                 {
-                    case "playfair":
-                        await Playfair(cmdlets[1]);
+                    case "classical":
+                        await Classical(cmdlets[1]);
                         return;
-                    case "aes":
+                    case "enigmafile":
                         await Aes(cmdlets[1]);
                         return;
+                    case "enigma machine":
                     default:
                         throw new InvalidOperationException("Unknown operation");
                 }
@@ -97,7 +98,7 @@ namespace Thismaker.Aretha
             
         }
 
-        private Task Playfair(string cmd)
+        private Task Classical(string cmd)
         {
             try
             {
