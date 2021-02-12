@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Text;
+using System.Text.Json;
 
 namespace Thismaker.Enigma.Classical
 {
@@ -165,6 +167,23 @@ namespace Thismaker.Enigma.Classical
                 i++;
             }
         }
+
+        public void Save(Stream stream)
+        {
+            var str= JsonSerializer.Serialize(this);
+            using var sw = new StreamWriter(stream);
+            sw.Write(str);
+        }
+
+        public static EnigmaMachine Load(Stream stream)
+        {
+            using var sw = new StreamReader(stream);
+            var str = sw.ReadToEnd();
+            var result = JsonSerializer.Deserialize<EnigmaMachine>(str);
+
+            return result;
+        }
+
         #endregion
 
         #region Logic Methods
