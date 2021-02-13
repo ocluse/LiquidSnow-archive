@@ -25,11 +25,12 @@ namespace Thismaker.Anubis.Media
 
             var message = new BitArray(ls_data.ToArray());
 
-            var count = message.Count;
+            var count = input.DataSize * input.Format.NumChannels * LsbDepth;
 
             if (EnsureSuccess)
             {
-
+                if(message.Length>count)
+                    throw new InvalidOperationException("There is not enough room in the audio file to write the data");
             }
 
             var pos = 0;

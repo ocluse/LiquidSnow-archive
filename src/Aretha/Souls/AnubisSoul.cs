@@ -12,42 +12,7 @@ namespace Thismaker.Aretha
        
         public Soul Soul { get { return Soul.Anubis; } }
 
-        private static Progress<float> WriteProgress()
-        {
-            var progress = new Progress<float>();
-
-            int previousProgress = 0;
-
-            progress.ProgressChanged += (o, e) =>
-            {
-                int percent = (int)(e * 100.0f);
-
-                if (percent - previousProgress < 1) return;
-
-                previousProgress = percent;
-
-                Console.Write("\r");
-                string progBar = "Execution Progress: ";
-                for (int i = 0; i <= 100; i += 10)
-                {
-                    if (i <= percent) progBar += "|";
-                    else progBar += ".";
-                }
-
-                progBar += $" {percent}%";
-
-                
-
-                Console.Write(progBar);
-
-                if (percent == 100)
-                {
-                    Console.WriteLine();
-                }
-            };
-
-            return progress;
-        }
+        
 
         public void Speak(string text)
         {
@@ -88,22 +53,22 @@ namespace Thismaker.Aretha
                 //make the jector:
                 var jectorBuilder = new JectorBuilder().WithType(type);
 
-                var response = Ask("Do you want to ensure a successful write? (Y/N)", true);
+                var response = Ask("Do you want to ensure a successful write?", true);
 
-                if (response == null) return;
+                //if (response == null) return;
 
                 if (response == "y")
                 {
                     jectorBuilder.WithRequiredSuccess();
                 }
 
-                response = Ask("Do you want to use the default end of file marker? (Y/N)", true);
-                if (response == null) return;
+                response = Ask("Do you want to use the default end of file marker?", true);
+                //if (response == null) return;
 
                 if (response == "n")
                 {
                     response = Ask("What end of file marker would you like to use?", false, true);
-                    if (response == null) return;
+                    //if (response == null) return;
 
                     jectorBuilder.WithEOF(response);
                 }
@@ -119,6 +84,8 @@ namespace Thismaker.Aretha
                 {
                     await Eject(jector);
                 }
+
+                Aretha.SoulSucceeded(Soul.Anubis);
             }
             catch(Exception ex)
             {
@@ -130,11 +97,8 @@ namespace Thismaker.Aretha
         public async Task Inject(Jector jector)
         {
             var inputPath = GetPath("Provide path to file to be written into:", true);
-            if (inputPath == null) return;
             var dataPath = GetPath("Provide a path to the file to be hidden:", true);
-            if (dataPath == null) return;
             var outputPath = GetPath("Provide a path where the file copy with hidden data will be saved:", false);
-            if (outputPath == null) return;
 
             if (inputPath == outputPath)
             {
@@ -155,13 +119,18 @@ namespace Thismaker.Aretha
 
             Speak("Executing Command. Please Wait");
 
-            using var source = File.OpenRead(inputPath);
-            using var destination = File.OpenWrite(outputPath);
-            using var data = File.OpenRead(dataPath);
-            await jector.InjectAsync(source, destination, data, WriteProgress());
-
-
-            Speak($"Command Executed Successfully!");
+            try
+            {
+                using var source = File.OpenRead(inputPath);
+                using var destination = File.OpenWrite(outputPath);
+                using var data = File.OpenRead(dataPath);
+                await jector.InjectAsync(source, destination, data, Aretha.WriteProgress());
+                Speak($"Command Executed Successfully!");
+            }
+            catch(Exception ex)
+            {
+                Aretha.SoulFailed(Soul.Anubis, ex);
+            }
         }
 
         public async Task Eject(Jector jector)
@@ -183,12 +152,20 @@ namespace Thismaker.Aretha
 
             Speak("Executing Command. Please Wait");
 
-            using var source = File.OpenRead(inputPath);
-            using var destination = File.OpenWrite(outputPath);
+            try
+            {
+                using var source = File.OpenRead(inputPath);
+                using var destination = File.OpenWrite(outputPath);
 
-            await jector.EjectAsync(source, destination, WriteProgress());
+                await jector.EjectAsync(source, destination, Aretha.WriteProgress());
 
-            Speak($"Command Executed Successfully!");
+                Speak($"Command Executed Successfully!");
+                
+            }
+            catch(Exception ex)
+            {
+                Aretha.SoulFailed(Soul.Anubis, ex);
+            }
         }
 
         private static JectorType GetJectorType(string name)

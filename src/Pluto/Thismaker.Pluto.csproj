@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Rapidly build finance based applications. Allows for record keeping, transaction monitoring etc.</Description>
+    <PackageTags>finance financial records transactions money</PackageTags>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +16,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Horus\Thismaker.Horus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

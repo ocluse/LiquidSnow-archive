@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Thismaker.Enigma;
+using Thismaker.Horus;
 
 namespace Thismaker.Pluto
 {
@@ -60,7 +60,7 @@ namespace Thismaker.Pluto
         
         public Transaction()
         {
-            ID = Enigma.Enigma.GenerateID(IDKind.Hash);
+            ID = Horus.Horus.GenerateID(IDKind.Hash);
         }
 
         public Transaction(Transaction copy)

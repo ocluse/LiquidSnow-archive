@@ -5,7 +5,12 @@
     <LangVersion>8.0</LangVersion>
     <PackageId>Thismaker.Anubis</PackageId>
     <Authors>Thismaker</Authors>
-    <Description />
+    <Description>Allows you to perform steganography in images and audio files. You can hide entire files in images using this library.</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>steganography</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +19,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Thismaker.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

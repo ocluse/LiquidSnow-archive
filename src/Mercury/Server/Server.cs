@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using TEnigma = Thismaker.Enigma.Enigma;
 namespace Thismaker.Mercury
 {
     public class Server

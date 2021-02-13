@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
-using Thismaker.Enigma;
+using Thismaker.Horus;
 
 namespace Thismaker.Pluto
 {
@@ -55,7 +55,7 @@ namespace Thismaker.Pluto
 
         public Account()
         {
-            AccountID = Enigma.Enigma.GenerateID();
+            AccountID = Horus.Horus.GenerateID();
             Transactions = new ObservableCollection<Transaction>();
         }
 
@@ -79,7 +79,7 @@ namespace Thismaker.Pluto
 
         public void GenerateNewID()
         {
-            AccountID = Enigma.Enigma.GenerateID();
+            AccountID = Horus.Horus.GenerateID();
         }
     }
 

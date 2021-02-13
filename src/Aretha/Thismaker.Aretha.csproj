@@ -3,11 +3,25 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Thismaker</Authors>
+    <Description>Aretha allows you to access most of the stuff on LiquidSnow and experiment with them. It is best used as an already built application. Have fun :)</Description>
+    <PackageProjectUrl></PackageProjectUrl>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Anubis\Thismaker.Anubis.csproj" />
-    <ProjectReference Include="..\Enigma\Thismaker.Enigma.csproj" />
+    <ProjectReference Include="..\Horus\Thismaker.Horus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

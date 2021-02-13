@@ -3,11 +3,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>AbaClient Allows you to build Server-Client based applications rapidly. Use in conjuction with Thismaker.Aba.Server for optimal performance.</Description>
+    <Description>For apps that rely on SignalRCore and WebApi, this allows you to build the client side of Server-Client based applications rapidly.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>client-application</PackageTags>
+    <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
+    <Copyright></Copyright>
+    <PackageReleaseNotes>First release. Api is generally frozen. I don't know what to put here. Thank you.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
