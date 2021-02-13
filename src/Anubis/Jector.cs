@@ -9,8 +9,14 @@ using System.Threading.Tasks;
 
 namespace Thismaker.Anubis
 {
-    public interface IJector
+    public abstract class Jector
     {
+        /// <summary>
+        /// The depth of the Least Significant Bit, increasing the value may allow storing bigger files,
+        /// but may lead to noticable artifacts in the produced data. Value cannot be greater than 8
+        /// </summary>
+        public int LsbDepth { get; set; } = 2;
+
         /// <summary>
         /// The string that will be used to signify an End of File, if not assigned, 
         /// a default value will be used.
@@ -20,23 +26,22 @@ namespace Thismaker.Anubis
         /// the returned data is truncated at where the EOF was found.
         /// If the value is null, the EOF will not be added at the end nor will it be checked.
         /// </summary>
-        string EOF { get; set; }
+        public string EOF { get; set; }
+        = "#$%-";
 
+        /// <summary>
+        /// The EOF as a byte array, using UTF8 Encoding
+        /// </summary>
+        protected byte[] Sign
+        {
+            get { return Encoding.UTF8.GetBytes(EOF); }
+        }
 
         /// <summary>
         /// When <see cref="true"/> throws <see cref="InvalidOperationException"/> 
         /// when the EOF cannot be written or was not read.
         /// </summary>
-        bool EnsureSuccess { get; set; }
-
-        object Inject(object source, byte[] data);
-
-        byte[] Eject(object source);
-
-
-        Task<object> InjectAsync(object source, byte[] data, IProgress<float> progress=null, CancellationToken cancellationToken=default);
-
-        Task<byte[]> EjectAsync(object source, IProgress<float> progress=null, CancellationToken cancellationToken=default);
+        public bool EnsureSuccess { get; set; } = false;
 
         /// <summary>
         /// Injects data to a source stream, saving the data to the specified destination stream.
@@ -47,7 +52,7 @@ namespace Thismaker.Anubis
         /// <param name="progress">Where to report the <b>data writing</b> progress,</param>
         /// <param name="cancellationToken">A way to cancel the write process</param>
         /// <returns></returns>
-        Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<float> progress=null, CancellationToken cancellationToken=default);
+        public abstract Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<float> progress=null, CancellationToken cancellationToken=default);
 
         /// <summary>
         /// Seeks data hidden in a stream, saving it to the destination.
@@ -57,7 +62,26 @@ namespace Thismaker.Anubis
         /// <param name="progress">The progress of <b>data reading</b> progress</param>
         /// <param name="cancellationToken">A way to cancel the read process</param>
         /// <returns></returns>
-        Task EjectAsync(Stream source, Stream destination, IProgress<float> progress=null, CancellationToken cancellationToken=default);
+        public abstract Task EjectAsync(Stream source, Stream destination, IProgress<float> progress=null, CancellationToken cancellationToken=default);
+
+        protected bool IsSignature(byte[] input, int index)
+        {
+            try
+            {
+                foreach (var b in Sign)
+                {
+
+                    if (b != input[index]) return false;
+                    index++;
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
 
     }
 }

@@ -30,11 +30,11 @@ namespace Thismaker.Anubis
             return this;
         }
 
-        public IJector Build()
+        public Jector Build()
         {
             if (!_type.HasValue) throw new InvalidOperationException("Cannot build a typeless Jector");
 
-            IJector result = _type.Value switch
+            Jector result = _type.Value switch
             {
                 JectorType.Bitmap => new BitmapJector(),
                 JectorType.WaveFile=>new WaveFileJector(),

@@ -14,17 +14,8 @@ namespace Thismaker.Anubis.Imaging
     /// A Jector that allows for writing data into and from <see cref="Bitmap"/> 
     /// image files.
     /// </summary>
-    public class BitmapJector : IJector
+    public class BitmapJector : Jector
     {
-        /// <inheritdoc/>
-        public string EOF { get; set; } = "#$%-";
-
-        /// <summary>
-        /// The depth of the Least Significant Bit, increasing the value may allow storing bigger files,
-        /// but may lead to noticable artifacts in the produced data. Value cannot be greater than 8
-        /// </summary>
-        public int LsbDepth { get; set; } = 2;
-
         /// <summary>
         /// When <see cref="true"/>, the Alpha Channel will also be written to, 
         /// and read from,
@@ -33,19 +24,7 @@ namespace Thismaker.Anubis.Imaging
         /// </summary>
         public bool UseAlpha { get; set; } = false;
 
-        /// <summary>
-        /// The EOF as a byte array, using UTF8 Encoding
-        /// </summary>
-        private byte[] Sign
-        {
-            get { return Encoding.UTF8.GetBytes(EOF); }
-        }
-
-
-        public bool EnsureSuccess { get; set; } = false;
-
-
-        public Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public override Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
             //Prepare the images:
             var inputImage = (Bitmap)Image.FromStream(source);
@@ -86,12 +65,9 @@ namespace Thismaker.Anubis.Imaging
                 for (int x = 0; x < width; x++)
                 {
                     //Check cancellation token:
-                    if (cancellationToken != default)
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-                        }
+                        cancellationToken.ThrowIfCancellationRequested();
                     }
 
                     //Do our work
@@ -145,7 +121,7 @@ namespace Thismaker.Anubis.Imaging
             return Task.CompletedTask;
         }
         
-        public Task EjectAsync(Stream source, Stream destination, IProgress<float> progress=null, CancellationToken cancellationToken=default)
+        public override Task EjectAsync(Stream source, Stream destination, IProgress<float> progress=null, CancellationToken cancellationToken=default)
         {
             //Prepare the image
             var inputImage = (Bitmap)Image.FromStream(source);
@@ -163,12 +139,9 @@ namespace Thismaker.Anubis.Imaging
                 for (int x = 0; x < width; x++)
                 {
                     //Check cancellation token:
-                    if (cancellationToken != default)
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-                        }
+                        cancellationToken.ThrowIfCancellationRequested();
                     }
 
                     var pixel = inputImage.GetPixel(x, y);
@@ -233,84 +206,5 @@ namespace Thismaker.Anubis.Imaging
 
         }
 
-        public object Inject(object input, byte[] data)
-        {
-            throw new NotImplementedException();
-        }
-
-        public byte[] Eject(object input)
-        {
-            throw new NotImplementedException();
-        }
-
-        bool IsSignature(byte[] input, int index)
-        {
-            try
-            {
-                foreach (var b in Sign)
-                {
-
-                    if (b != input[index]) return false;
-                    index++;
-                }
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-
-        }
-
-        public async Task<object> InjectAsync(object source, byte[] data, IProgress<float> progress=null, CancellationToken cancellationToken=default)
-        {
-            using var msSource = new MemoryStream();
-            using var msDestination = new MemoryStream();
-            using var msData = new MemoryStream(data);
-            try
-            {
-                var image = (Bitmap)source;
-                image.Save(msSource, ImageFormat.Png);
-                await InjectAsync(msSource, msDestination, msData, progress, cancellationToken);
-
-            }
-            catch (OperationCanceledException)
-            {
-                msSource.Dispose();
-                msDestination.Dispose();
-                msData.Dispose();
-
-                throw;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-            return (Bitmap)Image.FromStream(msDestination);
-        }
-
-        public async Task<byte[]> EjectAsync(object source, IProgress<float> progress=null, CancellationToken cancellationToken=default)
-        {
-            using var msSource = new MemoryStream();
-            using var msDestination = new MemoryStream();
-            try
-            {
-                ((Bitmap)source).Save(msSource, ImageFormat.Png);
-                await EjectAsync(msSource, msDestination, progress, cancellationToken);
-            }
-            catch(OperationCanceledException)
-            {
-                msSource.Dispose();
-                msDestination.Dispose();
-                throw;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-            return msDestination.ToArray();
-        } 
     }
 }

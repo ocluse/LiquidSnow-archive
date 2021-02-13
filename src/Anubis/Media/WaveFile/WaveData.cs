@@ -5,61 +5,58 @@ using System.Text;
 
 namespace Thismaker.Anubis.Media
 {
-    public partial class WaveFile
+    public partial class WaveFile : IDisposable
     {
+        private bool _hasHeader = false;
+
         private int
            _chunkSize,
            _fmtChunkSize,
            _dataChunkSize,
            _listChunkSize;
-        private short _audioFormat;
+
+        private readonly Stream _stream;
 
         /// <summary>
         /// Throws errors if the file is not cleanly intact
         /// </summary>
         public bool EnsureCleanRead { get; set; }
 
-        /// <summary>
-        /// The number of audio channels. 1-Mono, 2-Stereo
-        /// </summary>
-        public short NumChannels { get; private set; }
+        private WaveFormat _format;
 
-        /// <summary>
-        /// The sample rate of the audio, e.g 44100Hz etc
-        /// </summary>
-        public int SampleRate { get; private set; }
-
-        /// <summary>
-        /// The bits per sample, e.g 8bits, 16bits etc
-        /// </summary>
-        public short BitsPerSample { get; private set; }
-
-        /// <summary>
-        /// The byte rate. Don't know what it is in detail just that :)
-        /// </summary>
-        public int ByteRate
+        public WaveFormat Format
         {
-            get { return SampleRate * NumChannels * BitsPerSample / 8; }
+            get => _format;
         }
 
-        /// <summary>
-        /// The number of bytes fr one sample including all channels.
-        /// </summary>
-        public short BlockAlign
+        public int DataSize
         {
-            get { return (short)(NumChannels * BitsPerSample / 8); }
+            get => _dataChunkSize;
         }
-
-        public List<ChannelData> Channels { get; set; }
 
         public WaveFile(Stream stream)
         {
-            Load(stream);
+
+            _stream = stream;
+
+            if (stream.Length > 0)
+            {
+                LoadHeader();
+            }
         }
-    }
 
-    public struct WaveFormat
-    {
+        public void DuplicateFormat(WaveFile source)
+        {
+            _format = source.Format;
+            _chunkSize = source._chunkSize;
+            _fmtChunkSize = source._fmtChunkSize;
+            _dataChunkSize = source._dataChunkSize;
+            _listChunkSize = source._listChunkSize;
+        }
 
+        public void Dispose()
+        {
+            _stream.Dispose();
+        }
     }
 }

@@ -81,7 +81,7 @@ namespace Thismaker.Aretha
                     cmdlets = new List<string>(args);
                 }
 
-                IJector jector;
+                Jector jector;
 
                 var type = GetJectorType(cmdlets[0]);
 
@@ -127,7 +127,7 @@ namespace Thismaker.Aretha
             }
         }
 
-        public async Task Inject(IJector jector)
+        public async Task Inject(Jector jector)
         {
             var inputPath = GetPath("Provide path to file to be written into:", true);
             if (inputPath == null) return;
@@ -164,7 +164,7 @@ namespace Thismaker.Aretha
             Speak($"Command Executed Successfully!");
         }
 
-        public async Task Eject(IJector jector)
+        public async Task Eject(Jector jector)
         {
             var inputPath = GetPath("Provide a path to file containing hidden data:", true);
 

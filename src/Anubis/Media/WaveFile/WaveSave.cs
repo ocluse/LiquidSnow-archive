@@ -8,77 +8,69 @@ namespace Thismaker.Anubis.Media
 {
     public partial class WaveFile
     {
-        public void Save(Stream stream)
+        public void SaveHeader()
         {
             //Set stream position to origin:
-            stream.Position = 0;
+            _stream.Position = 0;
+            using var writer = new BinaryWriter(_stream, Encoding.ASCII, true);
 
             //RIFF Marker
-            var buffer = "RIFF".GetBytes<ASCIIEncoding>();
-
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write("RIFF".ToCharArray());
 
             //ChunkSize:
-            buffer = BitConverter.GetBytes(_chunkSize);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_chunkSize);
 
             //Formart Marker:
-            buffer = "WAVE".GetBytes<ASCIIEncoding>();
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write("WAVE".ToCharArray());
 
             //-----------------------------FORMAT---------------------------------------
-            buffer = "fmt ".GetBytes<ASCIIEncoding>();
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write("fmt ".ToCharArray());
 
             //fmt Chunk size
-            buffer = BitConverter.GetBytes(_fmtChunkSize);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_fmtChunkSize);
 
             //AudioFormat
-            buffer = BitConverter.GetBytes(_audioFormat);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_format.AudioFormat);
 
             //Channels
-            buffer = BitConverter.GetBytes(NumChannels);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_format.NumChannels);
 
             //Sample Rate
-            buffer = BitConverter.GetBytes(SampleRate);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_format.SampleRate);
 
             //Byte Rate
-            buffer = BitConverter.GetBytes(ByteRate);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_format.ByteRate);
 
             //BlockAlign
-            buffer = BitConverter.GetBytes(BlockAlign);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_format.BlockAlign);
 
             //BitsPerSample
-            buffer = BitConverter.GetBytes(BitsPerSample);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_format.BitsPerSample);
 
             //----------------------DATA MARKER----------------------------------------
-
-            buffer = "data".GetBytes<ASCIIEncoding>();
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write("data".ToCharArray());
 
             //Data chunk size
-            buffer = BitConverter.GetBytes(_dataChunkSize);
-            stream.Write(buffer, 0, buffer.Length);
+            writer.Write(_dataChunkSize);
 
-            //write data:
-            using var bw = new BinaryWriter(stream, Encoding.Unicode, true);
-            for(int i = 0; i < Channels[0].Samples.Count; i++)
+            _hasHeader = true;
+        }
+
+        public void WriteSample(Sample sample)
+        {
+            if (!_hasHeader) SaveHeader();
+
+            if (sample.Channels.Count != _format.NumChannels)
+                throw new InvalidDataException("Sample channels must be equal to WaveFile channel count");
+
+            
+            using var writer = new BinaryWriter(_stream, Encoding.ASCII, true);
+            foreach(var channel in sample.Channels)
             {
-                foreach(var channel in Channels)
-                {
-                    buffer = channel.Samples[i].Data;
-                    var bytes = new BitArray(buffer);
-                    buffer=bytes.ToBytes();
-                    bw.Write(buffer);
-                    //stream.Write(buffer, 0, buffer.Length);
-                }
+                if (channel.Data.Length != _format.BytesPerSample)
+                    throw new InvalidDataException("Invalid channel size for WaveFile");
+
+                writer.Write(channel.Data);
             }
         }
     }

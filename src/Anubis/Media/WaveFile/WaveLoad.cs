@@ -7,161 +7,125 @@ namespace Thismaker.Anubis.Media
 {
     public partial class WaveFile
     {
-       
-
-        public void Load(Stream stream)
+        private void LoadHeader()
         {
-            stream.Position = 0;
+            _stream.Position = 0;
+            using var reader = new BinaryReader(_stream, Encoding.ASCII, true);
+
             //--------------------------------VALIDITY--------------------------------//
             //RIFF Marker
-            var buffer = new byte[4];
-            stream.Read(buffer, 0, buffer.Length);
-            var strBuffer=buffer.GetString<ASCIIEncoding>();
-            if (strBuffer != "RIFF") throw new InvalidDataException("The file is not a valid WAV file");
+            var str=reader.ReadChars(4);
+            if(!str.IsString("RIFF")) throw new InvalidDataException("The file is not a valid WAV file");
 
             //ChunkSize
-            stream.Read(buffer, 0, buffer.Length);
-            _chunkSize = BitConverter.ToInt32(buffer, 0);
+            _chunkSize = reader.ReadInt32();
 
             //Formart Marker
-            stream.Read(buffer, 0, buffer.Length);
-            strBuffer = buffer.GetString<ASCIIEncoding>();
-            if (strBuffer != "WAVE") throw new InvalidDataException("The file is not a valid wave file");
-
+            if(!reader.ReadChars(4).IsString("WAVE")) throw new InvalidDataException("The file is not a valid wave file");
 
             //----------------------------DATA 1-------------------------------------//
-
-            stream.Read(buffer, 0, buffer.Length);
-            strBuffer = buffer.GetString<ASCIIEncoding>();
-
-            if (strBuffer != "fmt ") throw new InvalidDataException("Invalid or unrecognized WAV file");
+            if (!reader.ReadChars(4).IsString("fmt ")) throw new InvalidDataException("Invalid or unrecognized WAV file");
 
             //fmt Chunk size
-            stream.Read(buffer, 0, buffer.Length);
-            _fmtChunkSize = BitConverter.ToInt32(buffer, 0);
+            _fmtChunkSize = reader.ReadInt32();
 
             //AudioFormat
-            buffer = new byte[2];
-            stream.Read(buffer, 0, buffer.Length);
-            _audioFormat = BitConverter.ToInt16(buffer, 0);
-            
+            _format.AudioFormat = reader.ReadInt16();
+
             //Channels
-            buffer = new byte[2];
-            stream.Read(buffer, 0, buffer.Length);
-            NumChannels = BitConverter.ToInt16(buffer, 0);
+            _format.NumChannels = reader.ReadInt16();
 
             //Sample Rate
-            buffer = new byte[4];
-            stream.Read(buffer, 0, buffer.Length);
-            SampleRate = BitConverter.ToInt32(buffer, 0);
+            _format.SampleRate = reader.ReadInt32();
 
             //theoritical ByteRate
-            stream.Read(buffer, 0, buffer.Length);
-            var byteRate = BitConverter.ToInt32(buffer, 0);
+            var byteRate = reader.ReadInt32();
 
             //theoritical BlockAlign
-            buffer = new byte[2];
-            stream.Read(buffer, 0, buffer.Length);
-            var blockAlign = BitConverter.ToInt16(buffer, 0);
+            var blockAlign = reader.ReadInt16();
 
             //Theoritical BitsPerSample
-            buffer = new byte[2];
-            stream.Read(buffer, 0, buffer.Length);
-            BitsPerSample = BitConverter.ToInt16(buffer, 0);
+            _format.BitsPerSample = reader.ReadInt16();
 
             //Check for EnsureCleanRead:
-            if ((byteRate != ByteRate ||
-                blockAlign != BlockAlign) && EnsureCleanRead) 
+            if ((byteRate != _format.ByteRate ||
+                blockAlign != _format.BlockAlign) && EnsureCleanRead)
                 throw new InvalidDataException("There is an error in the WAV file");
 
             //Advance streamPostion:
-            
-            stream.Position +=( _fmtChunkSize - 16);
+            reader.BaseStream.Position+= (_fmtChunkSize - 16);
 
             //==========================DATA 2============================//
-            buffer = new byte[4];
-            stream.Read(buffer, 0, buffer.Length);
-            strBuffer = buffer.GetString<ASCIIEncoding>();
+            var strBuffer = new string(reader.ReadChars(4));
 
-            if (strBuffer == "data")
+            if (strBuffer != "data")
             {
-                GetData(stream);
-            }
-            else if (strBuffer == "LIST")
-            {
-                stream.Read(buffer, 0, buffer.Length);
-                _listChunkSize = BitConverter.ToInt32(buffer, 0);
-
-                //Advance position by chunksize"
-                stream.Position += _listChunkSize;
-
-                //try to find data:
-                buffer = new byte[4];
-                stream.Read(buffer, 0, buffer.Length);
-                strBuffer = buffer.GetString<ASCIIEncoding>();
-
-                if (strBuffer != "data") throw new InvalidDataException("Invalid/unknown WAV file");
-                GetData(stream);
-            }
-            else
-            {
-                throw new InvalidDataException("Invalid/unknown WAV file");
-            }
-        }
-
-        
-
-        private void GetData(Stream stream)
-        {
-            //Data chunk size
-            var buffer = new byte[4];
-            stream.Read(buffer, 0, buffer.Length);
-            _dataChunkSize = BitConverter.ToInt32(buffer, 0);
-
-            //Actual Data
-            
-            Channels = new List<ChannelData>();
-
-            //Create the channels:
-            for(int i = 0; i < NumChannels; i++)
-            {
-                Channels.Add(new ChannelData());
-            }
-
-            int channelIndex = 0;
-
-            buffer = new byte[BitsPerSample/8];
-            
-            while (true)
-            {
-                if (channelIndex >= NumChannels) channelIndex = 0;
-
-                //read the audio data:
-                stream.Read(buffer, 0, buffer.Length);
-
-                Sample sample = new Sample() { Data = buffer };
-
-                Channels[channelIndex].Samples.Add(sample);
-
-                channelIndex++;
-
-                if (stream.Position >= stream.Length-1)
+                if (strBuffer == "LIST")
                 {
-                    break;
+                    _listChunkSize = reader.ReadInt32();
+
+                    //Advance position by chunksize"
+                    reader.BaseStream.Position += _listChunkSize;
+
+                    //try to find data:
+
+                    if (!reader.ReadChars(4).IsString("data")) throw new InvalidDataException("Invalid/unknown WAV file");
+                }
+                else
+                {
+                    throw new InvalidDataException("Invalid/unknown WAV file");
                 }
             }
+
+            //Data chunk size
+            _dataChunkSize = reader.ReadInt32();
+
+            _hasHeader = true;
+        }
+
+        public Sample GetNextSample()
+        {
+            using var reader = new BinaryReader(_stream, Encoding.ASCII, true);
+
+            var sample = new Sample();
+            for(int i = 0; i < _format.NumChannels; i++)
+            {
+                if (reader.PeekChar() == -1)
+                {
+                    if (sample.Channels.Count == 0)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return sample;
+                    }
+                }
+
+                var data=reader.ReadBytes(_format.BytesPerSample);
+                var channel = new Channel(data);
+                sample.Channels.Add(channel);
+            }
+
+            return sample;
         }
     }
 
+    public class Sample
+    {
+        public List<Channel> Channels { get; set; }
+         = new List<Channel>();
+    }
 
-
-    public struct Sample
+    public class Channel
     {
         public byte[] Data { get; set; }
+
+        public Channel(byte[] data)
+        {
+            Data = data;
+        }
     }
 
-    public class ChannelData
-    {
-        public List<Sample> Samples { get; set; } = new List<Sample>();
-    }
+    
 }
