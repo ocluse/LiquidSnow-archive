@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -10,6 +10,8 @@
     <PackageTags>client-application client-app signalr webapi web-api azure-ad azure-adb2c</PackageTags>
     <PackageReleaseNotes>First release. Generally frozen, most methods work well as expected.</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

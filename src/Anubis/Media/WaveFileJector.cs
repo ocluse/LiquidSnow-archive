@@ -25,11 +25,11 @@ namespace Thismaker.Anubis.Media
 
             var message = new BitArray(ls_data.ToArray());
 
-            var count = input.DataSize * input.Format.NumChannels * LsbDepth;
-
+            var count = message.Length;
+            var maxData= input.DataSize * input.Format.NumChannels * LsbDepth;
             if (EnsureSuccess)
             {
-                if(message.Length>count)
+                if(count>maxData)
                     throw new InvalidOperationException("There is not enough room in the audio file to write the data");
             }
 
@@ -72,7 +72,7 @@ namespace Thismaker.Anubis.Media
 
                 if (progress != null)
                 {
-                    var percent = pos / (float)count;
+                    var percent = pos / (float)maxData;
                     progress.Report(percent);
                 }
 

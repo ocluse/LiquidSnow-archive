@@ -10,6 +10,8 @@
     <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
     <Copyright></Copyright>
     <PackageReleaseNotes>First release. Api is generally frozen. I don't know what to put here. Thank you.</PackageReleaseNotes>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
