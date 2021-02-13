@@ -9,9 +9,10 @@ namespace Thismaker.Horus
 {
     public class Horus
     {
+        #region Generation
         /// <summary>
         /// Generates an arguably unique string of characters to be used for unique identification. 
-        /// The uniqueness strength boils down to the kind used, but the kind used depends on the scenario.
+        /// The uniqueness strength boils down to the <see cref="IDKind"/> used, depending on the scenario.
         /// Some IDs may not be suitable for different scenarios
         /// </summary>
         /// <param name="kind">The kind of ID to be generated, determines the strength as well as the look</param>
@@ -65,10 +66,21 @@ namespace Thismaker.Horus
             var start = GenerateID();
             return GetHashString(start);
         }
+        #endregion
 
         #region Randomnization
         private static readonly Random _random = new Random();
 
+        public static int Random(int min, int max)
+        {
+            return _random.Next(min, max);
+        }
+
+        /// <summary>
+        /// Returns a random string of the specified <paramref name="size"/>
+        /// </summary>
+        /// <param name="size">The number of characters to include in the string</param>
+        /// <param name="lowerCase">If true, returns lowercase characters, otherwise uppercase</param>
         public static string Random(int size = 8, bool lowerCase = false)
         {
             var builder = new StringBuilder(size);
@@ -84,14 +96,15 @@ namespace Thismaker.Horus
 
         }
 
-        public static int Random(int min, int max)
-        {
-            return _random.Next(min, max);
-        }
-
         #endregion
 
-        #region Misc
+        #region Hash
+
+        /// <summary>
+        /// Quickly computes the hash of a file
+        /// </summary>
+        /// <param name="path">Path to the file whose hash is to be calculated</param>
+        /// <returns></returns>
         public static string ComputeFileHash(string path)
         {
             using var alSHA = SHA256.Create();
@@ -102,17 +115,31 @@ namespace Thismaker.Horus
             return result;
         }
 
+        /// <summary>
+        /// Returns the hash of an array of data
+        /// </summary>
+        /// <param name="inputData"></param>
+        /// <returns></returns>
         public static byte[] GetHash(byte[] inputData)
         {
             using var alSHA = SHA256.Create();
             return alSHA.ComputeHash(inputData);
         }
 
+        /// <summary>
+        /// Returns the hash of a string. No idea why you'd want that,
+        /// but hey I made it so....
+        /// </summary>
+        /// <param name="inputString"></param>
+        /// <returns></returns>
         public static byte[] GetHash(string inputString)
         {
             return GetHash(Encoding.UTF8.GetBytes(inputString));
         }
 
+        /// <summary>
+        /// Hashes a string.
+        /// </summary>
         public static string GetHashString(string inputString)
         {
             StringBuilder sb = new StringBuilder();

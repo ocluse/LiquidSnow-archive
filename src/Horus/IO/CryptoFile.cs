@@ -9,18 +9,17 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Thismaker.Horus.Symmetrics;
 
-namespace Thismaker.Horus
+namespace Thismaker.Horus.IO
 {
 
     /// <summary>
     /// A file that, in it's natural state, holds it's data in an encrypted format.
     /// </summary>
-    public class CryptoFile:IDisposable
+    public class CryptoFile : IDisposable
     {
         #region Private Fields
         private byte[] _key;
         
-
         private readonly Stream _stream;
         #endregion
 
@@ -163,6 +162,9 @@ namespace Thismaker.Horus
             await Algorithm.DecryptAsync(input: _stream, output: stream, _key, progress, cancellationToken);
         }
 
+        /// <summary>
+        /// Closes and releases the underlying stream
+        /// </summary>
         public void Dispose()
         {
             _stream.Dispose();

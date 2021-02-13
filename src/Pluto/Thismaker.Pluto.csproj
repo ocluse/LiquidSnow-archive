@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Enigma\Thismaker.Enigma.csproj" />
+    <ProjectReference Include="..\Horus\Thismaker.Horus.csproj" />
   </ItemGroup>
 
 </Project>

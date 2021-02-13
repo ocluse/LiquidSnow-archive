@@ -3,110 +3,90 @@ using System.IO;
 using System.Text;
 using Thismaker.Horus.Classical;
 using Thismaker.Horus.Symmetrics;
+using Thismaker.Horus.IO;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Test.Enigma.NetCore
 {
     class Program
     {
-        static EnigmaMachine enigma;
-        static void Main(string[] args)
+        static async Task Main()
         {
-            Console.WriteLine("Enter a Key: ");
-            var key = Console.ReadLine().GetBytes<UTF8Encoding>();
+            Console.WriteLine("Provide a Key:");
+            var key = Console.ReadLine();
 
-            Console.WriteLine("Enter a plaintext");
-            var input = Console.ReadLine().GetBytes<UTF8Encoding>();
+            Console.WriteLine("Provide a path to the CryptoContainer");
+            var cryptoPath = Console.ReadLine();
 
-            var crypter = PredefinedSymmetric.AesFixed;
+            using var cryptoStream = new FileStream(cryptoPath, FileMode.OpenOrCreate);
+            using var container = new CryptoContainer(cryptoStream, key);
 
-            using var msInput = new MemoryStream(input);
-            using var msOutput = new MemoryStream();
-            crypter.Run(msInput, msOutput, key, true);
-
-            var output = msOutput.ToArray();
-
-            var input2 = new MemoryStream(output);
-            var output2 = new MemoryStream();
-
-            crypter.Run(input2, output2, key, false);
-
-            Console.WriteLine($"Output: {output2.ToArray().GetString<UTF8Encoding>()}");
+            Console.WriteLine("Enter path to extract the contents of the Container");
+            var outputPath = Console.ReadLine();
+            await container.ExtractContainerAsync(outputPath);
         }
 
-        static void Mainx(string[] args)
+        static async Task Mainxx()
         {
-            Console.WriteLine("Do you wish to create a new machine? [Y/N] ");
-            var input = Console.ReadLine();
+            Console.WriteLine("Provide a Key:");
+            var key = Console.ReadLine();
 
-            if (input.ToLower() == "y")
-            {
-                enigma = StandardEnigmaMachines.RandomASCII;
+            Console.WriteLine("Provide a path to create the CryptoContainer");
+            var cryptoPath = Console.ReadLine();
 
-                Console.WriteLine("Do you wish to save this machine [Y/N]");
-                input = Console.ReadLine();
+            var paths= new List<string>();
 
-                if (input.ToLower() == "y")
-                {
-                    Console.WriteLine("Provide a path where the machine will be saved:");
-                    input = Console.ReadLine();
-
-                    using var fs = new FileStream(input, FileMode.OpenOrCreate, FileAccess.Write);
-                    enigma.Save(fs);
-                }
-            }
-            else
-            {
-                Console.WriteLine("Provide path to machine to load:");
-                input = Console.ReadLine();
-
-                using var fs = new FileStream(input, FileMode.Open, FileAccess.Read);
-                enigma = EnigmaMachine.Load(fs);
-            }
-
-            Operate();
-        }
-
-        private static void Operate()
-        {
-            GetKey();
-
-            Work();
-
-            Operate();
-        }
-
-        private static void GetKey()
-        {
-            Console.WriteLine("Please provide a key to use:");
-            enigma.Key = Console.ReadLine();
-            enigma.ResetRotors();
-        }
-
-        private static void Work()
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("The EnigmaMachine is now Activated. Any Key you pressed will be remapped. Pressing escape will allow you to exit.");
-            Console.ResetColor();
             while (true)
             {
-                var input = Console.ReadKey(true);
-
-                if (input.Key == ConsoleKey.Escape)
-                {
-                    Console.WriteLine();
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Machine Exited");
-                    Console.ResetColor();
+                Console.WriteLine("Enter path to file to insert into CryptoFile:");
+                var inputPath = Console.ReadLine();
+                if (inputPath == "stop")
                     break;
-                }
-                if (input.Key == ConsoleKey.Enter)
-                {
-                    Console.WriteLine();
-                    continue;
-                }
-                var output = enigma.Run(input.KeyChar);
-                Console.Write(output);
+
+                paths.Add(inputPath);
             }
+
+            using var cryptoStream = new FileStream(cryptoPath, FileMode.OpenOrCreate);
+            using var container = new CryptoContainer(cryptoStream, key);
+
+            foreach(var path in paths)
+            {
+                using var inputStream = new FileStream(path, FileMode.Open);
+                await container.AddAsync(path, inputStream, false);
+            }
+        }
+
+        static async Task Paused()
+        {
+
+            Console.WriteLine("Provide a Key:");
+            var key = Console.ReadLine();
+
+            Console.WriteLine("Provide a path to create the CryptoFile");
+            var cryptoPath = Console.ReadLine();
+
+            Console.WriteLine("Enter path to file to insert into CryptoFile:");
+            var inputPath = Console.ReadLine();
+
+            using var cryptoStream = new FileStream(cryptoPath, FileMode.OpenOrCreate);
+            using var inputStream = new FileStream(inputPath, FileMode.Open);
+
+            using var ef = new CryptoFile(cryptoStream, key);
+            await ef.WriteAsync(inputStream);
+
+            Console.WriteLine("Enter path to extract the contents of the CryptoFile");
+            var outputPath = Console.ReadLine();
+            var outputStream = new FileStream(outputPath, FileMode.CreateNew);
+
+            await ef.ReadAsync(outputStream);
+
+            Console.WriteLine("Creating a copy to test the thing:");
+
+            inputStream.Position = 0;
+            using var fsTest = File.Create("test.crypto");
+            await PredefinedSymmetric.AesFixed.EncryptAsync(inputStream, fsTest, key.GetBytes<UTF8Encoding>());
+            ef.Dispose();
         }
     }
 }

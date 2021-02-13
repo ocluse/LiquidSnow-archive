@@ -6,6 +6,12 @@ namespace Thismaker.Horus
 {
 	static class Extensions
 	{
+		/// <summary>
+		/// Makes all letters uppercase and removes any spaces.
+		/// Useful for most classical encryption stuff
+		/// </summary>
+		/// <param name="strInput"></param>
+		/// <returns></returns>
 		public static string CapitalizeAndCompress(this string strInput)
 		{
 			strInput = Regex.Replace(strInput, @"\s+", "");
@@ -14,6 +20,10 @@ namespace Thismaker.Horus
 			return strInput;
 		}
 
+		/// <summary>
+		/// Relaces a character in the string, with the provided string,
+		/// returning a string with the character replaced.
+		/// </summary>
 		public static string ReplaceAt(this string strInput, int index, char c)
 		{
 			StringBuilder sb = new StringBuilder(strInput);
@@ -21,10 +31,6 @@ namespace Thismaker.Horus
 			return sb.ToString();
 		}
 
-		public static byte[] ToBytesUTF8(this string strInput)
-		{
-			return Encoding.UTF8.GetBytes(strInput);
-		}
 
 		public static byte[] ToBytesBase64(this string strInput)
         {
@@ -37,12 +43,9 @@ namespace Thismaker.Horus
 			return System.Convert.ToBase64String(plainTextBytes);
 		}
 
-		public static string ToUTF8(this string base64EncodedData)
-		{
-			var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
-			return Encoding.UTF8.GetString(base64EncodedBytes);
-		}
-
+		/// <summary>
+		/// True if the string contains the specified character
+		/// </summary>
 		public static bool Contains(this string str, char c)
         {
 			foreach(var ch in str){

@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TEnigma=Thismaker.Enigma.Enigma;
+using Thismaker.Horus;
 
 namespace Thismaker.Mercury
 {
@@ -27,7 +27,7 @@ namespace Thismaker.Mercury
 
         public ClientConnection()
         {
-            ConnectionId = TEnigma.GenerateID();
+            ConnectionId = Horus.Horus.GenerateID();
             ctsMain = new CancellationTokenSource();
         }
 
