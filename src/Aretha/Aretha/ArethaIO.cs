@@ -125,7 +125,7 @@ namespace Thismaker.Aretha
 
             progress.ProgressChanged += (o, e) =>
             {
-                if (DeltaTime.Elapsed < 250 && e != 1) return;
+                if (DeltaTime.Elapsed < 100 && e != 1) return;
 
                 DeltaTime.Capture();
                 int percent = (int)(e * 100.0f);

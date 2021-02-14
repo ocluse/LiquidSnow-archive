@@ -48,22 +48,23 @@ namespace Thismaker.Aretha
                 switch (cmdlets[0])
                 {
                     case "vigenere":
-                    case "ceasar":
+                    case "caesar":
                     case "playfair":
                         await Classical(cmdlets[0],cmdlets[1]);
-                        Aretha.SoulSucceeded(Soul.Anubis);
-                        return;
+                        break;
                     case "cryptofile":
                         await CryptoFile(cmdlets[1]);
-                        Aretha.SoulSucceeded(Soul.Anubis);
-                        return;
+                        break;
+		    case "crypto-container":
+			await CryptoContainer(cmdlets[1]);
+			break;
                     case "enigma-machine":
                         await EnigmaMachine(cmdlets[1]);
-                        Aretha.SoulSucceeded(Soul.Anubis);
-                        return;
+                        break;
                     default:
                         throw new InvalidOperationException("Unknown operation");
                 }
+		Aretha.SoulSucceeded(Soul.Anubis);
             }
             catch (Exception ex)
             {
@@ -71,6 +72,87 @@ namespace Thismaker.Aretha
                 return;
             }
         }
+
+	private async Task CryptoContainer(string cmd)
+	{
+		var containerPath = Ask("Provide a path to the crypto-container", false, true);
+		
+		var key = Ask("Provide a key to use");
+
+		using var containerStream = new FileStream(containerPath, FileMode.OpenOrCreate);
+		
+		using var container = new CryptoContainer(containerStream, key);
+		
+		if (cmd == "add")
+		{
+			var filepath = GetPath("Provide a path to the file you wish to add", true);
+			
+			var filename = Ask("Provide a name for the file", false, true);
+			
+			var exists = container.Exists(filename);
+			
+			if (exists)
+			{
+				var response = Ask("A file of similar name exists. Do you wish to overwrite it?", true);
+				if (response == "n") return;
+			}
+			
+			using var fileStream = File.OpenRead(filepath);
+			
+			Speak("Executing Command. Please Wait");
+			
+			await container.AddAsync(filename, fileStream, true, Aretha.WriteProgress());
+		}
+		else if (cmd == "get")
+		{
+			var filename = Ask("Provide a name of the file you wish to get", false, true);
+			
+			var filepath = GetPath("Provide a path where the decrypted file will be saved", false);
+
+			if ( !container.Exists(filename) )
+			{
+				Speak("The file does not exist in the container");
+				return;
+			}
+
+			using var fileStream = File.OpenWrite(filepath);
+			
+			Speak("Executing Command. Please Wait");
+			
+			await container.GetAsync(filename, fileStream, Aretha.WriteProgress());
+		}
+		else if (cmd == "delete")
+		{
+			var filename = Ask("Provide name of file to delete from the container", false, true);
+
+			if ( !container.Exists(filename) )
+			{
+				Speak("The file does not exist in the container");
+				return;
+			}
+
+			var isDeleted = container.Delete(filename);
+
+			if (!isDeleted)
+			{
+				Speak("Failed to delete the file");
+				return;
+			}
+		}
+		else if (cmd == "extract")
+		{
+			var extractPath = Ask("Provide the path to the container for extraction", false, true);
+
+			await container.ExtractContainerAsync(extractPath, Aretha.WriteProgress());
+		}	
+		else
+		{
+			Speak("Unknown input command");
+			return;
+		}
+
+		Speak("Task Completed Successfully!");
+	}
 
         private async Task CryptoFile(string cmd)
         {
@@ -119,8 +201,8 @@ namespace Thismaker.Aretha
 
                     var key = Ask("Provide the key to use:");
 
-                    using var fsFile = File.OpenRead(filePath);
-                    using var fsCrypt = File.OpenWrite(cryptoPath);
+                    using var fsFile = File.OpenWrite(filePath);
+                    using var fsCrypt = File.OpenRead(cryptoPath);
 
 
                     Speak("Executing Command. Please Wait");
@@ -140,7 +222,7 @@ namespace Thismaker.Aretha
 
         private Task Classical(string algName, string cmd)
         {
-            if (cmd != "encrypt" || cmd != "decrypt") 
+            if (cmd != "encrypt" && cmd != "decrypt") 
                 throw new InvalidOperationException($"{cmd} is not a valid classical algorithm command");
 
             try

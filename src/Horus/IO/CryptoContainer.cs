@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.IO.Packaging;
 using System.Threading.Tasks;
 using System.Threading;
@@ -206,15 +207,30 @@ namespace Thismaker.Horus.IO
                 Directory.CreateDirectory(outputDirecotry);
             }
             var parts = _package.GetParts();
+
+            int index = 0;
+            int count = parts.Count();
+                
+            var innerProgress = new Progress<float>{};
+            innerProgress.ProgressChanged += (o, e) => 
             {
-                foreach(var part in parts)
-                {
-                    var name = part.Uri.ToString();
-                    var path=IOUtility.CombinePath(outputDirecotry, name);
-                    var fs = new FileStream(path, FileMode.OpenOrCreate);
-                    using var ef = new CryptoFile(part.GetStream(), Key);
-                    await ef.ReadAsync(fs);
-                }
+                var percent = (index + e - 1) / count;
+                progress.Report(percent);
+            };
+
+            if (progress == null)
+                innerProgress = null;
+
+            foreach(var part in parts)
+            {
+                var name = part.Uri.ToString();
+                var path=IOUtility.CombinePath(outputDirecotry, name);
+                var fs = File.OpenWrite(path);
+                using var cryptoStream = part.GetStream();
+                var length = cryptoStream.Length;
+                using var ef = new CryptoFile(cryptoStream, Key);
+                await ef.ReadAsync(fs, innerProgress);
+                index++;
             }
         }
 

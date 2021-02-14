@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Aretha/Aretha.csproj",
+                "${workspaceFolder}/src/Aretha/Thismaker.Aretha.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Aretha/Aretha.csproj",
+                "${workspaceFolder}/src/Aretha/Thismaker.Aretha.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +32,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/Aretha/Aretha.csproj",
+                "${workspaceFolder}/src/Aretha/Thismaker.Aretha.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

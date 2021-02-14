@@ -179,7 +179,11 @@ namespace Thismaker.Horus.Classical
 
             if (index == -1) throw new InvalidOperationException("Character not found in alphabet");
 
-            index = (index + steps) % Count;
+            index += steps;
+	    
+	    while ( index >= Count ) index -= Count;
+
+	    while ( index < 0 ) index += Count;
 
             return this[index];
         }
