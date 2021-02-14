@@ -223,13 +223,15 @@ namespace Thismaker.Horus.IO
 
             foreach(var part in parts)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+
                 var name = part.Uri.ToString();
                 var path=IOUtility.CombinePath(outputDirecotry, name);
-                var fs = File.OpenWrite(path);
-                using var cryptoStream = part.GetStream();
-                var length = cryptoStream.Length;
-                using var ef = new CryptoFile(cryptoStream, Key);
-                await ef.ReadAsync(fs, innerProgress);
+                using var fs = File.OpenWrite(path);
+                await GetAsync(name, fs, innerProgress);
                 index++;
             }
         }
