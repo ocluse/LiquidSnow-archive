@@ -26,7 +26,7 @@
     <SolidColorBrush x:Key="AccentDisabled" Color="#4D4D4D"/>
 
     <SolidColorBrush x:Key="PanelForeground" Color="#1A1A1A"/>
-    <SolidColorBrush x:Key="PanelGray" Color="#4D4D4D"/>
+    <SolidColorBrush x:Key="PanelGray" Color="#999999"/>
     <SolidColorBrush x:Key="PanelGrayDark" Color="#FF3F3F3F"/>
     <SolidColorBrush x:Key="PanelBackground" Color="White"/>
     <SolidColorBrush x:Key="PanelSecondary" Color="#999999"/>

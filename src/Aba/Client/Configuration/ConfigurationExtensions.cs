@@ -11,7 +11,7 @@ namespace Thismaker.Aba.Client
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static AbaClientBuilder<T> WithConfiguration<T>(this AbaClientBuilder<T> aba, IConfiguration config)where T:Aba.Client.ClientBase<T>, new()
+        public static AbaClientBuilder<T> WithConfiguration<T>(this AbaClientBuilder<T> aba, IConfiguration config)where T:ClientBase<T>, new()
         {
             aba.client.Configure(config);
 

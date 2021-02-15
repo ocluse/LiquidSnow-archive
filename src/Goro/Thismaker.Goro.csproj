@@ -4,13 +4,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <Authors>Thismaker</Authors>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Goro is a UI/UX design library that allows you to create great looking WPF applications by providing custom themes. Almost all controls have been reskinned to look uniform and great. Allows you to use icons, such as those in SegoeMDL2 or those by Material Design by Google.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ui ux ui/ux ui-ux user-interface material-design themes</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -245,5 +245,10 @@ namespace Thismaker.Horus.Classical
         {
             return !d1.Equals(d2);
         }
+
+        public override string ToString()
+        {
+            return $"{X}x{Y}";
+        }
     }
 }

@@ -148,7 +148,7 @@ namespace Thismaker.Horus.Symmetrics
             alg.Key = key;
             alg.IV = iv;
 
-            float workedOn = 0;
+            long workedOn = 0;
             var trans = forward ? alg.CreateEncryptor() : alg.CreateDecryptor();
             using var csInput = new CryptoStream(input, trans, CryptoStreamMode.Read);
             while (true)
@@ -160,16 +160,18 @@ namespace Thismaker.Horus.Symmetrics
 
                 var buffer = new byte[8];
                 int read = csInput.Read(buffer, 0, buffer.Length);
-                if (read == 0)
-                {
-                    break;
-                }
+                
                 output.Write(buffer, 0, read);
 
                 workedOn += read;
                 if(progress!=null && input.CanSeek)
                 {
-                    progress.Report(workedOn / input.Length);
+                    progress.Report(workedOn /(float) input.Length);
+                }
+
+                if (read == 0)
+                {
+                    break;
                 }
             }
 

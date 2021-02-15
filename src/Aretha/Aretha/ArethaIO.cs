@@ -123,25 +123,28 @@ namespace Thismaker.Aretha
 
             DeltaTime.Capture();
 
+            Console.WriteLine();
+
             progress.ProgressChanged += (o, e) =>
             {
-                if (DeltaTime.Elapsed < 100 && e != 1) return;
+                var er = Math.Round(e, 2);
+                if (DeltaTime.Elapsed < 100 && er != 1) return;
 
                 DeltaTime.Capture();
-                int percent = (int)(e * 100.0f);
+                int percent = (int)(er * 100.0f);
 
                 if (percent - previousProgress < 1) return;
 
                 previousProgress = percent;
 
-                Console.Write("\r");
+                
                 string progBar = "Execution Progress: ";
                 for (int i = 0; i <= 100; i += 10)
                 {
                     if (i <= percent) progBar += "|";
                     else progBar += ".";
                 }
-
+                Console.Write("\r");
                 progBar += $" {percent}%";
 
                 Console.Write(progBar);

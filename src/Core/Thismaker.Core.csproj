@@ -4,13 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Very useful library that provide some fundamental utlilities, extensions and abilities that are usually used in almost every other development scenario.</Description>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <PackageTags>thismaker core extensions fundamentals  generic</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

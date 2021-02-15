@@ -4,13 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Horus allows you to deal with several forms of encryption, and provides the useful CryptoFile and CryptoContainer to organize your app's data securely. It also has extras, like the ability to work simulate Enigma Machines, and perform classical ciphers such as playfair.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>encryption security ceasar-cipher playfair symmetric-algorithm aes encrypted</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

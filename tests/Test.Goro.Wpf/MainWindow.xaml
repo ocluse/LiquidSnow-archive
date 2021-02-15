@@ -90,6 +90,7 @@
                     <Button IsEnabled="False" Margin="15 10 0 0" Content="Hello" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" Click="Button_Click"/>
                     <Button  Margin="10" Content="I'm a link click me"  VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource LinkButton}" Click="Button_Click_1"/>
                     <goro:StatusIndicator Status="Information" Design="MaterialDesign"/>
+                    <ProgressBar Value="20" Maximum="100" Margin="10" Height="10"/>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

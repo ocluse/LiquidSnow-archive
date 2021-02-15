@@ -2,16 +2,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>For apps that rely on SignalRCore and WebApi, this allows you to build the client side of Server-Client based applications rapidly.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
     <Copyright></Copyright>
-    <PackageReleaseNotes>First release. Api is generally frozen. I don't know what to put here. Thank you.</PackageReleaseNotes>
+    <PackageReleaseNotes>General fixes.</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

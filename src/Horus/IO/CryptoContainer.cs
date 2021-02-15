@@ -214,7 +214,7 @@ namespace Thismaker.Horus.IO
             var innerProgress = new Progress<float>{};
             innerProgress.ProgressChanged += (o, e) => 
             {
-                var percent = (index + e - 1) / count;
+                var percent = (index + e) / count;
                 progress.Report(percent);
             };
 

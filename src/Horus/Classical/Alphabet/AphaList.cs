@@ -35,10 +35,16 @@ namespace Thismaker.Horus.Classical
             items.RemoveAt(index);
         }
 
-        public void Add(char item)
+        public bool Add(char item)
         {
-            if (Contains(item)) return;
+            if (Contains(item)) return false;
             items.Add(item);
+            return true;
+        }
+
+        void ICollection<char>.Add(char c)
+        {
+
         }
 
         public void Clear()
@@ -65,5 +71,6 @@ namespace Thismaker.Horus.Classical
         {
             return items.GetEnumerator();
         }
+
     }
 }

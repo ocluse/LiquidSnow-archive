@@ -9,10 +9,11 @@
     <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
     <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
     <PackageReleaseNotes>First release. Very frozen. Don't fear using.</PackageReleaseNotes>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Client\Thismaker.Aba.Client.csproj" />
-    <ProjectReference Include="..\Msal\Thismaker.Aba.Client.Msal.csproj" />
   </ItemGroup>
 
   <ItemGroup>

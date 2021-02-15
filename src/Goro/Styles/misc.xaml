@@ -21,6 +21,59 @@
         </Setter>
     </Style>
 
+    <!--#region Progbar-->
+    <Style x:Key="{x:Type ProgressBar}" TargetType="{x:Type ProgressBar}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                    <Grid MinHeight="14"
+                          MinWidth="200"
+                          Background="{TemplateBinding Background}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Determinate" />
+                                <VisualState x:Name="Indeterminate">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Duration="00:00:00"
+                                                     Storyboard.TargetName="PART_Indicator"
+                                                     Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="00:00:00">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <SolidColorBrush>Transparent</SolidColorBrush>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        
+                        <Border x:Name="PART_Track"
+                                BorderThickness="1"/>
+                        <Border x:Name="PART_Indicator"
+                                BorderThickness="1"
+                                HorizontalAlignment="Left"
+                                Background="{TemplateBinding Foreground}"
+                                >
+                            <Grid ClipToBounds="True" x:Name="Animation">
+
+                                <Rectangle x:Name="PART_GlowRect" 
+                                           Width="100"
+                                           HorizontalAlignment="Left" 
+                                           Fill="{TemplateBinding Foreground}" 
+                                           Margin="-100,0,0,0" />
+                            </Grid>
+                        </Border>
+                        
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background" Value="{DynamicResource PanelHighlight}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+    </Style>
+    <!--#endregion-->
+    
     <!--#region Context Menu and Menus-->
     <Style TargetType="{x:Type ContextMenu}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
