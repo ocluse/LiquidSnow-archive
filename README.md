@@ -25,3 +25,24 @@ A library dedicated to Steganography(not sure if I spelled that right). It allow
 ## 8. Aba
 After noticing overwhelming similarities among several Server-Client based applications I was creating, I decided to condense the code into a single-shareable library that can be used easily to get such applications running. Aba is exteremly useful, only rivaled by perhaps Core, Enigma and Goro. Aba comes in three parts: AbaClient, which is responsible for handling client side states, such as requesting for Access Tokens, making HTTP requests to a WebApi and more, AbaServer, which has utility for generating custom JWT tokens, server-side authentication, and more core server infrstructure. Finally there is AbaCommon, which provides the common ground for the server and the client to work on.
 
+
+
+----
+
+### Code of Conduct
+
+While contributing to the project, please maintain a healthy environment for everyone. TO do this, kindly adhere to the stipulated [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+
+
+----
+
+### Security
+Read the [Security Policy](.github/SECURITY.md) document to see the security policy and how to help in case of a vulnerability.
+
+
+----
+
+### 📜 License
+
+This project is Copyright (c) Thismaker and licensed under the terms of the [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
