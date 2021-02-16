@@ -2,11 +2,12 @@
 
 ## Supported Versions
 
-Please use version 1.1.0 as it is the latest working update version.
+Please use version 1.0.2 as it is the latest working update version.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.1.0   | :white_check_mark: |
+| 1.0.2	  | :white_check_mark: |
+| 1.0.1   | :x:                |
 | 0.0.5   | :x:                |
 
 ## Reporting a Vulnerability

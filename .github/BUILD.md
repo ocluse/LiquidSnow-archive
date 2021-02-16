@@ -20,11 +20,11 @@ To install the, check out [How to Insall](https://docs.microsoft.com/en-gb/dotne
 
 ---
 ---
-## Building Specific LiquidSnow Projects on `Linux`.
+## Building Specific LiquidSnow Projects/Assemblies on `Linux`.
 ```
 dotnet build [PROJECT] --runtime [DISTRO]
 ```
-Replace [PROJECT] with a specific LiquidSnow project e.g. Aretha.
+Replace [PROJECT] with a specific LiquidSnow project/assembly e.g. Aretha.
 Replace [DISTRO] with a specific Linux distro and its architecture e.g. Ubuntu.18.04-x64.
 
 Example build of Aretha for Ubuntu
