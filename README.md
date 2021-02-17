@@ -1,38 +1,48 @@
-# :heavy_exclamation_mark: __Warning__
-The framework is currently under migratory construction. Most of the details written here might not work, and some functions may not work as intended. Please only use it in an experimental environment until  create a release, which should be very soon.
-
 # LiquidSnow
-The LiquidSnow is a collection of .NET assemblies that you can use to make your .NET development work easy. Although it's still in development and is highly unstable, it is super conveneint for various tasks that trouble the .NET developer even in it's current state. Below is a preview of what each of the assemblies do:
+The LiquidSnow is a collection of .NET assemblies that you can use to make your .NET development work easy. It covers mutitudes of bases, from fundamental concepts to those that I just added for fun. While most of the API is generally frozen, there may still be breaking changes in the future, so keep this in mind. If you have any issues, don't hesitate to ask for assistance in the issues tab. Also, check the Wiki for documentation on how to use the Framework.
 
 ## ___*Aretha*___
-If you want to see some of the cool things you could do with LiquidSnow, build Aretha and run it. It is a .NET 5 Console Application, therefore multiplatform. The longterm intention is for Aretha to be used as a mini LiquidSnow tool, currently you could use it to perform various Classical ciphers performed by `Thismaker.Enigma` and also encrypt and decrypt files from the same library, it also allows you to experiment with the code in `Thismaker.Anubis` by injecting data into bitmap images and ejecting data thereof. If you want a quick example, build and run aretha then type `summon Anubis bitmap inject` and follow through the prompts.
+If you want to see some of the cool things you could do with LiquidSnow, clone the repository, build Aretha and run it. It is a .NET Core Console App, therefore you can build it on Linux, Windows and Mac. Once you've run it, you should see: `Aretha: Ready to summon`. Type `summon anubis bitmap inject` and follow through the prompts. This should kickstart a process that will allow you to hide a file of your chosing inside an image of your chosing. Be sure to check out the Wiki to see all the things you should be able to do with Aretha. 
 
 ## 1. Core
-Core is a collection of exteremly fundamental and useful utilities and extensions that are necessary across of .NET development platforms. For example it provides interfaces to get properties, by name from objects, corrects the failures of `System.IO.Path.Combine()` by adding a better and perhaps more philosophically correct approach, plus a bunch of other super cool stuffs. Perhaps this is the most important, most of the other assemblies actively depend on it.
+Core is a collection of exteremly fundamental and useful utilities and extensions that are necessary across of .NET development platforms. For example it provides interfaces to get properties, by name from objects, corrects the failures of `System.IO.Path.Combine()` by adding a better and perhaps more philosophically correct approach, plus a bunch of other super cool stuffs. All the other assemblies in the framework actively depend on it. Check out the Wiki for how to use the methods and functions defined in Core. I'm certain you shall find one of them useful.
 
-## 2. Enigma
-Perhaps my favourite, it is just basically Encryption. Enigma allows for fanatics like myself an opportunity to cipher, decipher and hack classical encryption methods like the playfair, ceaser and more, and most importantly it provides a mechanism for file encryption and protection. It does this by providing the `EnigmaFile` and `EnigmaContainer`, the file basically provides a way to encrypt and decrypt single files securely as a developer, if you use a lot of serialization like me and save the string to file, you'll find this very handy as it can automatically convert a C#  generic `object` and store it to a file. The `EnigmaContainer`, on the other hand provides an interface for developers to store collections of data, essentially it manages several instances of EnigmaFiles in what can be thought of as a 'safe'. The project is .NET Standard so anywhere .NET can run, it can run.
+## 2. Horus
+Extensive library with a main focus on encryption. Currently it handles 2 main categories: classical algorithms, such as playfair and vigenere, and symmetric algorithms, such as AES and Rijndael. On top of that, it provides an IO structure for safely and securely storing files by means of encryption. It does this by providing the `CryptoFile`(single files) and the `CryptoContainer`(multiple files) objects. Horus can also simulate the EnigmaMachine, allows you to define your own EnigmaMachine or use one of the predefined ones based on real models.
 
 ## 3. Goro
-A super interesting one, one that came about by my need of creating nice UIs that are standardized. Goro is the WPF developers pie, it supports themes(accent colors, darkmode/lightmode), contains custom controls and has several useful utilities, such as those that convert `Bitmaps` to `BitmapImages`, and so many more. It provides skinning and styles for several wpf controls, and provides basic colors to get you started. This can only be used, unfortunately, in a .NET WPF project, it's for designing so duh? Also also, Goro is 'Drawing' in my native language, if you ever wonder where the name came from.
-
-To see how you can use goro in your project, view the project's [Readme](https://github.com/thismaker/LiquidSnow/blob/main/src/Goro/Readme.md)
+A super interesting one, one that came about by my need of creating nice UIs that are standardized. Goro is the WPF developers pie, it supports themes(accent colors, darkmode/lightmode), contains custom controls and has several useful utilities, such as those that convert `Bitmaps` to `BitmapImages`, and so many more. It provides skinning and styles for several fundamental wpf controls, and provides basic colors to get you started. This can only be used, unfortunately, in a .NET WPF project, it's for designing so duh? Also also, Goro is 'Drawing' in my native language, if you ever wonder where the name came from. Check the Wiki for more info.
 
 ## 4. Mercury
-Just like the Roman god Mercury, this assembly is useful for those intending to send messages. It provides a Server-Client infrastructure that the dotnet developer can use to make his/her life very easy. This project is currently in cooldown mode as I focus on other projects in the framework. Expect a load of updates. It's usefulness is also limited, in part, by the existence of the greater Aba.
+Just like the Roman god Mercury, this assembly is useful for those intending to send messages. It provides a Server-Client infrastructure for sending message over Net Sockets (not __WebSockets!__). As such, it is exteremely barebones. For a better approach, utilise `Thismaker.Aba.Client` and `Thismaker.Aba.Server` to create superior client-server applications.
 
 ## 5. Pluto
-Basically, if you're developing software that has anything Financial or Accounting in it, Pluto is the one for you. The assembly provides interface and logic for dealing with Financial Accounting information and data, using accepted international standards. It is .NET Standard, so chill, it will be easy to intergrate it to the stuff you already have.
-
-## 6. Lansique
-Basically again, if you're developing software that has anything legal, lawyerish in it, then this will help you. Although still under construction, it's ultimate goal is to provide a way to organize legal documents, parse them from the web and allow the dotnet developer to present such data to the user ***meaningfully.***
-
-## 8. Sia
-Basically again again, Sia is for those who are organizing libraries and as such, in it's complete form, it is intended to be fully able to manage libraries, and provide interfaces that the dotnet developer can use to display such library information to the user, such as loading pdf documents, organizing files, viewing ebups etc. Sia is still in very early developemt and its definite path is yet to be shaped, I'm a solo dev, remeber....these things drain :)
+It provides a crude framework for developing financial management and accounting based applications.
 
 ## 7. Anubis
-A library dedicated to Steganography(not sure if I spelled that right). Currently, there is a `BitmapJector` class that allows one to inject data into bitmaps and retrieve it later. I could say that Anubis is the most exciting of all the libraries, I've always had a thing for secrets, and it provides a way to hide things so..... Anyway, using Anubis and Enigma will make the dotnet developer unstoppable when it comes to security. Currently I am looking to create a way to hide data in audio files, starting with the WAV files as it is the simplest, ya'll should wish me luck :)
+A library dedicated to Steganography(not sure if I spelled that right). It allows you to hide files and data in images and WAV  audio files.
 
 ## 8. Aba
 After noticing overwhelming similarities among several Server-Client based applications I was creating, I decided to condense the code into a single-shareable library that can be used easily to get such applications running. Aba is exteremly useful, only rivaled by perhaps Core, Enigma and Goro. Aba comes in three parts: AbaClient, which is responsible for handling client side states, such as requesting for Access Tokens, making HTTP requests to a WebApi and more, AbaServer, which has utility for generating custom JWT tokens, server-side authentication, and more core server infrstructure. Finally there is AbaCommon, which provides the common ground for the server and the client to work on.
+
+
+
+----
+
+### Code of Conduct
+
+While contributing to the project, please maintain a healthy environment for everyone. TO do this, kindly adhere to the stipulated [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+
+
+----
+
+### Security
+Read the [Security Policy](.github/SECURITY.md) document to see the security policy and how to help in case of a vulnerability.
+
+
+----
+
+### 📜 License
+
+This project is Copyright (c) Thismaker and licensed under the terms of the [Apache License Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
