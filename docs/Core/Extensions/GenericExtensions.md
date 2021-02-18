@@ -1,4 +1,4 @@
-# Introduction
+# Generic Extensions
 Generic Extensions usually target `System.Collection.Generic` namespace.
 Extensions provided include:
 1. [Move<T>(int oldIndex, int newIndex)](#movetint-oldindex-int-newindex)
@@ -8,9 +8,8 @@ Extensions provided include:
 5. [Rotate<T>(int offset)](#rotatetint-offset)
 6. [RotateLinquish<T>(int offset)](#rotatelinquishtint-offset)
 
-Most of these extensions apply to IList<T> and the `SearchPattern<T>(Func<T[], T, bool>[] matches)` extension applies to all `IEnumerables`.
+Most of these extensions apply to `IList<T>` and the `SearchPattern<T>(Func<T[], T, bool>[] matches)` extension applies to all `IEnumerables`.
 
-# Extensions
 ## `Move<T>(int oldIndex, int newIndex)`
 This extension moves an item within the list from its current index(`oldIndex`)
 to a new index(`newIndex`). The overload `Move<T>(T item, int newIndex)` moves the specified `item` from it's current index to the new index.
