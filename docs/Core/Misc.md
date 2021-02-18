@@ -65,4 +65,4 @@ static void Main(string[] args)
     contact.Name=Console.ReadLine();
 }
 ```
-The preceeding example makes use of the `GetPropValue(string)` extension provided by Core. To see more extensions provided by core, see [Extensions](.\Extensions\Extensions.md)
+The preceeding example makes use of the `GetPropValue(string)` extension provided by Core. To see more extensions provided by core, see [Extensions](./Extensions/Extensions.md)
