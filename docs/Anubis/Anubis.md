@@ -14,7 +14,7 @@ This is the binary representation for the number 231. The Least Significant Bit 
 
 With this in mind, and returning to our pixel channels. Imagine changing the least significant bit for a specific channel. There should be very little difference between the overall output pixel and the original pixel. Consider the image below:
 
-![LIB DIFFERENCE DEMONSTRATION](.\images\lsb-difference-demonstration.png "Significance of the LSB in pixels")
+<img src=".\images\lsb-difference-demonstration.png"/>
 
 As you can see, there is no perceptible difference between these two images, though they both have different values of RGB.
 
