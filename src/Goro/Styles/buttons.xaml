@@ -50,9 +50,9 @@
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="border" Property="Background" Value="{Binding Background, 
-                                RelativeSource={RelativeSource TemplatedParent}, ConverterParameter='D',
-                                Converter={StaticResource colorConverter}}"/>
-                                
+                                RelativeSource={RelativeSource TemplatedParent}
+                                ,ConverterParameter='D', Converter={StaticResource colorConverter}}"/>
+
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="border" Property="Background" Value="{Binding Background, 

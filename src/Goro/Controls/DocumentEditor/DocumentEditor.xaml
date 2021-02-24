@@ -4,12 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Thismaker.Goro"
-             xmlns:VM="clr-namespace:Thismaker.Goro.Controls"
              mc:Ignorable="d" 
              xmlns:sys="System.Windows.Media"
              d:DesignHeight="450" d:DesignWidth="800" Background="{DynamicResource PanelBackground}">
     <UserControl.DataContext>
-        <VM:DocumentEditorViewModel/>
+        <local:DocumentEditorViewModel/>
     </UserControl.DataContext>
     <Grid>
         <Grid.RowDefinitions>

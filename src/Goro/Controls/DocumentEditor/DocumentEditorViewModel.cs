@@ -11,7 +11,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using Thismaker.Goro.Commands;
 
-namespace Thismaker.Goro.Controls
+namespace Thismaker.Goro
 {
     internal class DocumentEditorViewModel:BindableBase
     {

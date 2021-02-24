@@ -48,15 +48,12 @@ namespace Thismaker.Aba.Client.Transfers
         /// Fired whenever an error occurs with the transfer processs for <b>queued</b> Transfers
         /// </summary>
         public event Action<Exception> TransferFailed;
-        
+
         #endregion
 
         #region Properties
 
-        public bool RequeueOnError
-        {
-            get;set;
-        }
+        public bool RequeueOnError { get; set; } = true;
         #endregion
 
         #region Initialization
@@ -66,14 +63,14 @@ namespace Thismaker.Aba.Client.Transfers
             auth = authenticator;
 
             _queued = new ObservableQueue<Transfer>();
-
+            _active = new ObservableCollection<Transfer>();
             _queued.CollectionChanged += OnQueuedChanged;
             _active.CollectionChanged += OnInvokedChanged;
         }
 
         private void OnInvokedChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            CollectionChanged.Invoke(this, e);
+            CollectionChanged?.Invoke(this, e);
         }
 
         private void OnQueuedChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -95,7 +92,7 @@ namespace Thismaker.Aba.Client.Transfers
             }
 
             //Inform our observers:
-            CollectionChanged.Invoke(this, e);
+            CollectionChanged?.Invoke(this, e);
         }
 
         #endregion
@@ -269,6 +266,37 @@ namespace Thismaker.Aba.Client.Transfers
             {
                 transfer.TransferCancelled -= OnTransferCancelled;
             }
+        }
+
+        /// <summary>
+        /// Determines whether the SAS protected blob exists
+        /// </summary>
+        /// <param name="blobName">The name of the blob</param>
+        /// <returns>True if the blob exists</returns>
+        public async Task<bool> Exists(string blobName)
+        {
+            var uri = await auth.GetSASToken(blobName);
+
+            //build the blob:
+            var blob = new BlobClient(uri);
+
+            return blob.Exists();
+        }
+
+        /// <summary>
+        /// Allows you to delete a SAS protected blob.
+        /// Blob will only be deleted if it exists
+        /// </summary>
+        /// <param name="blobName">The name of the blob to delete</param>
+        /// <returns></returns>
+        public async Task Delete(string blobName)
+        {
+            var uri = await auth.GetSASToken(blobName);
+
+            //build the blob:
+            var blob = new BlobClient(uri);
+
+            blob.DeleteIfExists();
         }
 
         #endregion
