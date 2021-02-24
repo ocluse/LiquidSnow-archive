@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading;
 using Thismaker.Core; 
 
 namespace Thismaker.Aba.Client.Transfers
@@ -31,22 +33,32 @@ namespace Thismaker.Aba.Client.Transfers
 
     public abstract class Transfer : BindableBase
     {
+        #region Private Fields
+        private string _name, _blobName;
+        private TransferMode _mode;
+        private TransferState _state;
+        private readonly CancellationTokenSource _cancellationTokenSource;
+        #endregion
+
+        #region Init
+
+        public event Action<Transfer> TransferCancelled;
+
         internal Transfer()
         {
             State = TransferState.Waiting;
+            _cancellationTokenSource = new CancellationTokenSource();
         }
+        #endregion
 
-        private string name, blobName;
-        private TransferMode mode;
-        private TransferState state;
-
+        #region Properties
         /// <summary>
         /// The name of the transfer, as a general identifier
         /// </summary>
         public string Name
         {
-            get { return name; }
-            internal set { SetProperty(ref name, value); }
+            get { return _name; }
+            internal set { SetProperty(ref _name, value); }
         }
 
         /// <summary>
@@ -54,8 +66,8 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public string BlobName
         {
-            get { return blobName; }
-            internal set { SetProperty(ref blobName, value); }
+            get { return _blobName; }
+            internal set { SetProperty(ref _blobName, value); }
         }
 
         /// <summary>
@@ -63,8 +75,8 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public TransferMode Mode
         {
-            get { return mode; }
-            internal set { SetProperty(ref mode, value); }
+            get { return _mode; }
+            internal set { SetProperty(ref _mode, value); }
         }
 
         /// <summary>
@@ -72,14 +84,39 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public TransferState State
         {
-            get { return state; }
-            internal set { SetProperty(ref state, value); }
+            get { return _state; }
+            internal set { SetProperty(ref _state, value); }
         }
+
+        /// <summary>
+        /// The cancellation token associated with the transfer, 
+        /// that will be tripped when the transfer is cancelled.
+        /// </summary>
+        public CancellationToken CancellationToken
+        {
+            get { return _cancellationTokenSource.Token; }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Cancels the transfer, if it had already started or waiting in a queue
+        /// </summary>
+        public void Cancel()
+        {
+            if(State!=TransferState.Cancelled)
+            _cancellationTokenSource.Cancel();
+            State = TransferState.Cancelled;
+            TransferCancelled.Invoke(this);
+        }
+        #endregion
     }
 
     public enum TransferState
     {
-        Processing, Waiting, Error, Requeued
+        Processing, Waiting, Error, Requeued, Cancelled
     }
 
     public enum TransferMode

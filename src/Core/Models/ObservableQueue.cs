@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
 
-namespace Thismaker.Core.Utils
+namespace Thismaker.Core.Models
 {
     /// <summary>
     /// A <see cref="Queue{T}"/> that raises events whenenevr it changes. Useful for binding scenarios
