@@ -9,8 +9,8 @@
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.6</Version>
-    <PackageReleaseNotes>Added ability to check if blob exists, and deleting blobs.</PackageReleaseNotes>
+    <Version>1.0.7</Version>
+    <PackageReleaseNotes>Fixed an issue that was closing StreamTransfers, making them virtual unuseful for MemoryStreams</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

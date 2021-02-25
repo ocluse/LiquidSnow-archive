@@ -147,14 +147,16 @@ namespace Thismaker.Aba.Client.Transfers
                 //build the blob:
                 var blob = new BlobClient(uri);
                 Stream stream;
-
+                bool dispose;
                 //Locate the destination/origin stream for the transfer
                 if (transfer.GetType() == typeof(StreamTransfer))
                 {
+                    dispose = false;
                     stream = ((StreamTransfer)transfer).Stream;
                 }
                 else
                 {
+                    dispose = true;
                     if (transfer.Mode == TransferMode.Upload)
                     {
                         stream = File.OpenRead(((FileTransfer)transfer).Path);
@@ -180,7 +182,7 @@ namespace Thismaker.Aba.Client.Transfers
                     
                     await blob.DownloadToAsync(stream, transfer.CancellationToken);
                 }
-
+                if(dispose)
                 stream.Dispose();
             }
             catch (DirectoryNotFoundException ex)
