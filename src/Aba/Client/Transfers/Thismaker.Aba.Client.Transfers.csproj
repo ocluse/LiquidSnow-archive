@@ -9,7 +9,8 @@
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.2</Version>
+    <Version>1.0.6</Version>
+    <PackageReleaseNotes>Added ability to check if blob exists, and deleting blobs.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

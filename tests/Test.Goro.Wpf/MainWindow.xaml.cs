@@ -43,7 +43,21 @@ namespace Test.Goro.Wpf
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ThemeManager.Theme = ThemeManager.Theme == ThemeMode.Dark ? ThemeMode.Light : ThemeMode.Dark;
+            GoroMessageBox.Design = IconDesign.MaterialDesign;
+            var result=GoroMessageBox.Show("Hello", "Where is my mother? Lorem ipsum sint amen faxi daremones", MessageBoxButton.YesNo, StatusInfo.Warning);
 
+            if (!result.HasValue)
+            {
+                GoroMessageBox.Show("Results inconclusive");
+            }
+            else if (result == true)
+            {
+                GoroMessageBox.Show("It was ok");
+            }
+            else
+            {
+                GoroMessageBox.Show("It was false");
+            }
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

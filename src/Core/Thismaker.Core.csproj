@@ -11,7 +11,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>thismaker core extensions fundamentals  generic</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
+    <PackageReleaseNotes>Fixed namespaces.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

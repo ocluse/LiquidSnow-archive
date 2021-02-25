@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
 
-namespace Thismaker.Core.Utils
+namespace Thismaker.Core.Models
 {
     /// <summary>
     /// A see <see cref="Stack{T}"/> that raises events when changed. Useful for binding and stuff

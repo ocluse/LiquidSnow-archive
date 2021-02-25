@@ -8,6 +8,7 @@
     <Style TargetType="{x:Type local:StatusIndicator}">
         <Setter Property="Width" Value="30"/>
         <Setter Property="Height" Value="30"/>
+        <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:StatusIndicator}">
@@ -15,7 +16,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid>
-                            <local:SymbolIcon Icon="{TemplateBinding Status, Converter={StaticResource iconConverter}, ConverterParameter='Status'}" 
+                            <local:SymbolIcon Foreground="{TemplateBinding Foreground}" Icon="{TemplateBinding Status, Converter={StaticResource iconConverter}, ConverterParameter='Status'}" 
                                               Design="{TemplateBinding Design}"
                                               Height="{TemplateBinding Height}"
                                               Width="{TemplateBinding Width}"/>

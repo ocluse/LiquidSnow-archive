@@ -6,15 +6,41 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Thismaker.Core.Models;
+using System.Collections.Specialized;
+using System.Collections;
 
 namespace Thismaker.Aba.Client.Transfers
 {
-    public class TransferManager
+    public class TransferManager : INotifyCollectionChanged, IEnumerable<Transfer>
     {
+        #region Implementations
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public IEnumerator<Transfer> GetEnumerator()
+        {
+            var active = new List<Transfer>();
+            active.AddRange(_queued);
+            active.AddRange(_active);
+
+            return active.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            var active = new List<Transfer>();
+            active.AddRange(_queued);
+            active.AddRange(_active);
+
+            return active.GetEnumerator();
+        }
+
+        #endregion
+
         #region Private Fields
-        private readonly Queue<Transfer> pending;
+        private readonly ObservableCollection<Transfer> _active;
+        private readonly ObservableQueue<Transfer> _queued;
         private readonly ITransferAuthenticator auth;
-        private readonly Timer transferTimer;
         #endregion
 
         #region Events
@@ -22,15 +48,12 @@ namespace Thismaker.Aba.Client.Transfers
         /// Fired whenever an error occurs with the transfer processs for <b>queued</b> Transfers
         /// </summary>
         public event Action<Exception> TransferFailed;
+
         #endregion
 
         #region Properties
 
-
-        /// <summary>
-        /// A list of the current transfers, including the inactive ones
-        /// </summary>
-        public ObservableCollection<Transfer> ActiveTransfers { get; private set; }
+        public bool RequeueOnError { get; set; } = true;
         #endregion
 
         #region Initialization
@@ -39,47 +62,83 @@ namespace Thismaker.Aba.Client.Transfers
             //Set authenticator:
             auth = authenticator;
 
-            //Init:
-            ActiveTransfers = new ObservableCollection<Transfer>();
-            pending = new Queue<Transfer>();
-
-            //Transfer timer:
-            transferTimer = new Timer(1.0f)
-            {
-                Enabled = true,
-                AutoReset = true
-            };
-            transferTimer.Elapsed += TransferTimer_Elapsed;
-            transferTimer.Start();
+            _queued = new ObservableQueue<Transfer>();
+            _active = new ObservableCollection<Transfer>();
+            _queued.CollectionChanged += OnQueuedChanged;
+            _active.CollectionChanged += OnInvokedChanged;
         }
 
-        private async void TransferTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void OnInvokedChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            //Confirm that we have files currently pending
-            if (pending.Count == 0)
-            {
-                return;
-            }
-            //Disable the transfer timer
-            transferTimer.Enabled = false;
-
-            //Get the next transfer in the queue
-            var transfer = pending.Dequeue();
-
-            //Wait for the transfer
-            await Transfer(transfer, true).ContinueWith(t => {
-                TransferFailed?.Invoke(t.Exception);
-            }, TaskContinuationOptions.OnlyOnFaulted);
-
-            //Enable the transfer timer
-            transferTimer.Enabled = true;
-
+            CollectionChanged?.Invoke(this, e);
         }
+
+        private void OnQueuedChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            //Where an item is added, try to do our work:
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (_queued.Count == 1)
+                {
+                    try
+                    {
+                        DequeueTransfer();
+                    }
+                    catch
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            //Inform our observers:
+            CollectionChanged?.Invoke(this, e);
+        }
+
         #endregion
 
         #region Private Methods
-        private async Task Transfer(Transfer transfer, bool requeueOnError)
+        private async void DequeueTransfer()
         {
+            //Get the next transfer in the queue
+            var transfer = _queued.Dequeue();
+
+            //Wait for the transfer
+            try
+            {
+                await Transfer(transfer);
+            }
+            catch (TransferException ex)
+            {
+                if (ex.InnerException.GetType() == typeof(IOException)
+                   && RequeueOnError
+                   && ex.Message.EndsWith("is being used by another process"))
+                {
+                    transfer.State = TransferState.Requeued;
+                    _queued.Enqueue(transfer);
+                }
+
+                TransferFailed.Invoke(ex);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            if (_queued.Count > 0)
+            {
+                DequeueTransfer();
+            }
+        }
+
+        private async Task Transfer(Transfer transfer)
+        {
+            //The Cancelled Transfer should not be executed
+            if (transfer.State == TransferState.Cancelled)
+            {
+                return;
+            }
+            _active.Add(transfer);
             try
             {
                 //Get the SAS for the transfer
@@ -109,16 +168,17 @@ namespace Thismaker.Aba.Client.Transfers
 
                 //Upload or download depending on the transfer
                 if (transfer.Mode == TransferMode.Upload)
-                {
-                    await blob.UploadAsync(stream, true);
+                { 
+                    await blob.UploadAsync(stream, true, transfer.CancellationToken);
                 }
                 else
                 {
                     if (!blob.Exists().Value)
                     {
-                        throw new NullReferenceException("Blob not found");
+                        throw new TransferException("Blob not found");
                     }
-                    await blob.DownloadToAsync(stream);
+                    
+                    await blob.DownloadToAsync(stream, transfer.CancellationToken);
                 }
 
                 stream.Dispose();
@@ -126,90 +186,77 @@ namespace Thismaker.Aba.Client.Transfers
             catch (DirectoryNotFoundException ex)
             {
                 transfer.State = TransferState.Error;
-                string message = $"The file: '{transfer.Name}' destined for upload could not be located in the physical disk. The directory does not exist";
-                throw new TransferManagerException(message, ex);
-                //Processor.Log(, LogLevel.Error);
+                string message = $"Directory for the transfer '{transfer.Name}' does not exist";
+                throw new TransferException(message, ex);
             }
             catch (FileNotFoundException ex)
             {
                 transfer.State = TransferState.Error;
-                string message = $"The file: '{transfer.Name}' destined for upload could not be located in the physical disk. The file does not exists";
-                throw new TransferManagerException(message, ex);
-                //Processor.Log(, LogLevel.Error);
+                string message = $"The file for transfer '{transfer.Name}' was not found";
+                throw new TransferException(message, ex);
             }
             catch (IOException ex)
             {
-                //Processor.Log(, LogLevel.Error);
-
-                //Requeue on error
-                if (requeueOnError)
-                {
-                    transfer.State = TransferState.Requeued;
-                    pending.Enqueue(transfer);
-                }
-                string message = $"The file: '{transfer.Name}' is still being used by another application/process, it has been requeued and will be uploaded once it's available";
-                throw new TransferManagerException(message, ex);
+                string message = $"The file for transfer '{transfer.Name}' is being used by another process";
+                throw new TransferException(message, ex);
             }
             catch (UnauthorizedAccessException ex)
             {
-                string message = $"Spectre does not have permision to access: '{transfer.Name}.' It will not be uploaded";
+                string message = $"Insufficient permission to access the file for tranfser '{transfer.Name}.'";
                 transfer.State = TransferState.Requeued;
-                //Processor.Log(, LogLevel.Error);
-                if (requeueOnError)
-                {
-                    transfer.State = TransferState.Requeued;
-                    pending.Enqueue(transfer);
-                }
-
-                throw new TransferManagerException(message, ex);
-                //Requeue on error
+                throw new TransferException(message, ex);
             }
-
-            catch (Exception ex)
+            finally
             {
-                string message = $"Failed to upload the file: '{transfer.Name}' due to unknown reasons";
-                transfer.State = TransferState.Error;
-                //Processor.Log(, LogLevel.Error);
-                throw ex;
+                _active.Remove(transfer);
             }
-
         }
         #endregion
 
         #region Public Methods
         /// <summary>
-        /// Adds a transfer to the transfer queue, recommended for load balancing.
-        /// Any errors or exceptions are reported through the OnTransferExceptionEvent rather than via rethrow.
+        /// Adds a transfer to the queue, recommended for load balancing.
+        /// Transfer related exceptions are reported through the <see cref="TransferFailed"/> event.
+        /// Non-related errors will be thrown to the calling thread.
         /// </summary>
-        /// <param name="transfer"></param>
-        public void Enqueue(Transfer transfer)
+        /// <param name="transfer">the transfer to add to queue</param>
+        /// <param name="requeue">If true, the transfer will be requeued even if it's already in the queue.</param>
+        /// <returns>True if the item was successfully added to queue</returns>
+        public bool Enqueue(Transfer transfer, bool requeue=false)
         {
             transfer.State = TransferState.Waiting;
-            if (ActiveTransfers.Any(x => x.BlobName == transfer.BlobName && x.Mode == transfer.Mode))
+            if (_queued.Any(x => x.BlobName == transfer.BlobName && x.Mode == transfer.Mode))
             {
-                throw new InvalidOperationException("Transfer already exists in queue");
-                //Processor.Log($"The transfer {transfer.Name} already exists in the queue and was not readded", LogLevel.Info);
+                if (!requeue) return false;
             }
+            _queued.Enqueue(transfer);
 
-            pending.Enqueue(transfer);
-            ActiveTransfers.Add(transfer);
+            
+            return true;
+        }
+
+        private void OnTransferCancelled(Transfer sender)
+        {
+            if (_active.Contains(sender))
+            {
+                _active.Remove(sender);
+            }
         }
 
         /// <summary>
-        /// Immediately begins a transfer, rather enqueuing it for processing at it's turn, 
-        /// any error that occurs is directly rethrown to the calling thread
+        /// Immediately begins a transfer, rather than waiting for all active transfers to be completed.
+        /// Any error that occurs is directly rethrown to the calling thread
         /// </summary>
-        /// <param name="transfer">The transfer to work with</param>
+        /// <param name="transfer">The transfer to execute</param>
         /// <returns></returns>
         public async Task Invoke(Transfer transfer)
         {
-            //Add it to the ActiveTransfers list for notification
-            ActiveTransfers.Add(transfer);
-
             try
             {
+                transfer.TransferCancelled += OnTransferCancelled;
                 //Start the task:
-                await Transfer(transfer, false);
+                await Transfer(transfer);
+                
             }
             catch
             {
@@ -217,10 +264,41 @@ namespace Thismaker.Aba.Client.Transfers
             }
             finally
             {
-                //Attempt to remove from active transfers, in case it has not been removed yet
-                ActiveTransfers.Remove(transfer);
+                transfer.TransferCancelled -= OnTransferCancelled;
             }
         }
+
+        /// <summary>
+        /// Determines whether the SAS protected blob exists
+        /// </summary>
+        /// <param name="blobName">The name of the blob</param>
+        /// <returns>True if the blob exists</returns>
+        public async Task<bool> Exists(string blobName)
+        {
+            var uri = await auth.GetSASToken(blobName);
+
+            //build the blob:
+            var blob = new BlobClient(uri);
+
+            return blob.Exists();
+        }
+
+        /// <summary>
+        /// Allows you to delete a SAS protected blob.
+        /// Blob will only be deleted if it exists
+        /// </summary>
+        /// <param name="blobName">The name of the blob to delete</param>
+        /// <returns></returns>
+        public async Task Delete(string blobName)
+        {
+            var uri = await auth.GetSASToken(blobName);
+
+            //build the blob:
+            var blob = new BlobClient(uri);
+
+            blob.DeleteIfExists();
+        }
+
         #endregion
     }
 }

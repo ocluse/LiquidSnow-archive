@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace System
+namespace Thismaker.Core.Utilities
 {
     public class EnumUtility
     {

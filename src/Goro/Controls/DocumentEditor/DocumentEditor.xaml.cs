@@ -12,7 +12,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Media = System.Windows.Media;
 using System.Linq;
-using Thismaker.Goro.Controls;
 using System.IO;
 
 namespace Thismaker.Goro

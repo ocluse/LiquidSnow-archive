@@ -208,7 +208,7 @@ namespace System.Collections.Generic
 
     public static class GenericCollectionsExtensions
     {
-        public static void Move<T>(this List<T> list, int oldIndex, int newIndex)
+        public static void Move<T>(this IList<T> list, int oldIndex, int newIndex)
         {
             var item = list[oldIndex];
 
@@ -220,7 +220,7 @@ namespace System.Collections.Generic
             list.Insert(newIndex, item);
         }
 
-        public static void Move<T>(this List<T> list, T item, int newIndex)
+        public static void Move<T>(this IList<T> list, T item, int newIndex)
         {
             if (item != null)
             {
