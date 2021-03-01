@@ -5,51 +5,40 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
+using Thismaker.Core;
 using Thismaker.Horus;
 
 namespace Thismaker.Pluto
 {
-    public class Account:INotifyPropertyChanged
+    public class Account : BindableBase
     {
         #region Props
-        private string name;
-        private AccountType type;
-        private ObservableCollection<Transaction> transactions;
+        private string _name, _id;
+        private AccountType _type;
+        private ObservableCollection<Transaction> _transactions;
 
-        public string AccountID { get; set; }
+        public string AccountID
+        {
+            get => _id;
+            set => SetProperty(ref _id, value);
+        }
 
         public string Name 
         {
-            get { return name; }
-            set { SetFied(ref name, value, nameof(Name)); }
+            get { return _name; }
+            set { SetProperty(ref _name, value, nameof(Name)); }
         }
         
         public ObservableCollection<Transaction> Transactions
         {
-            get { return transactions; }
-            set { SetFied(ref transactions, value, nameof(Transactions)); }
+            get { return _transactions; }
+            set { SetProperty(ref _transactions, value, nameof(Transactions)); }
         }
+
         public AccountType Type
         {
-            get { return type; }
-            set { SetFied(ref type, value, nameof(Type)); }
-        }
-        #endregion
-
-        #region INotifyImplementation
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected bool SetFied<T>(ref T field, T value, string propertyName)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
+            get { return _type; }
+            set { SetProperty(ref _type, value, nameof(Type)); }
         }
         #endregion
 
@@ -86,7 +75,6 @@ namespace Thismaker.Pluto
     public enum AccountType
     {
         Asset, Liability, Equity, Payable, Receiveable, Income, Expense, Cash, Bank
-
     }
 
 }
