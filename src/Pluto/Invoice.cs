@@ -8,6 +8,7 @@ namespace Thismaker.Pluto
 {
     public class Invoice : BindableBase
     {
+        #region Private Fields
         private ObservableCollection<InvoiceItem> _items;
         private DateTime _dateDue, _dateCreated;
         private string _id, _details, _tag, _billedTo;
@@ -15,7 +16,17 @@ namespace Thismaker.Pluto
         private double _tax;
         private double? _shipping, _discount;
         private double _paid;
-        
+        #endregion
+
+        #region Initialiation
+        public Invoice()
+        {
+            DateCreated = DateTime.UtcNow;
+            ID = Horus.Horus.GenerateID();
+        }
+        #endregion
+
+        #region Properties
         /// <summary>
         /// The unique identifier of the invoice
         /// </summary>
@@ -192,6 +203,10 @@ namespace Thismaker.Pluto
             get => Total-Paid;
         }
 
+        #endregion
+
+        #region Public Methods
+
         /// <summary>
         /// Returns a transaction that can be used to represent the invoice in a <see cref="Account"/>
         /// </summary>
@@ -229,6 +244,8 @@ namespace Thismaker.Pluto
                 Type = type
             };
         }
+
+        #endregion
     }
 
     public class InvoiceItem:Charge
