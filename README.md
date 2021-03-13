@@ -1,4 +1,25 @@
-# LiquidSnow
+<h1 align="center">LiquidSnow</h1>
+
+
+<p align="center">
+    <a href="https://github.com/thismaker/LiquidSnow/blob/main/LICENSE" target="blank">
+        <img src="https://img.shields.io/github/license/thismaker/LiquidSnow?style=flat-square" alt="LiquidSnow licence" />
+    </a>
+    <a href="https://github.com/thismaker/LiquidSnow/fork" target="blank">
+        <img src="https://img.shields.io/github/forks/thismaker/LiquidSnow?style=flat-square" alt="LiquidSnow forks"/>
+    </a>
+    <a href="https://github.com/thismaker/LiquidSnow/stargazers" target="blank">
+        <img src="https://img.shields.io/github/stars/thismaker/LiquidSnow?style=flat-square" alt="LiquidSnow stars"/>
+    </a>
+    <a href="https://github.com/thismaker/LiquidSnow/issues" target="blank">
+        <img src="https://img.shields.io/github/issues/thismaker/LiquidSnow?style=flat-square" alt="LiquidSnow issues"/>
+    </a>
+    <a href="https://github.com/thismaker/LiquidSnow/pulls" target="blank">
+        <img src="https://img.shields.io/github/issues-pr/thismaker/LiquidSnow?style=flat-square" alt="LiquidSnow pull-requests"/>
+    </a>
+</p>
+
+
 The LiquidSnow is a collection of .NET assemblies that you can use to make your .NET development work easy. It covers mutitudes of bases, from fundamental concepts to those that I just added for fun. While most of the API is generally frozen, there may still be breaking changes in the future, so keep this in mind. If you have any issues, don't hesitate to ask for assistance in the issues tab. Also, check the Wiki for documentation on how to use the Framework.
 
 LiquidSnow Assemblies:
