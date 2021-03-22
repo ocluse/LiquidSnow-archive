@@ -236,29 +236,34 @@
         <Setter Property="TextTrimming" Value="None"/>
         <Setter Property="FontWeight" Value="ExtraLight"/>
         <Setter Property="FontSize" Value="46px"/>
+        <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
     </Style>
     
     <Style x:Key="SubHeader" TargetType="{x:Type TextBlock}">
         <Setter Property="TextTrimming" Value="None"/>
         <Setter Property="FontWeight" Value="ExtraLight"/>
         <Setter Property="FontSize" Value="32px"/>
+        <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
     </Style>
     
     <Style x:Key="Title" TargetType="{x:Type TextBlock}">
         <Setter Property="TextTrimming" Value="None"/>
         <Setter Property="FontWeight" Value="Thin"/>
         <Setter Property="FontSize" Value="24px"/>
+        <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
     </Style>
     
     <Style x:Key="Subtitle" TargetType="{x:Type TextBlock}">
         <Setter Property="TextTrimming" Value="None"/>
         <Setter Property="FontSize" Value="20px"/>
+        <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
     </Style>
     
     <Style x:Key="Base" TargetType="{x:Type TextBlock}">
         <Setter Property="TextTrimming" Value="None"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontSize" Value="14px"/>
+        <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
     </Style>
     
     <Style TargetType="{x:Type TextBlock}">
@@ -269,6 +274,7 @@
     <Style x:Key="Caption" TargetType="{x:Type TextBlock}">
         <Setter Property="TextTrimming" Value="None"/>
         <Setter Property="FontSize" Value="12px"/>
+        <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
     </Style>
     <!--#endregion-->
     

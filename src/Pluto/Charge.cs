@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Thismaker.Core;
@@ -9,30 +8,30 @@ namespace Thismaker.Pluto
     public class Charge : BindableBase
     {
         private string _id, _details, _tag;
-        private double _amount;
+        private decimal _amount;
         private DateTime _date;
         
-        public string ID
+        public virtual string ID
         {
             get => _id;
             set => SetProperty(ref _id, value);
         }
-        public string Details
+        public virtual string Details
         {
             get => _details;
             set => SetProperty(ref _details, value);
         }
-        public string Tag
+        public virtual string Tag
         {
             get => _tag;
             set => SetProperty(ref _tag, value);
         }
-        public double Amount
+        public virtual decimal Amount
         {
             get => _amount;
             set => SetProperty(ref _amount, value);
         }
-        public DateTime Date
+        public virtual DateTime Date
         {
             get => _date;
             set => SetProperty(ref _date, value);
@@ -42,16 +41,6 @@ namespace Thismaker.Pluto
         {
             ID = Horus.Horus.GenerateID();
             Date = DateTime.UtcNow;
-        }
-
-        public static Charge FromJson(string json)
-        {
-            return JsonConvert.DeserializeObject<Charge>(json);
-        }
-
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this);
         }
 
         public virtual void Update(Charge copy)

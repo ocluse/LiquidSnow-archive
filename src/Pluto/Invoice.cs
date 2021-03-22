@@ -13,9 +13,10 @@ namespace Thismaker.Pluto
         private DateTime _dateDue, _dateCreated;
         private string _id, _details, _tag, _billedTo;
         private string _sender;
-        private double _tax;
-        private double? _shipping, _discount;
-        private double _paid;
+        private decimal _tax;
+        private decimal _shipping, _discount;
+        private decimal _paid;
+        private int _index;
         #endregion
 
         #region Initialiation
@@ -23,14 +24,36 @@ namespace Thismaker.Pluto
         {
             DateCreated = DateTime.UtcNow;
             ID = Horus.Horus.GenerateID();
+            Items = new ObservableCollection<InvoiceItem>();
         }
+
+        /// <summary>
+        /// Creates a new invoice, assigning the provided index
+        /// </summary>
+        /// <param name="index"></param>
+        public Invoice(int index)
+        {
+            Index = index;
+        }
+
         #endregion
 
         #region Properties
+        
+        /// <summary>
+        /// The index of the <see cref="Invoice"/>. Usually the number of the invoice.
+        /// In business we say e.g Invoice No 23.
+        /// </summary>
+        public virtual int Index
+        {
+            get => _index;
+            set => SetProperty(ref _index, value);
+        }
+
         /// <summary>
         /// The unique identifier of the invoice
         /// </summary>
-        public string ID
+        public virtual string ID
         {
             get => _id;
             set => SetProperty(ref _id, value);
@@ -39,7 +62,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The details or description of the invoice
         /// </summary>
-        public string Details
+        public virtual string Details
         {
             get => _details;
             set => SetProperty(ref _details, value);
@@ -48,16 +71,16 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The tag of the invoice
         /// </summary>
-        public string Tag
+        public virtual string Tag
         {
-            get => _details;
+            get => _tag;
             set => SetProperty(ref _tag, value);
         }
         
         /// <summary>
         /// The addresee of the invoice
         /// </summary>
-        public string BilledTo
+        public virtual string BilledTo
         {
             get=> _billedTo;
             set => SetProperty(ref _billedTo, value);
@@ -66,7 +89,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The person sending/creating the invoice
         /// </summary>
-        public string Sender
+        public virtual string Sender
         {
             get => _sender;
             set => SetProperty(ref _sender, value);
@@ -75,7 +98,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The tax applied to the invoice, expressed as a 0-1 percentage. i.e if 0.3 then tax is 30%
         /// </summary>
-        public double Tax
+        public virtual decimal Tax
         {
             get => _tax;
             set => SetProperty(ref _tax, value);
@@ -84,7 +107,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// A list of items in the invoice
         /// </summary>
-        public ObservableCollection<InvoiceItem> Items
+        public virtual ObservableCollection<InvoiceItem> Items
         {
             get => _items;
             set => SetProperty(ref _items, value);
@@ -93,7 +116,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The due date of the invoice i.e the date it is to be paid
         /// </summary>
-        public DateTime DateDue
+        public virtual DateTime DateDue
         {
             get => _dateDue;
             set => SetProperty(ref _dateDue, value);
@@ -102,7 +125,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The date the invoice was created.
         /// </summary>
-        public DateTime DateCreated
+        public virtual DateTime DateCreated
         {
             get => _dateCreated;
             set => SetProperty(ref _dateCreated, value);
@@ -111,7 +134,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The total shipping amount. If provided.
         /// </summary>
-        public double? Shipping
+        public virtual decimal Shipping
         {
             get => _shipping;
             set => SetProperty(ref _shipping, value);
@@ -120,7 +143,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The discount to charge on the items as a percentage of 0-1, ie 25% discount is 0.25
         /// </summary>
-        public double? Discount
+        public virtual decimal Discount
         {
             get => _discount;
             set => SetProperty(ref _discount, value);
@@ -129,7 +152,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The total currently paid amount.
         /// </summary>
-        public double Paid
+        public virtual decimal Paid
         {
             get => _paid;
             set => SetProperty(ref _paid, value);
@@ -138,13 +161,13 @@ namespace Thismaker.Pluto
         /// <summary>
         /// This the total amount of items in the invoice excluding tax, discounts and shipping costs
         /// </summary>
-        public double SubTotal
+        public virtual decimal SubTotal
         {
             get
             {
                 if (Items == null) return 0;
                 if (Items.Count == 0) return 0;
-                double totals = 0;
+                decimal totals = 0;
                 
                 foreach(var item in Items)
                 {
@@ -158,7 +181,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// This is the total amount of the invoice, including taxes, discounts and shippings costs
         /// </summary>
-        public double Total
+        public virtual decimal Total
         {
             get
             {
@@ -170,7 +193,7 @@ namespace Thismaker.Pluto
                 totals += tax;
 
                 //Add shipping:
-                if (Shipping.HasValue) totals += Shipping.Value;
+                totals += Shipping;
 
                 //Return subtotal
                 return totals;
@@ -180,15 +203,13 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The totals of the invoice including discounts
         /// </summary>
-        public double DiscountedTotal
+        public virtual decimal DiscountedTotal
         {
             get
             {
                 var totals = SubTotal;
-                if (!Discount.HasValue) return totals;
-
                 //compute discount:
-                var discount = totals * Discount.Value;
+                var discount = totals * Discount;
                 totals -= discount;
 
                 return totals;
@@ -198,7 +219,7 @@ namespace Thismaker.Pluto
         /// <summary>
         /// The difference between the <see cref="Total"/> amount and the <see cref="Paid"/> amount
         /// </summary>
-        public double Balance
+        public virtual decimal Balance
         {
             get => Total-Paid;
         }
@@ -211,7 +232,7 @@ namespace Thismaker.Pluto
         /// Returns a transaction that can be used to represent the invoice in a <see cref="Account"/>
         /// </summary>
         /// <returns>A <see cref="Transaction"/> that is debit in nature, with the same details as invoice</returns>
-        public Transaction GetTransaction()
+        public virtual Transaction GetTransaction()
         {
             return GetTransaction(Details);
         }
@@ -221,7 +242,7 @@ namespace Thismaker.Pluto
         /// </summary>
         /// <param name="details">The custom details to use with the transaction</param>
         /// <returns>A <see cref="Transaction"/> that is debit in nature, with the provided details</returns>
-        public Transaction GetTransaction(string details)
+        public virtual Transaction GetTransaction(string details)
         {
             return GetTransaction(details, TransactionType.Debit);
         }
@@ -232,7 +253,7 @@ namespace Thismaker.Pluto
         /// <param name="details">The custom details to use with the transaction</param>
         /// <param name="type">The custom type to assign to the transaction</param>
         /// <returns>A <see cref="Transaction"/> that has the provided nature, with the provided details</returns>
-        public Transaction GetTransaction(string details, TransactionType type)
+        public virtual Transaction GetTransaction(string details, TransactionType type)
         {
             //first get subtotal:
             return new Transaction()
@@ -245,19 +266,41 @@ namespace Thismaker.Pluto
             };
         }
 
+        public virtual void Update(Invoice source)
+        {
+            Index = source.Index;
+            ID = source.ID;
+            Details = source.Details;
+            Tag = source.Tag;
+            BilledTo = source.BilledTo;
+            Sender = source.Sender;
+            Tax = source.Tax;
+            DateDue = source.DateDue;
+            DateCreated = source.DateCreated;
+            Shipping = source.Shipping;
+            Discount = source.Discount;
+            Paid = source.Paid;
+
+            if (Items != null)
+            {
+                Items.Clear();
+                Items.AddRange(source.Items);
+            }
+        }
+
         #endregion
     }
 
-    public class InvoiceItem:Charge
+    public class InvoiceItem : Charge
     {
-        private double _quantity;
+        private decimal _quantity;
 
-        public double Quantity
+        public virtual decimal Quantity
         {
             get => _quantity;
             set => SetProperty(ref _quantity, value);
         }
-        public double Totals
+        public decimal Totals
         {
             get => _quantity * Amount;
         }
@@ -266,6 +309,12 @@ namespace Thismaker.Pluto
         public InvoiceItem() : base()
         {
 
+        }
+
+        public virtual void Update(InvoiceItem copy)
+        {
+            Quantity = copy.Quantity;
+            base.Update(copy);
         }
     }
 }

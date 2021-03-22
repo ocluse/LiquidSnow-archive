@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Thismaker.Horus;
@@ -12,7 +11,7 @@ namespace Thismaker.Pluto
         #region Props
         private TransactionType _type;
 
-        public TransactionType Type 
+        public virtual TransactionType Type 
         {
             get { return _type; }
             set { SetProperty(ref _type, value); } 
@@ -25,22 +24,7 @@ namespace Thismaker.Pluto
 
         }
 
-        public Transaction(Transaction copy)
-        {
-            Date = copy.Date;
-            Amount = copy.Amount;
-            Details = copy.Details;
-            Type = copy.Type;
-            ID = copy.ID;
-            Tag = copy.Tag;
-        }
-
-        public new static Transaction FromJson(string json)
-        {
-            return JsonConvert.DeserializeObject<Transaction>(json);
-        }
-
-        public void Update(Transaction copy)
+        public virtual void Update(Transaction copy)
         {
             base.Update(copy);
             Type = copy.Type;

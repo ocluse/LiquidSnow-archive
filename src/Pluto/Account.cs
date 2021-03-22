@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -17,25 +16,25 @@ namespace Thismaker.Pluto
         private AccountType _type;
         private ObservableCollection<Transaction> _transactions;
 
-        public string AccountID
+        public virtual string ID
         {
             get => _id;
             set => SetProperty(ref _id, value);
         }
 
-        public string Name 
+        public virtual string Name 
         {
             get { return _name; }
             set { SetProperty(ref _name, value, nameof(Name)); }
         }
         
-        public ObservableCollection<Transaction> Transactions
+        public virtual ObservableCollection<Transaction> Transactions
         {
             get { return _transactions; }
             set { SetProperty(ref _transactions, value, nameof(Transactions)); }
         }
 
-        public AccountType Type
+        public virtual AccountType Type
         {
             get { return _type; }
             set { SetProperty(ref _type, value, nameof(Type)); }
@@ -44,31 +43,8 @@ namespace Thismaker.Pluto
 
         public Account()
         {
-            AccountID = Horus.Horus.GenerateID();
+            ID = Horus.Horus.GenerateID();
             Transactions = new ObservableCollection<Transaction>();
-        }
-
-        public Account(Account copy)
-        {
-            AccountID = copy.AccountID;
-            Name = copy.Name;
-            Type = copy.Type;
-            Transactions = new ObservableCollection<Transaction>(copy.Transactions);
-        }
-
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this);
-        }
-
-        public static Account FromJson(string json)
-        {
-            return JsonConvert.DeserializeObject<Account>(json);
-        }
-
-        public void GenerateNewID()
-        {
-            AccountID = Horus.Horus.GenerateID();
         }
     }
 

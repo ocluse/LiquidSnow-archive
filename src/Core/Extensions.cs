@@ -161,6 +161,18 @@ namespace System.Collections.ObjectModel
             }
         }
 
+        public static int RemoveAll<T>(this ObservableCollection<T> collection, Func<T, bool> predicate)
+        {
+            var removable = collection.Where(predicate).ToList();
+
+            foreach (var itemToRemove in removable)
+            {
+                collection.Remove(itemToRemove);
+            }
+
+            return removable.Count;
+        }
+
         public static IEnumerable<T> FindAll<T>(this ObservableCollection<T> collection, Func<T, bool> predicate)
         {
             return collection.Where(predicate);
