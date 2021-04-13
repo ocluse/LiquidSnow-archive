@@ -24,6 +24,8 @@ namespace Thismaker.Goro
             = DependencyProperty.Register(nameof(Icon), typeof(Icon), typeof(CheckboxIcon), new PropertyMetadata(Icon.None));
         public static readonly DependencyProperty DesignProperty
             = DependencyProperty.Register(nameof(Design), typeof(IconDesign), typeof(CheckboxIcon), new PropertyMetadata(IconDesign.Segoe));
+        public static readonly DependencyProperty HighlightProperty
+            = DependencyProperty.Register(nameof(Highlight), typeof(SolidColorBrush), typeof(CheckboxIcon));
 
         public Icon Icon
         {
@@ -35,6 +37,12 @@ namespace Thismaker.Goro
         {
             get { return (IconDesign)GetValue(DesignProperty); }
             set { SetValue(DesignProperty, value); }
+        }
+
+        public SolidColorBrush Highlight
+        {
+            get { return (SolidColorBrush)GetValue(HighlightProperty); }
+            set { SetValue(HighlightProperty, value); }
         }
     }
 }

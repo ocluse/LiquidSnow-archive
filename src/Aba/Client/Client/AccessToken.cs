@@ -1,11 +1,13 @@
 ﻿
+using System;
+
 namespace Thismaker.Aba.Client
 {
     public class AccessToken
     {
         private string value, key;
         private AccessTokenKind kind;
-
+        private DateTimeOffset exipresOn;
         /// <summary>
         /// The actual value of the access-token, usually a random base64-encoded string
         /// </summary>
@@ -31,6 +33,15 @@ namespace Thismaker.Aba.Client
         {
             get { return kind; }
             set { kind = value; }
+        }
+
+        /// <summary>
+        /// The expiry time of the token. May be applicable to Bearer and custom tokens
+        /// </summary>
+        public DateTimeOffset ExpiresOn
+        {
+            get { return exipresOn; }
+            set { exipresOn = value; }
         }
 
         public static AccessToken Bearer(string value)

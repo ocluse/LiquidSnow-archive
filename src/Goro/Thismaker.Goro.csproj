@@ -11,8 +11,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>ui ux ui/ux ui-ux user-interface material-design themes</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.3.2</Version>
-    <PackageReleaseNotes>Added a MessageBox button</PackageReleaseNotes>
+    <Version>1.0.3.6</Version>
+    <PackageReleaseNotes>Introduce OpenFolderDialog</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:goro="http://schemas.thismaker.com/liquidsnow/goro"
-        xmlns:local="clr-namespace:Test.Goro.Wpf"
+        xmlns:local="clr-namespace:Test.Goro.Wpf" 
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800" Style="{DynamicResource StandardWindow}">
     <Grid>
@@ -14,7 +14,7 @@
         </Grid.ColumnDefinitions>
         <TabControl>
             <TabItem Header="Wonderful" goro:ControlExtensions.Icon="Add">
-                <goro:DocumentEditor Design="MaterialDesign"/>
+                <goro:DocumentEditor/>
             </TabItem>
             <TabItem Header="Next" goro:ControlExtensions.Icon="Cut">
                 <ListView>
@@ -77,7 +77,7 @@
         </TabControl>
        
         <Grid Grid.Column="1">
-            <ScrollViewer>
+            <ScrollViewer Background="{DynamicResource PanelGrayResponsive}">
                 <StackPanel>
                     <TextBlock Text="Header" Style="{DynamicResource Header}"/>
                     <TextBlock Text="Subheader" Style="{DynamicResource SubHeader}"/>
@@ -88,6 +88,8 @@
                     <CheckBox IsEnabled="False" Content="Allow Thismaker" d:IsChecked="true"/>
                     <Button Margin="15 0 0 0" Content="Hello" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" Click="Button_Click"/>
                     <Button IsEnabled="False" Margin="15 10 0 0" Content="Hello" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left" Click="Button_Click"/>
+                    <goro:ButtonIcon Highlight="Red" Icon="Add" Height="40" Width="40"/>
+                    <goro:CheckboxIcon Highlight="Green" Icon="Edit" Height="40" Width="40"/>
                     <Button  Margin="10" Content="I'm a link click me"  VerticalAlignment="Center" HorizontalAlignment="Center" Style="{DynamicResource LinkButton}" Click="Button_Click_1"/>
                     <goro:StatusIndicator Status="Information" Design="MaterialDesign"/>
                     <ProgressBar Value="20" Maximum="100" Margin="10" Height="10"/>

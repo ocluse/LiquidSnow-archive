@@ -24,7 +24,18 @@ namespace Thismaker.Goro
         public DocumentEditor()
         {
             InitializeComponent();
-            ((DocumentEditorViewModel)DataContext).Attach(Doc);
+            
+
+            try
+            {
+                ((DocumentEditorViewModel)DataContext).Attach(Doc);
+                Design = ThemeManager.DefaultDesign;
+            }
+            catch
+            {
+
+            }
+            
         }
 
         public IconDesign Design
@@ -60,6 +71,11 @@ namespace Thismaker.Goro
             {
                 throw;
             }
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }

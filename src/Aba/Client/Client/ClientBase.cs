@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -12,9 +13,8 @@ namespace Thismaker.Aba.Client
     /// The <see cref="ClientBase{T}"/> is an abstract class with the very basic fundamentals of what
     /// all apps are supposed to contain
     /// </summary>
-    public abstract class ClientBase<T> where T : ClientBase<T>
+    public abstract partial class ClientBase<T> where T : ClientBase<T>
     {
-        private AccessToken accessToken;
 
         #region Properties
         public virtual IContext Context { get; set; }
@@ -44,30 +44,7 @@ namespace Thismaker.Aba.Client
         /// The access token that is usually added as an authorization header
         /// to the app's <see cref="HubConnection"/> and <see cref="HttpClient"/>.
         /// </summary>
-        public AccessToken AccessToken 
-        {
-            get
-            {
-                return accessToken;
-            } 
-            protected set
-            {
-                if (accessToken != null && accessToken.Kind==AccessTokenKind.Custom)
-                {
-                    HttpClient.DefaultRequestHeaders.Remove(accessToken.Key);
-                }
-                accessToken = value;
-
-                if (accessToken.Kind == AccessTokenKind.Custom)
-                {
-                    HttpClient.DefaultRequestHeaders.Add(accessToken.Key, accessToken.Value);
-                }
-                else
-                {
-                    HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(accessToken.Key, accessToken.Value);
-                }
-            } 
-        }
+        public AccessToken AccessToken { get; set; }
 
         /// <summary>
         /// The client used to access the server api
@@ -78,6 +55,8 @@ namespace Thismaker.Aba.Client
         /// The connection to the server's hub
         /// </summary>
         protected HubConnection HubConnection { get; set; }
+
+        public virtual Func<Task<string>> ReadAccessToken { get; set; }
 
         #endregion
 
@@ -130,7 +109,12 @@ namespace Thismaker.Aba.Client
                    .WithUrl($"{BaseAddress}/{HubEndpoint}/",
                    options =>
                    {
-                       options.AccessTokenProvider = GetAccessTokenAsync;
+                       options.AccessTokenProvider = ReadHubAccessToken;
+                   })
+                   .ConfigureLogging(logging =>
+                   {
+                       logging.AddDebug();
+                       logging.SetMinimumLevel(LogLevel.Debug);
                    })
                    .Build();
 
@@ -169,20 +153,67 @@ namespace Thismaker.Aba.Client
             return Task.CompletedTask;
         }
 
-        private Task<string> GetAccessTokenAsync()
+        protected virtual async Task<string> ReadHubAccessToken()
         {
-            return Task.FromResult(AccessToken?.Value);
+            if (ReadAccessToken == null)
+            {
+                return AccessToken?.Value;
+            }
+            else
+            {
+                return await ReadAccessToken.Invoke();
+            }
         }
+
         #endregion
 
         #region Api Methods
+        /// <summary>
+        /// Prepares the HttpClient by setting the appropriate request header, such as Bearer token, before calling the ServerMethods.
+        /// This method is always run before all API Methods such as <see cref="ApiGetAsync(string, bool)"/>
+        /// </summary>
+        /// <param name="secured">If true, the http client sends along an Authorization or other authentication headers, otherwise, it removes them</param>
+        /// <returns></returns>
+        protected virtual async Task ReadyHttpClientForRequest(bool secured)
+        {
+            
+
+            if (secured)
+            {
+                var accessToken = ReadAccessToken != null ? await ReadAccessToken.Invoke() : AccessToken.Value;
+                if (AccessToken.Kind == AccessTokenKind.Custom)
+                {
+                    HttpClient.DefaultRequestHeaders.Remove(AccessToken.Key);
+                    HttpClient.DefaultRequestHeaders.Add(AccessToken.Key, accessToken);
+                }
+                else
+                {
+                    HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AccessToken.Key, accessToken);
+                }
+            }
+            else
+            {
+                if (AccessToken?.Kind == AccessTokenKind.Custom)
+                {
+                    HttpClient.DefaultRequestHeaders.Remove(AccessToken.Key);
+                }
+                else
+                {
+                    HttpClient.DefaultRequestHeaders.Remove("Authorization");
+                }
+            }
+        }
+
         /// <summary>
         /// Calls the HTTP GET on the server's Api
         /// </summary>
         /// <param name="requestUri">The specific request uri, will be combined with the path info</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> ApiGetAsync(string requestUri)
+        public async Task<HttpResponseMessage> ApiGetAsync(string requestUri, bool secured=true)
         {
+            //Prep the HttpClient
+            await ReadyHttpClientForRequest(secured);
+
             try
             {
                 return await HttpClient.GetAsync(ApiEndpoint==null?$"/{requestUri}"
@@ -200,8 +231,11 @@ namespace Thismaker.Aba.Client
         /// <param name="endpoint">The endpoint that will be attached to the base address and called.</param>
         /// <param name="requestUri">The request Url</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> EndpointGetAsync(string endpoint, string requestUri)
+        public async Task<HttpResponseMessage> EndpointGetAsync(string endpoint, string requestUri, bool secured=true)
         {
+            //Prep the HttpClient
+            await ReadyHttpClientForRequest(secured);
+
             try
             {
                 return await HttpClient.GetAsync($"{endpoint}/{requestUri}");
@@ -218,8 +252,11 @@ namespace Thismaker.Aba.Client
         /// <param name="endpoint">The endpoint that will be attached to the base address and called.</param>
         /// <param name="requestUri">The request Url</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> EndpointPostAsync(string endpoint, string requestUri, HttpContent content)
+        public async Task<HttpResponseMessage> EndpointPostAsync(string endpoint, string requestUri, HttpContent content, bool secured=true)
         {
+            //Prep the HttpClient
+            await ReadyHttpClientForRequest(secured);
+
             try
             {
                 return await HttpClient.PostAsync($"{endpoint}/{requestUri}", content);
@@ -236,8 +273,11 @@ namespace Thismaker.Aba.Client
         /// <param name="requestUri">The specific uri to the post resource</param>
         /// <param name="content">The content to send to the server</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> ApiPostAsync(string requestUri, HttpContent content)
+        public async Task<HttpResponseMessage> ApiPostAsync(string requestUri, HttpContent content, bool secured=true)
         {
+            //Prep the HttpClient
+            await ReadyHttpClientForRequest(secured);
+
             try
             {
                 return await HttpClient.PostAsync(ApiEndpoint == null ? $"/{requestUri}"
@@ -248,6 +288,7 @@ namespace Thismaker.Aba.Client
                 throw;
             }
         }
+
         #endregion
 
         #region Hub

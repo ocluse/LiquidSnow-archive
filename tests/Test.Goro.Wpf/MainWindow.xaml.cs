@@ -46,17 +46,13 @@ namespace Test.Goro.Wpf
             GoroMessageBox.Design = IconDesign.MaterialDesign;
             var result=GoroMessageBox.Show("Hello", "Where is my mother? Lorem ipsum sint amen faxi daremones", MessageBoxButton.YesNo, StatusInfo.Warning);
 
-            if (!result.HasValue)
+            if (ThemeManager.DefaultDesign == IconDesign.Segoe)
             {
-                GoroMessageBox.Show("Results inconclusive");
-            }
-            else if (result == true)
-            {
-                GoroMessageBox.Show("It was ok");
+                ThemeManager.DefaultDesign = IconDesign.MaterialDesign;
             }
             else
             {
-                GoroMessageBox.Show("It was false");
+                ThemeManager.DefaultDesign = IconDesign.Segoe;
             }
         }
 

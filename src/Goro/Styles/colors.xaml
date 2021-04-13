@@ -7,6 +7,7 @@
     <Thickness x:Key="HeaderMargin" Left="0" Top="0" Right="0" Bottom="8"/>
     <!--#region Image Resources-->
     <BitmapImage x:Key="DefaultDP" UriSource="/Assets/defaultprofile.png"/>
+    <local:IconDesign x:Key="DefaultDesign">Segoe</local:IconDesign>
     <!--#endregion-->
 
     <!--#region  Colors-->
@@ -26,6 +27,7 @@
     <SolidColorBrush x:Key="AccentDisabled" Color="#4D4D4D"/>
 
     <SolidColorBrush x:Key="PanelForeground" Color="#1A1A1A"/>
+    <SolidColorBrush x:Key="PanelGrayResponsive" Color="#E6E6E6"/>
     <SolidColorBrush x:Key="PanelGray" Color="#999999"/>
     <SolidColorBrush x:Key="PanelGrayDark" Color="#FF3F3F3F"/>
     <SolidColorBrush x:Key="PanelBackground" Color="White"/>

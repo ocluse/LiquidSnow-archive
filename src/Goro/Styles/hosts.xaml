@@ -22,6 +22,7 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="local:ControlExtensions.Design" Value="{DynamicResource DefaultDesign}"/>
         <Setter Property="local:ControlExtensions.Icon" Value="None"/>
         <Setter Property="Template">
             

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Identity.Client;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Thismaker.Aba.Client.Msal
 {
@@ -70,6 +72,8 @@ namespace Thismaker.Aba.Client.Msal
         /// </summary>
         public IPublicClientApplication PublicClient { get; protected set; }
 
+        public TokenAccessArgs ApiTokenAccessArgs { get; protected set; }
+
         #endregion
 
         #region BaseOverrides
@@ -81,9 +85,13 @@ namespace Thismaker.Aba.Client.Msal
             PublicClient = PublicClientApplicationBuilder.Create(ClientID)
                .WithB2CAuthority(AuthoritySUSI)
                .WithRedirectUri(RedirectUri)
+               .WithLogging(OnMsalLog, LogLevel.Error)
                .Build();
 
+            ReadAccessToken = AcquireAccessToken;
         }
+
+
         #endregion
 
         #region Abstracts
@@ -98,6 +106,78 @@ namespace Thismaker.Aba.Client.Msal
         /// </summary>
         /// <returns></returns>
         public abstract Task Logout();
+
+        protected abstract void OnMsalLog(LogLevel level, string message, bool containsPii);
+        #endregion
+
+        #region Private Methods
+
+        private async Task<string> AcquireAccessToken()
+        {
+            return await AcquireAccessToken(null);
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void SetApiTokenAccessArgs(IAccount account, IEnumerable<string> scopes)
+        {
+            ApiTokenAccessArgs = new TokenAccessArgs
+            {
+                UserAccount = account,
+                Scopes = new List<string>(scopes)
+            };
+        }
+
+        public async Task<string> AcquireAccessToken(TokenAccessArgs args=null)
+        {
+            OnMsalLog(LogLevel.Info, "Access token requested", false);
+            if (args==null||args==ApiTokenAccessArgs)
+            {
+                //Special one, we can return the previous access token:
+                if (DateTimeOffset.UtcNow < AccessToken.ExpiresOn)
+                {
+                    OnMsalLog(LogLevel.Verbose, "Current token valid. Skipping token acquisition", false);
+                    return AccessToken.Value;
+                }
+                else
+                {
+                    args = ApiTokenAccessArgs;
+                    OnMsalLog(LogLevel.Verbose, "Current token expired. Initiating fresh token acquisiton", false);
+                }
+            }
+
+            AuthenticationResult result;
+            try
+            {
+                result = await PublicClient.AcquireTokenSilent(args.Scopes, args.UserAccount).ExecuteAsync();
+                if (string.IsNullOrEmpty(result.AccessToken)) throw new MsalUiRequiredException("404", "Access token was null");
+            }
+            catch (MsalUiRequiredException)
+            {
+                result = await PublicClient.AcquireTokenInteractive(args.Scopes)
+                    .WithB2CAuthority(AuthoritySUSI)
+                    .WithAccount(args.UserAccount)
+                    .WithParentActivityOrWindow(Context.GetMainWindow())
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new ClientException("Failed to acquire access token for protected resource", ExceptionKind.LoginFailure, ex);
+            }
+
+            //Check if the we are talking about the Api Here:
+            if (args == ApiTokenAccessArgs)
+            {
+                AccessToken.ExpiresOn = result.ExpiresOn;
+                AccessToken = AccessToken.Bearer(result.AccessToken);
+            }
+
+            return result.AccessToken;
+        }
+
         #endregion
 
     }

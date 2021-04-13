@@ -4,7 +4,8 @@
     xmlns:local="clr-namespace:Thismaker.Goro">
 
     <local:IconConverter x:Key="iconConverter"/>
-
+    <local:ColorSaturationConverter x:Key="colorConverter"/>
+    
     <Style TargetType="{x:Type local:StatusIndicator}">
         <Setter Property="Width" Value="30"/>
         <Setter Property="Height" Value="30"/>
@@ -30,8 +31,10 @@
     <Style TargetType="{x:Type local:ButtonIcon}">
         <Setter Property="Width" Value="40"/>
         <Setter Property="Height" Value="40"/>
+        <Setter Property="Design" Value="{DynamicResource DefaultDesign}"/>
         <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Highlight" Value="{DynamicResource Accent}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ButtonIcon}">
@@ -60,14 +63,17 @@
                                               Foreground="{TemplateBinding Foreground}"/>
                         </Grid>
                     </Border>
+
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="backGrid" Property="Background" Value="{DynamicResource AccentLight}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource AccentLight}"/>
+                            <Setter TargetName="backGrid" Property="Background" 
+                                    Value="{Binding Highlight, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource colorConverter}}"/>
+                            <Setter Property="Foreground" 
+                                    Value="{Binding Highlight, RelativeSource={RelativeSource Self}, Converter={StaticResource colorConverter}}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
-                            <Setter TargetName="backGrid" Property="Background" Value="{DynamicResource Accent}"/>
+                            <Setter Property="Foreground" Value="{Binding Highlight, RelativeSource={RelativeSource Self}}"/>
+                            <Setter TargetName="backGrid" Property="Background" Value="{Binding Highlight, RelativeSource={RelativeSource TemplatedParent}}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource PanelSecondary}"/>
@@ -81,8 +87,10 @@
     <Style TargetType="{x:Type local:CheckboxIcon}">
         <Setter Property="Width" Value="40"/>
         <Setter Property="Height" Value="40"/>
+        <Setter Property="Design" Value="{DynamicResource DefaultDesign}"/>
         <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
         <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Highlight" Value="{DynamicResource Accent}"/>
         <Setter Property="IsHitTestVisible" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -104,7 +112,7 @@
                             <Grid x:Name="backGrid" 
                                   Opacity="0.2" 
                                   Grid.RowSpan="3" Grid.ColumnSpan="3"/>
-                            <local:SymbolIcon Grid.Row="1" Grid.Column="1" 
+                            <local:SymbolIcon x:Name="Icon" Grid.Row="1" Grid.Column="1" 
                                               Icon="{TemplateBinding Icon}"
                                               Design="{TemplateBinding Design}"
                                               Foreground="{TemplateBinding Foreground}"/>
@@ -112,12 +120,14 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="backGrid" Property="Background" Value="{DynamicResource AccentLight}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource AccentLight}"/>
+                            <Setter TargetName="backGrid" Property="Background" 
+                                    Value="{Binding Highlight, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource colorConverter}}"/>
+                            <Setter Property="Foreground" 
+                                    Value="{Binding Highlight, RelativeSource={RelativeSource Self}, Converter={StaticResource colorConverter}}"/>
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
-                            <Setter TargetName="backGrid" Property="Background" Value="{DynamicResource Accent}"/>
+                            <Setter Property="Foreground" Value="{Binding Highlight, RelativeSource={RelativeSource Self}}"/>
+                            <Setter TargetName="backGrid" Property="Background" Value="{Binding Highlight, RelativeSource={RelativeSource TemplatedParent}}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource PanelSecondary}"/>
@@ -130,7 +140,7 @@
 
     <Style TargetType="{x:Type local:SymbolIcon}">
         <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
-        <Setter Property="Design" Value="Segoe"/>
+        <Setter Property="Design" Value="{DynamicResource DefaultDesign}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:SymbolIcon}">
