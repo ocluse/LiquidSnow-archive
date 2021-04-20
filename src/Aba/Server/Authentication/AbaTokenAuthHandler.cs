@@ -110,10 +110,8 @@ namespace Thismaker.Aba.Server.Authentication
             claims = new List<Claim>();
             
             var simplePrinciple= _manager.GetPrincipal(token);
-            
-            var identity = simplePrinciple?.Identity as ClaimsIdentity;
 
-            if (identity == null) return false;
+            if (simplePrinciple?.Identity is not ClaimsIdentity identity) return false;
 
             if (!identity.IsAuthenticated) return false;
 
@@ -130,13 +128,17 @@ namespace Thismaker.Aba.Server.Authentication
             if (!_keeper.CheckIfTokenExists(userId, token)) return false;
 
             //Add the required claims, returning false if a required claim is not found
-            foreach (var claimName in _requiredClaims)
+            if (_requiredClaims != null)
             {
-                var userClaim = identity.FindFirst(claimName);
-                if (userClaim==null||string.IsNullOrEmpty(userClaim.Value)) return false;
+                foreach (var claimName in _requiredClaims)
+                {
+                    var userClaim = identity.FindFirst(claimName);
+                    if (userClaim == null || string.IsNullOrEmpty(userClaim.Value)) return false;
 
-                claims.Add(userClaim);
+                    claims.Add(userClaim);
+                }
             }
+            
 
             return true;
         }

@@ -27,5 +27,9 @@ namespace Thismaker.Aba.Client
         NoEntitlements,
         RegisterFailure,
         ConnectionException,
+        RequestFailed,
+        AuthException,
+        GenericException,
+
     }
 }

@@ -23,6 +23,11 @@ namespace Thismaker.Aba.Server.Authentication
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
+            if (claims == null)
+            {
+                claims = new List<Claim>();
+            }
+
             claims.Add(new Claim(ClaimTypes.NameIdentifier, userId));
             var now = DateTime.UtcNow;
 
@@ -31,7 +36,7 @@ namespace Thismaker.Aba.Server.Authentication
                 Subject = new ClaimsIdentity(claims),
                 Issuer=JwtIssuer, 
                 IssuedAt=now, 
-                Expires = now.AddMinutes(Convert.ToInt32(expireMinutes)),
+                Expires = expireMinutes == 0 ? null : now.AddMinutes(Convert.ToInt32(expireMinutes)),
                 SigningCredentials = credentials
             };
 
@@ -42,20 +47,20 @@ namespace Thismaker.Aba.Server.Authentication
             return token;
         }
 
-        public ClaimsPrincipal GetPrincipal(string token)
+
+        public ClaimsPrincipal GetPrincipal(string token, bool requireExpTime=true)
         {
             try
             {
                 var tokenHander = new JwtSecurityTokenHandler();
-                var jwtToken = tokenHander.ReadToken(token) as JwtSecurityToken;
 
-                if (jwtToken == null) return null;
+                if (tokenHander.ReadToken(token) is not JwtSecurityToken jwtToken) return null;
 
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
 
                 var validationParameters = new TokenValidationParameters()
                 {
-                    RequireExpirationTime = true,
+                    RequireExpirationTime = requireExpTime,
                     ValidIssuer=JwtIssuer,
                     ValidateIssuer = true,
                     ValidateAudience = false,
@@ -70,6 +75,5 @@ namespace Thismaker.Aba.Server.Authentication
                 return null;
             }
         }
-
     }
 }
