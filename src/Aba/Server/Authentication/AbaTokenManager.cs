@@ -52,9 +52,9 @@ namespace Thismaker.Aba.Server.Authentication
         {
             try
             {
-                var tokenHander = new JwtSecurityTokenHandler();
+                var tokenHandler = new JwtSecurityTokenHandler();
 
-                if (tokenHander.ReadToken(token) is not JwtSecurityToken jwtToken) return null;
+                if (tokenHandler.ReadToken(token) is not JwtSecurityToken jwtToken) return null;
 
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
 
@@ -67,7 +67,7 @@ namespace Thismaker.Aba.Server.Authentication
                     IssuerSigningKey = securityKey
                 };
 
-                var principal = tokenHander.ValidateToken(token, validationParameters, out _);
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
                 return principal;
             }
             catch (Exception)
