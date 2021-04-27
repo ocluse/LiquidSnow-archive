@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Thismaker.Thoth;
 
 namespace Test.Thoth.Wpf
 {
@@ -23,6 +24,12 @@ namespace Test.Thoth.Wpf
         public MainWindow()
         {
             InitializeComponent();
+            Start();
+        }
+
+        public static async void Start()
+        {
+            await LocalizationManager.LoadData("localdata");
         }
     }
 }

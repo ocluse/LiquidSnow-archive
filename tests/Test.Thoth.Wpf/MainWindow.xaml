@@ -15,6 +15,8 @@
             <TextBox Width="300" Text="{Binding NameText, UpdateSourceTrigger=PropertyChanged}" Margin="10"/>
             <TextBlock Text="{Binding HeaderText}" Margin="10"/>
             <Button Content="{Binding ButtonText}" Command="{Binding ChangeLocaleCommand}" Width="100" Height="30"/>
+            <Button Content="{Binding ButtonText2}" Command="{Binding BindCommand}" Width="100" Height="30"/>
+            <Button Content="{Binding ButtonText3}" Command="{Binding ChangeKeyCommand}" Width="100" Height="30"/>
         </StackPanel>
     </Grid>
 </Window>

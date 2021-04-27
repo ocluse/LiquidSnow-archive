@@ -86,20 +86,52 @@ namespace Thismaker.Thoth
             return bindingItem;
         }
 
-        public static BindingItem ChangeBindingKey(string bindingId, string newKey, bool callSetString=false)
+        public static void UnbindProperty(object target, string propertyName, string table, string key)
         {
-            var item = _bindingItems.Find(x => x.Id == bindingId);
-            return ChangeBindingKey(bindingId,  item.TableKey, newKey, callSetString);
+            var item = _bindingItems.Find(x => x.Target == target && 
+            x.PropertyName == propertyName && 
+            x.TableKey == table && 
+            x.ItemKey == key);
+
+            if (item == null) throw new NullReferenceException("Target not found");
+            UnbindProperty(item);
         }
 
-        public static BindingItem ChangeBindingKey(string bindingId, string newTable, string newKey, bool callSetString = false)
+        public static void UnbindProperty(BindingItem item)
+        {
+            if (!_bindingItems.Contains(item)) throw new ArgumentException("The provided binding item was not found in the current localization manager");
+            item.UnbindAllTargets();
+            _bindingItems.Remove(item);
+        }
+
+        public static void UnbindAllProperties()
+        {
+            if (_bindingItems == null) return;
+            foreach(var item in _bindingItems)
+            {
+                item.UnbindAllTargets();
+            }
+            _bindingItems.Clear();
+        }
+
+        public static BindingItem ChangeBindingKey(string bindingId, string newKey, bool update=true, bool unbindTargets=true)
+        {
+            var item = _bindingItems.Find(x => x.Id == bindingId);
+            return ChangeBindingKey(bindingId,  item.TableKey, newKey, update, unbindTargets);
+        }
+
+        public static BindingItem ChangeBindingKey(string bindingId, string newTable, string newKey, bool update = false, bool unbindTargets=true)
         {
             var item = _bindingItems.Find(x => x.Id == bindingId);
             item.ItemKey = newKey;
             item.TableKey = newTable;
 
+            if (unbindTargets)
+            {
+                item.UnbindAllTargets();
+            }
 
-            if (callSetString)
+            if (update)
             {
                 var val = GetLocalizedString(item.TableKey, item.ItemKey);
                 item.SetString();
@@ -110,114 +142,21 @@ namespace Thismaker.Thoth
 
         private static async void OnCurrentLocaleChanged()
         {
-            LocaleChanged?.Invoke(CurrentLocale.ShortName);
-
             if (_bindingItems != null)
             {
                 await SetBoundProperties();
             }
+
+            LocaleChanged?.Invoke(CurrentLocale.ShortName);
         }
 
        private static Task SetBoundProperties()
        {
             foreach (var item in _bindingItems)
             {
-                
                 item.SetString();
             }
             return Task.CompletedTask;
        }
-    }
-
-    public class BindingItem : LocalizationBindingBase
-    {
-        public string Id { get; set; }
-        public string TableKey { get; set; }
-        public string ItemKey { get; set; }
-
-        public void SetString()
-        {
-            var val = LocalizationManager.GetLocalizedString(TableKey, ItemKey);
-            if (BindingTargets == null)
-            {
-                var prop = Target.GetType().GetProperty(PropertyName);
-                prop.SetValue(Target, val);
-            }
-            else
-            {
-                //construct the string:
-                var args = new List<object>();
-
-                foreach(var item in BindingTargets)
-                {
-                    args.Add(Target.GetPropValue(item.PropertyName));
-                }
-
-                var constructed = string.Format(val, args.ToArray());
-
-                var prop = Target.GetType().GetProperty(PropertyName);
-                prop.SetValue(Target, constructed);
-            }
-        }
-
-        public BindingItem BindObservableTarget(INotifyPropertyChanged target, string propertyName, bool listen = true)
-        {
-            var bindingTarget=BindTarget(target, propertyName, listen);
-
-            if (listen)
-            {
-                target.PropertyChanged += TargetPropertyChanged;
-            }
-            return bindingTarget;
-        }
-
-        private void TargetPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            SetString();
-        }
-
-        public BindingItem BindTarget(object target, string propertyName, bool listen=false)
-        {
-            if (BindingTargets == null)
-            {
-                BindingTargets = new List<BindingTarget>();
-            }
-
-            var item = new BindingTarget
-            {
-                PropertyName = propertyName,
-                Target = target,
-                Listen=listen
-            };
-
-            BindingTargets.Add(item);
-
-            return this;
-        }
-
-        public List<BindingTarget> BindingTargets { get; set; }
-    }
-
-    public abstract class LocalizationBindingBase
-    {
-        public object Target { get; set; }
-        public string PropertyName { get; set; }
-    }
-
-    public class BindingTarget:LocalizationBindingBase
-    {
-        public event Action<BindingTarget, bool> ListenStatusChanged;
-
-        private bool _listen;
-
-        public bool Listen
-        {
-            get => _listen;
-            set
-            {
-                _listen = value;
-                ListenStatusChanged?.Invoke(this,Listen);
-            }
-        }
     }
 }

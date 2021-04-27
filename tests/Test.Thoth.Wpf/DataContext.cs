@@ -15,7 +15,7 @@ namespace Test.Thoth.Wpf
     {
         private string headerText;
         private string nameText;
-        private string buttonText;
+        private string buttonText, buttonText2, buttonText3;
         public string HeaderText
         {
             get => headerText;
@@ -31,24 +31,21 @@ namespace Test.Thoth.Wpf
             get => buttonText;
             set => SetProperty(ref buttonText, value);
         }
+        public string ButtonText2
+        {
+            get => buttonText2;
+            set => SetProperty(ref buttonText2, value);
+        }
+        public string ButtonText3
+        {
+            get => buttonText3;
+            set => SetProperty(ref buttonText3, value);
+        }
         public DataContext()
         {
-            Start();
             ChangeLocaleCommand = new RelayCommand(OnChangeLocale);
-        }
-        private async void Start()
-        {
-            try 
-            {
-                await LocalizationManager.LoadData("localdata");
-            }
-            catch(Exception ex)
-            {
-                var x = 0;
-            }
-            
-            LocalizationManager.BindProperty(this, nameof(HeaderText), "login_scene", "headerInfoSI")
-                .BindObservableTarget(this, nameof(NameText));
+            BindCommand = new RelayCommand(OnBindTarget);
+            ChangeKeyCommand = new RelayCommand(OnChangeKey, CanChangeKey);
         }
         private void OnChangeLocale()
         {
@@ -59,7 +56,49 @@ namespace Test.Thoth.Wpf
             LocalizationManager.CurrentLocale = LocalizationManager.Locales[index];
             ButtonText = LocalizationManager.CurrentLocale.Name;
         }
+        bool state;
+        string id;
+        private void OnBindTarget()
+        {
+            if (state)
+            {
+                var bind=LocalizationManager.BindProperty(this, nameof(HeaderText), "login_scene", "headerInfoSI")
+                .BindObservableTarget(this, nameof(NameText));
+                id = bind.Id;
+                ButtonText2 = "Binding On";
+            }
+            else
+            {
+                id = null;
+                LocalizationManager.UnbindAllProperties();
+                ButtonText2 = "Binding Off";
+            }
+            state = !state;
+        }
+        private bool CanChangeKey()
+        {
+            return !string.IsNullOrEmpty(id);
+        }
+
+        bool isInfo;
+        private void OnChangeKey()
+        {
+            if (isInfo)
+            {
+                LocalizationManager.ChangeBindingKey(id, "headerTextSI");
+                ButtonText3 = "headerTextSI";
+            }
+            else
+            {
+                LocalizationManager.ChangeBindingKey(id, "headerInfoSI")
+                    .BindObservableTarget(this, nameof(NameText));
+                ButtonText3 = "headerInfoSI";
+            }
+            isInfo = !isInfo;
+        }
 
         public RelayCommand ChangeLocaleCommand { get; private set; }
+        public RelayCommand BindCommand { get; private set; }
+        public RelayCommand ChangeKeyCommand { get; private set; }
     }
 }

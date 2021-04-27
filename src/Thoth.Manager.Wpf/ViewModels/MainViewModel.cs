@@ -294,8 +294,8 @@ namespace Thismaker.Thoth.Manager.Wpf
 
             try
             {
-                
-                using var fsOpen = File.OpenWrite(file.FileName);
+
+                using var fsOpen = File.Open(file.FileName, FileMode.Create);
                 await _data.SaveAsync(fsOpen);
                 GoroMessageBox.Show("Success","Localization Data has been saved successfully", MessageBoxButton.OK,StatusInfo.Success);
             }
