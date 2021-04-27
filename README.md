@@ -31,6 +31,7 @@ LiquidSnow Assemblies:
  * [Pluto](#pluto)
  * [Anubis](#anubis)
  * [Aba](#aba)
+ * [Thoth](#thoth)
 
 
 <a id="aretha"></a>
@@ -65,7 +66,10 @@ A library dedicated to Steganography(not sure if I spelled that right). It allow
 ## 8. Aba
 After noticing overwhelming similarities among several Server-Client based applications I was creating, I decided to condense the code into a single-shareable library that can be used easily to get such applications running. Aba is exteremly useful, only rivaled by perhaps Core, Enigma and Goro. Aba comes in three parts: AbaClient, which is responsible for handling client side states, such as requesting for Access Tokens, making HTTP requests to a WebApi and more, AbaServer, which has utility for generating custom JWT tokens, server-side authentication, and more core server infrstructure. Finally there is AbaCommon, which provides the common ground for the server and the client to work on.
 
+## 9. Thoth
+Thoth is a useful assembly that you can use to add localization to your dotnet application. It allows you to easliy add support for multiple languages and maintain these languages. Furthermore, it has been built with MVVM in mind, which means that it will be easy to incorporate it into ViewModels. To highlight some of it's usefulness, it can be set up to update the text when the user changes the language preferences immediately. It can also be used to update the text when another property changes, for example, say you had a field that welcomes the use with something like "Hello, Ian", when the user changes the language to say Swahili, it will update it to, "Jambo, Ian" and in case Ian logs out and instead Monica logs in, it changes to "Jambo, Monica" with the programmer having created the translation states as ENGLISH: "Hello, {0}" and SWAHILI: "Jambo, {0}". 
 
+You may now be eager to try it out. To do so, please look at it in the feature branch, I have not completely finished it but you can try it out. Further, you will find the Thoth Manager too, which is a windows program that you can use to easily manage your localization states. Please look at the tests for an example of how it is used. I also promise to make this readme text more clear in the future,
 
 ----
 
