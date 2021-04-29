@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Thismaker.Horus;
 
 namespace Thismaker.Mercury
 {
@@ -31,31 +28,33 @@ namespace Thismaker.Mercury
             ctsMain = new CancellationTokenSource();
         }
 
-        public void Start()
+        public async void Start()
         {
-            Receive(ctsMain.Token).Start();
+            await Receive(ctsMain.Token);
         }
 
-        private Task Receive(CancellationToken cancellationToken)
+        private async Task Receive(CancellationToken cancellationToken)
         {
-            while (true)
+            await Task.Run(() =>
             {
-                if (cancellationToken.IsCancellationRequested)
+                while (true)
                 {
-                    break;
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    if (Socket.Available == 0) continue;
+                    var bufferSize = Socket.Available;
+
+                    var buffer = new byte[bufferSize];
+
+                    Socket.Receive(buffer);
+
+                    OnReceive?.Invoke(this, buffer);
                 }
-
-                if (Socket.Available == 0) continue;
-                var bufferSize = Socket.Available;
-
-                var buffer = new byte[bufferSize];
-
-                Socket.Receive(buffer);
-
-                OnReceive?.Invoke(this, buffer);
-            }
-
-            return Task.CompletedTask;
+            });
+           
         }
 
         public Task Send(byte[] data)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 
 namespace Thismaker.Thoth
 {
@@ -54,9 +53,9 @@ namespace Thismaker.Thoth
                 {
                     ((INotifyPropertyChanged)target.Target).PropertyChanged += TargetPropertyChanged;
                 }
-                catch(Exception ex)
+                catch
                 {
-                    var x = 0;
+                    //do nothing
                 }
             }
             else
@@ -65,9 +64,9 @@ namespace Thismaker.Thoth
                 {
                     ((INotifyPropertyChanged)target.Target).PropertyChanged -= TargetPropertyChanged;
                 }
-                catch(Exception ex)
+                catch
                 {
-                    var x = 0;
+                    //do nothing
                 }
             }
         }

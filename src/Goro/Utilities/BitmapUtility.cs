@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.IO;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace Thismaker.Goro.Utilities
 {

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace Thismaker.Aba.Client.Msal
 {
@@ -43,24 +42,12 @@ namespace Thismaker.Aba.Client.Msal
         /// <summary>
         /// Derived from the <see cref="AadInstance"/> and <see cref="Tenant"/>
         /// </summary>
-        public string AuthorityBase
-        {
-            get
-            {
-                return $"https://{AadInstance}/tfp/{Tenant}/";
-            }
-        }
+        public virtual string AuthorityBase => $"https://{AadInstance}/tfp/{Tenant}/";
 
         /// <summary>
         /// Derived from the <see cref="AuthorityBase"/> and the <see cref="PolicySUSI"/>
         /// </summary>
-        public string AuthoritySUSI
-        {
-            get
-            {
-                return $"{AuthorityBase}{PolicySUSI}";
-            }
-        }
+        public virtual string AuthoritySUSI => $"{AuthorityBase}{PolicySUSI}";
 
         /// <summary>
         /// The Api Scopes that the client wishes to access when acquirinng the <see cref=" AccessToken"/>
@@ -76,7 +63,7 @@ namespace Thismaker.Aba.Client.Msal
 
         #endregion
 
-        #region BaseOverrides
+        #region Base Overrides
         /// <inheritdoc/>
         public override void MakeApp()
         {
@@ -87,11 +74,8 @@ namespace Thismaker.Aba.Client.Msal
                .WithRedirectUri(RedirectUri)
                .WithLogging(OnMsalLog, LogLevel.Error)
                .Build();
-
             ReadAccessToken = AcquireAccessToken;
         }
-
-
         #endregion
 
         #region Abstracts
@@ -107,7 +91,13 @@ namespace Thismaker.Aba.Client.Msal
         /// <returns></returns>
         public abstract Task Logout();
 
-        protected abstract void OnMsalLog(LogLevel level, string message, bool containsPii);
+        /// <summary>
+        /// Override to capture any Msal logs
+        /// </summary>
+        protected virtual void OnMsalLog(LogLevel level, string message, bool containsPii)
+        {
+
+        }
         #endregion
 
         #region Private Methods
@@ -179,6 +169,5 @@ namespace Thismaker.Aba.Client.Msal
         }
 
         #endregion
-
     }
 }

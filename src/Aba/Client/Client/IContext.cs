@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Thismaker.Aba.Client
+﻿namespace Thismaker.Aba.Client
 {
     /// <summary>
     /// The context of the client. Should be impelemeted as e.g WindowsClient, AndroidClient, GeneralClient etc.

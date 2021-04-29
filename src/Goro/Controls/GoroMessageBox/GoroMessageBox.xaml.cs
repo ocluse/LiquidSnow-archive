@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Thismaker.Goro
 {
@@ -30,7 +21,12 @@ namespace Thismaker.Goro
             Show(title, content, MessageBoxButton.OK);
         }
 
-        public static bool? Show(string title, string content, MessageBoxButton button, StatusInfo? status=null)
+        public static bool? Show(string content, MessageBoxButton button=MessageBoxButton.OK, StatusInfo? status = null)
+        {
+            return Show(null, content, button, status);
+        }
+
+        public static bool? Show(string title, string content, MessageBoxButton button=MessageBoxButton.OK, StatusInfo? status=null)
         {
             if (button == MessageBoxButton.YesNoCancel) throw new InvalidOperationException("MessageBoxButton.YesNoCancel is currently unsupported");
 
@@ -38,7 +34,15 @@ namespace Thismaker.Goro
 
             dlg.Button2.Visibility = button == MessageBoxButton.OK ? Visibility.Collapsed : Visibility.Visible;
 
-            dlg.Title = title;
+            if (!string.IsNullOrEmpty(title))
+            {
+                dlg.Title = title;
+            }
+            else
+            {
+                dlg.Title = "Message";
+            }
+           
             dlg.ContentText.Text = content;
             dlg.Button1.Content = button == MessageBoxButton.YesNo ? "Yes" : "OK";
             dlg.Button2.Content = button == MessageBoxButton.YesNo ? "No" : "Cancel";
@@ -62,7 +66,6 @@ namespace Thismaker.Goro
         {
             InitializeComponent();
             DataContext = this;
-            
         }
 
         private void Button2_Click(object sender, RoutedEventArgs e)

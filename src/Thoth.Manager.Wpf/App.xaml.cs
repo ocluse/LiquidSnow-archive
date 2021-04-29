@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using Thismaker.Goro;
+using Thismaker.Goro.Utilities;
 
 namespace Thismaker.Thoth.Manager.Wpf
 {
@@ -18,7 +13,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         {
             ThemeManager.Initialize();
             ThemeManager.Theme = ThemeMode.Dark;
-            ThemeManager.Accent = DefaultColors.Briliet;
+            ThemeManager.Accent = ColorUtility.CreateBrush("#3A47AA").Color;
 
             var window = new MainWindow();
             MainWindow = window;

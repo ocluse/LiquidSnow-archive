@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
-
-namespace Thismaker.Horus.Symmetrics
+﻿namespace Thismaker.Horus.Symmetrics
 {
     public static class PredefinedSymmetric
     {

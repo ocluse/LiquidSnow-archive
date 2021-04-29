@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace Thismaker.Horus.Classical
 {
-	/// <summary>
-	/// A superior form of subsitution cipher. 
-	/// Similar to the ceasar cipher only that the offset for each character is individualised.
-	/// </summary>
+    /// <summary>
+    /// A superior form of subsitution cipher. 
+    /// Similar to the ceasar cipher only that the offset for each character is individualised.
+    /// </summary>
     public class Vigenere : ClassicalAlgorithm
     {
 		///<inheritdoc/>

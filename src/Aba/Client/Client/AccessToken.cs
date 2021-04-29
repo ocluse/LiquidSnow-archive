@@ -55,6 +55,18 @@ namespace Thismaker.Aba.Client
             return result;
         }
 
+        public static AccessToken Basic(string value)
+        {
+            var result = new AccessToken
+            {
+                Key = "Basic",
+                Kind = AccessTokenKind.Bearer,
+                Value = value
+            };
+
+            return result;
+        }
+
         public static AccessToken Custom(string key, string value)
         {
             var result = new AccessToken

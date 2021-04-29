@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Thismaker.Anubis;
 using System.IO;
 using System.Threading.Tasks;

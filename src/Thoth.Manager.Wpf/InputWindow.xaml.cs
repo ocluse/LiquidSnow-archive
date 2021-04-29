@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace Thismaker.Thoth.Manager.Wpf
 {
@@ -19,10 +7,11 @@ namespace Thismaker.Thoth.Manager.Wpf
     /// </summary>
     public partial class InputWindow : Window
     {
-        public InputWindow(string header)
+        public InputWindow(string header, string input=null)
         {
             InitializeComponent();
             ((InputWindowModel)DataContext).Header = header;
+            ((InputWindowModel)DataContext).InputString = input;
         }
 
         public string Input

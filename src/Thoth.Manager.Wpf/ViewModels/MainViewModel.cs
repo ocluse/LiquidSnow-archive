@@ -1,11 +1,8 @@
 ﻿using Microsoft.Win32;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Thismaker.Core;
 using Thismaker.Goro;
@@ -325,7 +322,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnEditTable()
         {
-            var dlg = new InputWindow("Provide a new table key");
+            var dlg = new InputWindow("Provide a new table key", SelectedTable.TableKey);
             var result = dlg.ShowDialog();
             if (!(result.HasValue && result.Value)) return;
             var tableKey = dlg.Input;
@@ -363,7 +360,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnEditItem()
         {
-            var dlg = new InputWindow("Provide the item's key");
+            var dlg = new InputWindow("Provide a new item key", SelectedItem.Key);
             var result = dlg.ShowDialog();
             if (!(result.HasValue && result.Value)) return;
             var itemKey = dlg.Input;

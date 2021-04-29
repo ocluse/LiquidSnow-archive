@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-
-namespace Thismaker.Core.Models
+﻿namespace Thismaker.Core.Models
 {
     /// <summary>
     /// A template that can be used for univeral messages.
@@ -12,7 +7,6 @@ namespace Thismaker.Core.Models
     /// </summary>
     public class UniversalMessage : BindableBase
     {
-
         #region Properties
 
         private string sender, header, content;

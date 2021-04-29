@@ -2,7 +2,7 @@
 
 namespace Thismaker.Anubis
 {
-    class EndOfFileException:Exception
+    public class EndOfFileException : Exception
     {
         public EndOfFileException() : base() { }
 

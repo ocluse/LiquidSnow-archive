@@ -4,6 +4,11 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>thoth-icon.ico</ApplicationIcon>
+    <Authors>Thismaker</Authors>
+    <Product>Thoth Manager</Product>
+    <Description>Used to manage Thoth Localization Data files.</Description>
+    <Copyright>©2021 Ocluse</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

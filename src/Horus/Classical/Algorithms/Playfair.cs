@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 
 namespace Thismaker.Horus.Classical
 {
-	/// <summary>
-	/// The playfair is a form of subsitution cipher that normally uses a grid to gauge its subsitution.
-	/// It would normally require a 5x5 grid, but my implementation allows for any grid size.
-	/// </summary>
+    /// <summary>
+    /// The playfair is a form of subsitution cipher that normally uses a grid to gauge its subsitution.
+    /// It would normally require a 5x5 grid, but my implementation allows for any grid size.
+    /// </summary>
     public class Playfair : ClassicalAlgorithm
     {
 		/// <summary>

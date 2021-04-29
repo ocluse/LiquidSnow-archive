@@ -30,6 +30,12 @@ namespace Thismaker.Aba.Client.Transfers
             return this;
         }
 
+        public TransferBuilder<T> WithBlobUri(string uri)
+        {
+            transfer.BlobUri = uri;
+            return this;
+        }
+
         public TransferBuilder<T> WithLocal(string path)
         {
             ((FileTransfer)(object)transfer).Path = path;

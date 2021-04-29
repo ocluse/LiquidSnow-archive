@@ -5,6 +5,9 @@ using Thismaker.Core;
 
 namespace Thismaker.Aba.Client.Transfers
 {
+    /// <summary>
+    /// A type of <see cref="Transfer"/>that has it's source or destination as a <see cref="System.IO.Stream"/>
+    /// </summary>
     public class StreamTransfer : Transfer
     {
         /// <summary>
@@ -18,6 +21,9 @@ namespace Thismaker.Aba.Client.Transfers
         }
     }
 
+    /// <summary>
+    /// A type of <see cref="Transfer"/> that has it's source or destination as a string path
+    /// </summary>
     public class FileTransfer : Transfer
     {
         /// <summary>
@@ -35,6 +41,7 @@ namespace Thismaker.Aba.Client.Transfers
     {
         #region Private Fields
         private string _name, _blobName;
+        private string _blobUri;
         private TransferMode _mode;
         private TransferState _state;
         private readonly CancellationTokenSource _cancellationTokenSource;
@@ -89,6 +96,15 @@ namespace Thismaker.Aba.Client.Transfers
         }
 
         /// <summary>
+        /// The uri for the blob. If none is proivided and the transfer is started, the transfer manager tries to access one.
+        /// </summary>
+        public string BlobUri
+        {
+            get => _blobUri;
+            set => SetProperty(ref _blobUri, value);
+        }
+
+        /// <summary>
         /// The cancellation token associated with the transfer, 
         /// that will be tripped when the transfer is cancelled.
         /// </summary>
@@ -106,9 +122,9 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public void Cancel()
         {
-            if(State!=TransferState.Cancelled)
+            if(State!=TransferState.Canceled)
             _cancellationTokenSource.Cancel();
-            State = TransferState.Cancelled;
+            State = TransferState.Canceled;
             TransferCancelled.Invoke(this);
         }
         #endregion
@@ -116,7 +132,7 @@ namespace Thismaker.Aba.Client.Transfers
 
     public enum TransferState
     {
-        Processing, Waiting, Error, Requeued, Cancelled
+        Processing, Waiting, Error, Requeued, Canceled
     }
 
     public enum TransferMode

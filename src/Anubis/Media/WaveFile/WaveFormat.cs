@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Thismaker.Anubis.Media
+﻿namespace Thismaker.Anubis.Media
 {
     public struct WaveFormat
     {

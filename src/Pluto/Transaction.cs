@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Thismaker.Horus;
-
-namespace Thismaker.Pluto
+﻿namespace Thismaker.Pluto
 {
     public class Transaction : Charge
     {

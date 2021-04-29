@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Timers;
 using Thismaker.Core.Models;
 using System.Collections.Specialized;
 using System.Collections;
@@ -134,7 +133,7 @@ namespace Thismaker.Aba.Client.Transfers
         private async Task Transfer(Transfer transfer)
         {
             //The Cancelled Transfer should not be executed
-            if (transfer.State == TransferState.Cancelled)
+            if (transfer.State == TransferState.Canceled)
             {
                 return;
             }
@@ -142,7 +141,15 @@ namespace Thismaker.Aba.Client.Transfers
             try
             {
                 //Get the SAS for the transfer
-                var uri = await auth.GetSASToken(transfer.BlobName);
+                Uri uri;
+                if (string.IsNullOrEmpty(transfer.BlobUri))
+                {
+                    uri = await auth.GetSASToken(transfer.BlobName);
+                }
+                else
+                {
+                    uri = new Uri(transfer.BlobUri);
+                }
 
                 //build the blob:
                 var blob = new BlobClient(uri);
@@ -177,7 +184,7 @@ namespace Thismaker.Aba.Client.Transfers
                 {
                     if (!blob.Exists().Value)
                     {
-                        throw new TransferException("Blob not found");
+                        throw new TransferException("Blob not found", transfer);
                     }
                     
                     await blob.DownloadToAsync(stream, transfer.CancellationToken);
@@ -188,31 +195,28 @@ namespace Thismaker.Aba.Client.Transfers
             catch (DirectoryNotFoundException ex)
             {
                 transfer.State = TransferState.Error;
-                string message = $"Directory for the transfer '{transfer.Name}' does not exist";
-                throw new TransferException(message, ex);
+                throw new TransferException(ex.Message, transfer, ex);
             }
             catch (FileNotFoundException ex)
             {
                 transfer.State = TransferState.Error;
-                string message = $"The file for transfer '{transfer.Name}' was not found";
-                throw new TransferException(message, ex);
+                throw new TransferException(ex.Message, transfer, ex);
             }
             catch (IOException ex)
             {
-                string message = $"The file for transfer '{transfer.Name}' is being used by another process";
-                throw new TransferException(message, ex);
+                throw new TransferException(ex.Message, transfer, ex);
             }
             catch (UnauthorizedAccessException ex)
             {
-                string message = $"Insufficient permission to access the file for tranfser '{transfer.Name}.'";
                 transfer.State = TransferState.Requeued;
-                throw new TransferException(message, ex);
+                throw new TransferException(ex.Message,transfer, ex);
             }
             finally
             {
                 _active.Remove(transfer);
             }
         }
+
         #endregion
 
         #region Public Methods
@@ -232,17 +236,7 @@ namespace Thismaker.Aba.Client.Transfers
                 if (!requeue) return false;
             }
             _queued.Enqueue(transfer);
-
-            
             return true;
-        }
-
-        private void OnTransferCancelled(Transfer sender)
-        {
-            if (_active.Contains(sender))
-            {
-                _active.Remove(sender);
-            }
         }
 
         /// <summary>
@@ -253,6 +247,14 @@ namespace Thismaker.Aba.Client.Transfers
         /// <returns></returns>
         public async Task Invoke(Transfer transfer)
         {
+            void OnTransferCancelled(Transfer sender)
+            {
+                if (_active.Contains(sender))
+                {
+                    _active.Remove(sender);
+                }
+            }
+
             try
             {
                 transfer.TransferCancelled += OnTransferCancelled;
@@ -271,7 +273,7 @@ namespace Thismaker.Aba.Client.Transfers
         }
 
         /// <summary>
-        /// Determines whether the SAS protected blob exists
+        /// Determines whether the blob exists
         /// </summary>
         /// <param name="blobName">The name of the blob</param>
         /// <returns>True if the blob exists</returns>
@@ -286,7 +288,7 @@ namespace Thismaker.Aba.Client.Transfers
         }
 
         /// <summary>
-        /// Allows you to delete a SAS protected blob.
+        /// Deletes the blob
         /// Blob will only be deleted if it exists
         /// </summary>
         /// <param name="blobName">The name of the blob to delete</param>

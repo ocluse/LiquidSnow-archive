@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Thismaker.Horus.IO;
 
 namespace Thismaker.Thoth
 {
@@ -41,8 +37,8 @@ namespace Thismaker.Thoth
 
         public static async Task LoadData(string path)
         {
-            using var fsContainer = File.OpenRead(path);
-            await LoadData(fsContainer);
+            using var fsData = File.OpenRead(path);
+            await LoadData(fsData);
         }
 
         public static async Task LoadData(Stream stream)
@@ -117,28 +113,37 @@ namespace Thismaker.Thoth
         public static BindingItem ChangeBindingKey(string bindingId, string newKey, bool update=true, bool unbindTargets=true)
         {
             var item = _bindingItems.Find(x => x.Id == bindingId);
-            return ChangeBindingKey(bindingId,  item.TableKey, newKey, update, unbindTargets);
+            return ChangeBindingKey(item, item.TableKey, newKey, update, unbindTargets);
         }
 
         public static BindingItem ChangeBindingKey(string bindingId, string newTable, string newKey, bool update = false, bool unbindTargets=true)
         {
             var item = _bindingItems.Find(x => x.Id == bindingId);
-            item.ItemKey = newKey;
-            item.TableKey = newTable;
+            return ChangeBindingKey(item, newKey, newTable, update, unbindTargets);
+        }
+
+        public static BindingItem ChangeBindingKey(BindingItem bindingItem, string newKey, bool update = false, bool unbindTargets = true)
+        {
+            return ChangeBindingKey(bindingItem, bindingItem.TableKey, newKey, update, unbindTargets);
+        }
+
+        public static BindingItem ChangeBindingKey(BindingItem bindingItem, string newTable, string newKey, bool update = false, bool unbindTargets = true)
+        {
+            bindingItem.ItemKey = newKey;
+            bindingItem.TableKey = newTable;
 
             if (unbindTargets)
             {
-                item.UnbindAllTargets();
+                bindingItem.UnbindAllTargets();
             }
-
             if (update)
             {
-                var val = GetLocalizedString(item.TableKey, item.ItemKey);
-                item.SetString();
+                bindingItem.SetString();
             }
-
-            return item;
+            return bindingItem;
         }
+
+       
 
         private static async void OnCurrentLocaleChanged()
         {

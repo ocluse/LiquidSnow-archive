@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Thismaker.Core.Globals
+﻿namespace Thismaker.Core.Globals
 {
     public static class WebGlobal
     {

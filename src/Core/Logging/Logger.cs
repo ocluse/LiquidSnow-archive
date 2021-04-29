@@ -4,6 +4,9 @@ using System.IO;
 
 namespace Thismaker.Core.Logging
 {
+    /// <summary>
+    /// Provides an easy way to quickly log without the complexities
+    /// </summary>
     public static class Logger
     {
         public static event Action<LogObject> LogEntered;

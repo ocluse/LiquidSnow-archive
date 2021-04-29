@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Thismaker.Horus.Classical
+﻿namespace Thismaker.Horus.Classical
 {
     /// <summary>
     /// A collection of well know Enigma Machines at their default configurations.

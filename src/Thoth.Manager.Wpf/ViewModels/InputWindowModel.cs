@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Thismaker.Core;
+﻿using Thismaker.Core;
 using Thismaker.Goro.Commands;
 
 namespace Thismaker.Thoth.Manager.Wpf

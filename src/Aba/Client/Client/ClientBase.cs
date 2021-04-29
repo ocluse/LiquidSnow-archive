@@ -2,10 +2,8 @@
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Thismaker.Aba.Common;
 
 namespace Thismaker.Aba.Client
 {
@@ -97,9 +95,9 @@ namespace Thismaker.Aba.Client
 
         #region Initialization
         /// <summary>
-        /// Should be called before accessing the Client-App's methods. Initializes the basics.
-        /// Where a costom <see cref="AccessToken"/> is used, this should be called again to refresh the AccessToken.
-        /// Note that this destroys previous bindings to the Hub and HttpClient, and therefore those must be refreshed.
+        /// Initializes the HttpClient and the HubConnection. Should be called only onces during the lifetime of the application.
+        /// This method must be called before accessing any of the Hub and HttpClient methods.
+        /// Overriding this method allows you to specify how the HttpClient and HubConnection should be initialized.
         /// </summary>
         public virtual void MakeApp()
         {
@@ -120,7 +118,7 @@ namespace Thismaker.Aba.Client
 
         /// <summary>
         /// Makes the app the singleton that can be easily accessed by <see cref="ClientBase{T}.Instance"/>
-        /// Can be used for persistance accross the environment's lifetime.
+        /// Can be used for persistance accross the applications's lifetime.
         /// </summary>
         public void MakeSingleton()
         {
@@ -164,15 +162,13 @@ namespace Thismaker.Aba.Client
 
         #region Api Methods
         /// <summary>
-        /// Prepares the HttpClient by setting the appropriate request header, such as Bearer token, before calling the ServerMethods.
-        /// This method is always run before all API Methods such as <see cref="ApiGetAsync(string, bool)"/>
+        /// Prepares the HttpClient by setting the appropriate request header, such as Bearer token, before sending the HTTP request.
+        /// This method is always run before all HTTP API/Endpoint Methods such as <see cref="ApiGetAsync(string, bool)"/>
         /// </summary>
         /// <param name="secured">If true, the http client sends along an Authorization or other authentication headers, otherwise, it removes them</param>
         /// <returns></returns>
         protected virtual async Task ReadyHttpClientForRequest(bool secured)
         {
-            
-
             if (secured)
             {
                 var accessToken = ReadAccessToken != null ? await ReadAccessToken.Invoke() : AccessToken.Value;
@@ -200,11 +196,11 @@ namespace Thismaker.Aba.Client
         }
 
         /// <summary>
-        /// Calls the HTTP GET on the server's Api
+        /// Sends a HTTP GET request to the Api Endpoint.
         /// </summary>
-        /// <param name="requestUri">The specific request uri, will be combined with the path info</param>
-        /// <param name="secured">If true, ensures that the method adds the <see cref="AccessToken"/> to the request for a secured resource</param>
-        /// <returns></returns>
+        /// <param name="requestUri">The specific request uri of the resource</param>
+        /// <param name="secured">If true, ensures that the <see cref="AccessToken"/> is added to the request headers</param>
+        /// <returns>The <see cref="HttpResponseMessage"/> returned</returns>
         public async Task<HttpResponseMessage> ApiGetAsync(string requestUri, bool secured=true)
         {
             //Prep the HttpClient
@@ -222,12 +218,14 @@ namespace Thismaker.Aba.Client
         }
 
         /// <summary>
-        /// A simpler way to call a HTTP GET on the APIs endpoint. Deserializes, by JSON the content of the response
+        /// A simpler way to send a HTTP GET. The result, if successful is deserialized through <see cref="Deserialize{TResult}(string)"/>
+        /// If the response does not indicate success, a <see cref="ClientException"/> with be thrown.
         /// </summary>
         /// <typeparam name="TResult">The type to deserialize the content to</typeparam>
         /// <param name="requestUri">The specific resource Uri on the endpoint</param>
         /// <param name="secured">If true, ensures that the method adds the <see cref="AccessToken"/> to the request for a secured resource</param>
-        /// <returns>The JSON deserialized content/body of the response from the API</returns>
+        /// <returns>The deserialised content/body of the response received</returns>
+        /// <exception cref="ClientException"/>
         public async Task<TResult>  ApiGetSimpleAsync<TResult>(string requestUri, bool secured = true)
         {
             try
@@ -236,11 +234,11 @@ namespace Thismaker.Aba.Client
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    return FromJson<TResult>(json);
+                    return Deserialize<TResult>(json);
                 }
                 else
                 {
-                    throw new ClientException(response.StatusCode.ToString(), ExceptionKind.RegisterFailure);
+                    throw new ClientException(response.StatusCode.ToString(), ExceptionKind.RequestFailed);
                 }
             }
             catch
@@ -250,12 +248,12 @@ namespace Thismaker.Aba.Client
         }
 
         /// <summary>
-        /// Calls a HTTP POST on the server's Api
+        /// Sends a HTTP POST request to the Api Endpoint
         /// </summary>
-        /// <param name="requestUri">The specific uri to the post resource</param>
-        /// <param name="content">The content to send to the server</param>
-        /// <param name="secured">If true, ensures that the method adds the <see cref="AccessToken"/> to the request for a secured resource</param>
-        /// <returns></returns>
+        /// <param name="requestUri">The specific uri of the request</param>
+        /// <param name="content">The content to send to in the body of the request</param>
+        /// <param name="secured">If true, ensures that the <see cref="AccessToken"/> is added to the request headers</param>
+        /// <returns>The response received from the HTTP request</returns>
         public async Task<HttpResponseMessage> ApiPostAsync(string requestUri, HttpContent content, bool secured = true)
         {
             //Prep the HttpClient
@@ -273,9 +271,9 @@ namespace Thismaker.Aba.Client
         }
 
         /// <summary>
-        /// A simpler way to make a HTTP POST on the Api endpoint that makes it easier to work with.
+        /// A simpler way to send a HTTP POST request to the Api endpoint
         /// </summary>
-        /// <typeparam name="TContent">The type of the provided <paramref name="content"/></typeparam>
+        /// <typeparam name="TContent">The type of content to be added to the body of the request<paramref name="content"/></typeparam>
         /// <typeparam name="TResult">The type of the expected result from the method</typeparam>
         /// <param name="requestUri">The specific uri of the post resource</param>
         /// <param name="content">The content to be included in the body of the request</param>
@@ -284,10 +282,11 @@ namespace Thismaker.Aba.Client
         /// <param name="serializeContent">If true, the content is serialized first by use of the 
         /// <see cref="GetStringContent{T}(T)"/> method. Otherwise, the content <b>must</b> be of type <see cref="HttpContent"/></param>
         /// <param name="deserializeResult">If true, the method first deserializes the Content
-        /// (assumes it to be JSON unless <see cref="FromJson{T}(string)"/> has been overriden)  of the <b>response</b> message</param>
+        /// (assumes it to be JSON unless <see cref="Deserialize{T}(string)"/> has been overriden)  of the <b>response</b> message</param>
         /// <returns>A <see cref="HttpResponseMessage"/> or generic type depending on the params</returns>
         /// <exception cref="ClientException">When <paramref name="deserializeResult"/> is true and the request failed</exception>
-        /// <exception cref="HttpRequestException"></exception>
+        /// <exception cref="HttpRequestException"/>
+        /// <exception cref="InvalidOperationException"/>
         public async Task<TResult> ApiPostSimpleAsync<TContent, TResult>(string requestUri, TContent content, bool secured = true, bool serializeContent=true, bool deserializeResult=true)
         {
             //Request validation:
@@ -323,7 +322,7 @@ namespace Thismaker.Aba.Client
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    return FromJson<TResult>(json);
+                    return Deserialize<TResult>(json);
                 }
                 else
                 {
@@ -336,6 +335,10 @@ namespace Thismaker.Aba.Client
             }
         }
 
+
+        /// <summary>
+        /// Similar to <see cref="ApiGetAsync(string, bool)"/> but instead sends the request to the provided endpoint.
+        /// </summary>
         public async Task<HttpResponseMessage> EndpointGetAsync(string endpoint, string requestUri, bool secured=true)
         {
             //Prep the HttpClient
@@ -351,6 +354,9 @@ namespace Thismaker.Aba.Client
             }
         }
 
+        /// <summary>
+        /// Similar to <see cref="ApiGetSimpleAsync(string, bool)"/> but instead sends the request to the provided endpoint.
+        /// </summary>
         public async Task<TResult> EndpointGetSimpleAsync<TResult>(string endpoint, string requestUri, bool secured = true)
         {
             try
@@ -359,7 +365,7 @@ namespace Thismaker.Aba.Client
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    return FromJson<TResult>(json);
+                    return Deserialize<TResult>(json);
                 }
                 else
                 {
@@ -372,6 +378,9 @@ namespace Thismaker.Aba.Client
             }
         }
 
+        /// <summary>
+        /// Similar to <see cref="ApiPostAsync(string, HttpContent, bool)"/> but instead sends the request to the provided endpoint.
+        /// </summary>
         public async Task<HttpResponseMessage> EndpointPostAsync(string endpoint, string requestUri, HttpContent content, bool secured=true)
         {
             //Prep the HttpClient
@@ -387,6 +396,9 @@ namespace Thismaker.Aba.Client
             }
         }
 
+        /// <summary>
+        /// Similar to <see cref="ApiPostSimpleAsync{TContent, TResult}(string, TContent, bool, bool, bool)"/> but instead sends the request to the provided endpoint.
+        /// </summary>
         public async Task<TResult> EndpointPostSimpleAsync<TContent, TResult>(string endpoint, string requestUri, TContent content, bool secured = true, bool serializeContent = true, bool deserializeResult = true)
         {
             //Request validation:
@@ -422,7 +434,7 @@ namespace Thismaker.Aba.Client
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    return FromJson<TResult>(json);
+                    return Deserialize<TResult>(json);
                 }
                 else
                 {
@@ -438,40 +450,56 @@ namespace Thismaker.Aba.Client
         #endregion
 
         #region Helpers
-        protected virtual T FromJson<T>(string json)
+        /// <summary>
+        /// Called by the HTTP helpers to deserialize a response. Override to customize how deserialization works
+        /// </summary>
+        /// <typeparam name="T">The type of required result</typeparam>
+        /// <param name="args">The string to deserialize</param>
+        protected virtual T Deserialize<T>(string args)
         {
-            return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<T>(args, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
-        protected virtual string ToJson<T>(T json)
+        /// <summary>
+        /// Called by the HTTP helpers, particularly the POST helper to serialize an object to be added to the body of the request
+        /// </summary>
+        /// <typeparam name="T">The type of object being serialized</typeparam>
+        /// <param name="args">The object to serialize</param>
+        protected virtual string Serialize<T>(T args)
         {
-            return JsonSerializer.Serialize(json);
+            return JsonSerializer.Serialize(args);
         }
 
+        /// <summary>
+        /// Called by the HTTP POST helper to create a string content out of a provided object. Override to customize the behaviour.
+        /// By default, the string content is encoded using UTF8 encoding with a mediatype of "application/json"
+        /// </summary>
         protected virtual StringContent GetStringContent<T>(T o)
         {
-            return new StringContent(ToJson(o), System.Text.Encoding.UTF8, "application/json");
+            return new StringContent(Serialize(o), System.Text.Encoding.UTF8, "application/json");
         }
 
         #endregion
 
         #region Hub
-
+        /// <summary>
+        /// When overriden, allows the client to subscribe methods to the Hub
+        /// </summary>
         public abstract void SubscribeHub();
 
+        /// <summary>
+        /// When overriden, allows the client to unsubscribe methods from the Hub
+        /// </summary>
         public abstract void UnsubscribeHub();
 
+        /// <summary>
+        /// Attempts to connect to the hub. Should be called only once during the lifetime of the application,
+        /// unless the client was disconnected and they wish to reconnect.
+        /// Calling this method when the hub was already online throws an exception.
+        /// </summary>
+        /// <returns></returns>
         public async Task ConnectHub()
         {
-            try
-            {
-                await HubConnection.StopAsync();
-            }
-            catch
-            {
-                //do nothing
-            }
-
             try
             {
                 await HubConnection.StartAsync();
@@ -480,122 +508,188 @@ namespace Thismaker.Aba.Client
             {
                 throw ex;
             }
-            
         }
 
+        /// <summary>
+        /// Send an RPC to the connected hub.
+        /// </summary>
         public async Task HubSend(string methodName)
         {
             await HubConnection.SendAsync(methodName);
         }
 
-        public async Task HubSend<T1>(string methodName, T1 arg1)
+        /// <summary>
+        /// Send an RPC to the connected hub.
+        /// </summary>
+        public async Task HubSend(string methodName, object arg1)
         {
             await HubConnection.SendAsync(methodName, arg1);
         }
 
-        public async Task HubSend<T1, T2>(string methodName, T1 arg1, T2 arg2)
+        /// <summary>
+        /// Send an RPC to the connected hub.
+        /// </summary>
+        public async Task HubSend(string methodName, object arg1, object arg2)
         {
             await HubConnection.SendAsync(methodName, arg1, arg2);
         }
 
-        public async Task HubSend<T1,T2,T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
+        /// <summary>
+        /// Send an RPC to the connected hub.
+        /// </summary>
+        public async Task HubSend(string methodName, object arg1, object arg2, object arg3)
         {
             await HubConnection.SendAsync(methodName, arg1, arg2, arg3);
         }
 
-        public async Task HubSend<T1, T2, T3, T4>(string methodName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        /// <summary>
+        /// Send an RPC to the connected hub. If you wish to send more than four arguments, consider using <see cref="HubConnection"/> directly
+        /// </summary>
+        public async Task HubSend(string methodName, object arg1, object arg2, object arg3, object arg4)
         {
             await HubConnection.SendAsync(methodName, arg1, arg2, arg3, arg4);
         }
 
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub(Action action)
         {
             var name = action.Method.Name;
             HubConnection.Remove(name);
         }
 
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub<T1>(Action<T1> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
-        
+
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub<T1,T2>(Action<T1,T2> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
-        
+
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub<T1,T2,T3>(Action<T1,T2,T3> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub(Action action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub<T1>(Action<T1> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub<T1,T2>(Action<T1,T2> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub<T1,T2,T3>(Action<T1,T2,T3> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
-        [Obsolete("Still under construction", true)]
-        public async Task<Result> CallHubAsync<Result>(string methodName)
-        {
-            var tcs = new TaskCompletionSource<Result>();
-            HubConnection.On<Result>(methodName, result =>
-            {
-                HubConnection.Remove(methodName);
-                tcs.SetResult(result);
-            });
-            await HubConnection.SendAsync(methodName);
 
+        /// <summary>
+        /// Sends a request to the hub and holds the calling thread until a response is received.
+        /// To use this method, ensure that the SignalR hub server must sends response after recieving this call through all paths.
+        /// </summary>
+        /// <typeparam name="TResult">The result expected from the hub. This method is only useful from single results</typeparam>
+        /// <param name="requestName">The name of the method to be called on the Server Hub</param>
+        /// <param name="responseName">The name of the method expected to be called by the server for response. If null, then the<paramref name="requestName"/> is used instead</param>
+        /// <param name="content">The content to send to the method, , if null, no content is sent</param>
+        /// <param name="timeOut">If provided, the method throws a <see cref="TaskCanceledException"/> if the time  in miliseconds elapses without receiving a response</param>
+        public async Task<TResult> CallHubAsync<TResult>(string requestName, string responseName=null, object content=null, double? timeOut=null)
+        {
+            if (string.IsNullOrEmpty(responseName))
+            {
+                responseName = requestName;
+            }
+            var tcs = new TaskCompletionSource<TResult>();
+
+            if (timeOut.HasValue)
+            {
+                var timer = new System.Timers.Timer(timeOut.Value)
+                {
+                    Enabled = true
+                };
+
+                void TimerElapsed(object sender, EventArgs e)
+                {
+                    HubConnection.Remove(responseName);
+                    timer.Elapsed -= TimerElapsed;
+                    tcs.SetCanceled();
+                }
+                timer.Elapsed += TimerElapsed;
+            }
+
+            void OnHubResponse(TResult result)
+            {
+                HubConnection.Remove(responseName);
+                tcs.SetResult(result);
+            }
+            HubConnection.On<TResult>(responseName, OnHubResponse);
+            if (content == null)
+            {
+                await HubSend(requestName);
+            }
+            else
+            {
+                await HubSend(requestName, content);
+            }
             return await tcs.Task;
         }
-
-        [Obsolete("Still under construction", true)]
-        public async Task<Result> CallHubAsync<Result, TPack>(IAbaPackage<TPack> package, [CallerMemberName] string methodName = null)
-        {
-            var tcs = new TaskCompletionSource<Result>();
-            HubConnection.On<Result>(methodName, result =>
-            {
-                HubConnection.Remove(methodName);
-                tcs.SetResult(result);
-            });
-            await HubConnection.SendAsync(methodName, package.ToJson());
-
-            return await tcs.Task;
-        }
-
         #endregion
     }
 }

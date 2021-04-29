@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
 using Thismaker.Aba.Server.Authentication;
 
 namespace Microsoft.AspNetCore.Builder

@@ -1,24 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Thismaker.Aba.Client.Transfers
 {
     public class TransferException : Exception
     {
-        public TransferException(string message) : base(message)
-        {
+        public Transfer Transfer { get; set; }
 
+        public TransferException(string message, Transfer transfer) : base(message)
+        {
+            Transfer = transfer;
         }
 
-        public TransferException(string message, Exception innerException) : base(message, innerException)
+        public TransferException(string message, Transfer transfer, Exception innerException) : base(message, innerException)
         {
-
+            Transfer = transfer;
         }
 
-        public TransferException()
+        public TransferException(Transfer transfer)
         {
-
+            Transfer = transfer;
         }
     }
 }

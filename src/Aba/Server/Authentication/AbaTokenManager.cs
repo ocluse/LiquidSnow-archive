@@ -48,7 +48,7 @@ namespace Thismaker.Aba.Server.Authentication
         }
 
 
-        public ClaimsPrincipal GetPrincipal(string token, bool requireExpTime=true)
+        public ClaimsPrincipal GetPrincipal(string token,  bool requireExpTime=true, bool validateLifetime = true)
         {
             try
             {
@@ -64,7 +64,8 @@ namespace Thismaker.Aba.Server.Authentication
                     ValidIssuer=JwtIssuer,
                     ValidateIssuer = true,
                     ValidateAudience = false,
-                    IssuerSigningKey = securityKey
+                    IssuerSigningKey = securityKey,
+                    ValidateLifetime=validateLifetime
                 };
 
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out _);

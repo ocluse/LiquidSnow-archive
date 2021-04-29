@@ -3,18 +3,37 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 
 public static class GlobalExtensions
 {
+    /// <summary>
+    /// Quickly check if a character array is the same as the input string
+    /// </summary>
+    /// <param name="value">The string to see if is same as the character array</param>
+    /// <returns>true if the character array is equal to the provided string</returns>
     public static bool IsString(this char[] chars, string value)
     {
         var test = new string(chars);
         return test == value;
     }
 
+    /// <summary>
+    /// Quickly tests if a string is similar to a character array.
+    /// </summary>
+    /// <param name="chars">The character array to test whether is the same as the string</param>
+    /// <returns>true if the string is equal to the character array</returns>
+    public static bool IsCharArray(this string value, char[] chars)
+    {
+        var test = new string(chars);
+        return test == value;
+    }
+
+    /// <summary>
+    /// Checks if a double is a perfect square
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns>true if a double is a perfect square, i.e the squareroot is an integer.</returns>
     public static bool IsPerfectSquare(this double input)
     {
         var sqrt = Math.Sqrt(input);
@@ -66,9 +85,14 @@ public static class GlobalExtensions
             return Encoding.Unicode.GetBytes(str);
         }
 
-        throw new ArgumentException("The encoding provided is invalid");
+        throw new ArgumentException("The encoding provided is unkown/unsupported");
     }
 
+    /// <summary>
+    /// Gets the string represented by a byte array
+    /// </summary>
+    /// <typeparam name="T">The encoding to use</typeparam>
+    /// <returns>A string represented by the encoding in the provided bytes</returns>
     public static string GetString<T>(this byte[] ba) where T : Encoding
     {
         if (typeof(T) == typeof(ASCIIEncoding))
@@ -92,35 +116,48 @@ public static class GlobalExtensions
             return Encoding.Unicode.GetString(ba);
         }
 
-        throw new ArgumentException("The encoding provided is invalid");
+        throw new ArgumentException("The encoding provided is unknown/unsupported");
     }
 
-    public static object GetPropValue(this object obj, string name)
+    /// <summary>
+    /// Returns the current value of a property with the provided name in the object.
+    /// </summary>
+    /// <param name="propertyName">The name of the property to retrieve</param>
+    /// <returns></returns>
+    public static object GetPropValue(this object obj, string propertyName)
     {
-        foreach (string part in name.Split('.'))
-        {
-            if (obj == null) { return null; }
-
-            Type type = obj.GetType();
-            PropertyInfo info = type.GetProperty(part);
-            if (info == null) { return null; }
-
-            obj = info.GetValue(obj, null);
-        }
-        return obj;
+        var prop = obj.GetType().GetProperty(propertyName);
+        return prop.GetValue(obj);
     }
 
-    public static T GetPropValue<T>(this object obj, string name)
+    /// <summary>
+    /// Returns the value of a property with the provided name in the object.
+    /// This method casts the value obtained to <typeparamref name="T"/>
+    /// </summary>
+    /// <typeparam name="T">The type to cast the property to</typeparam>
+    /// <param name="obj"></param>
+    /// <param name="propertyName">The name of the property to retrieve</param>
+    /// <returns>the value of the property</returns>
+    public static T GetPropValue<T>(this object obj, string propertyName)
     {
-        object retval = GetPropValue(obj, name);
-        if (retval == null) { return default; }
-
-        // throws InvalidCastException if types are incompatible
-        return (T)retval;
+        return (T)GetPropValue(obj, propertyName);
     }
 
-    
+    /// <summary>
+    /// Sets the value of a property with the provided name to the provided value
+    /// </summary>
+    /// <param name="value">The value to set to the property</param>
+    /// <param name="propertyName">The name of the property</param>
+    public static void SetPropValue(this object obj, string propertyName, object value)
+    {
+        var prop = obj.GetType().GetProperty(propertyName);
+        prop.SetValue(obj, value);
+    }
 
+    /// <summary>
+    /// Converts a string to the block format, where the first letter is capitalized and the rest are converted to small letters.
+    /// </summary>
+    /// <returns></returns>
     public static string ToBlock(this string s)
     {
         // Check for empty string.  
@@ -129,13 +166,17 @@ public static class GlobalExtensions
             return string.Empty;
         }
         // Return char and concat substring.  
-        return char.ToUpper(s[0]) + s.Substring(1);
+        return char.ToUpper(s[0]) + s.Substring(1).ToLower();
     }
 
+    /// <summary>
+    /// Returns true if a string is composed of letters and numbers only.
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
     public static bool IsAlphaNumeric(this string s)
     {
-        Regex r = new Regex("^[a-zA-Z0-9]*$");
-        return r.IsMatch(s);
+        return s.All(char.IsLetterOrDigit);
     }
 }
 
@@ -284,7 +325,7 @@ namespace System.Collections.Generic
             var last = count - 1;
             for (var i = 0; i < last; ++i)
             {
-                var random = new System.Random();
+                var random = new Random();
                 var r = random.Next(i, count);
                 var tmp = ts[i];
                 ts[i] = ts[r];
@@ -326,11 +367,18 @@ namespace System.Collections.Generic
             
         }
 
+        /// <summary>
+        /// Rotates a list by using the LINQ namespace. you may want to avoid this if you intend
+        /// to strip assemblies or the likes
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
         public static List<T> RotateLinquish<T>(this List<T> list, int offset)
         {
             return list.Skip(offset).Concat(list.Take(offset)).ToList();
         }
-
     }
 }
 

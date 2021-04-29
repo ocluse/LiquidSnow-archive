@@ -1,12 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Thismaker.Horus;
-using Thismaker.Horus.IO;
-using Thismaker.Horus.Classical;
 
 namespace Thismaker.Aretha
 {
