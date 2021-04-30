@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Thismaker.Aba.Client.Core;
 
 [assembly: InternalsVisibleTo("Thismaker.Aba.Client.Configuration")]
 namespace Thismaker.Aba.Client

@@ -17,7 +17,8 @@ namespace Test.Mercury.ClientTest
             };
 
             Client.OnConnected += Client_OnConnected;
-            Client.Connect();
+            Client.OnReceive += OnClientReceived;
+            _ = Client.ConnectAsync();
 
             while (true)
             {
@@ -27,9 +28,14 @@ namespace Test.Mercury.ClientTest
             }
         }
 
+        private static void OnClientReceived(byte[] obj)
+        {
+            Console.WriteLine(obj.GetString<UTF8Encoding>());
+        }
+
         private static void Client_OnConnected()
         {
-            Console.WriteLine("Client connected");
+            Console.WriteLine("Connected to Server");
         }
     }
 }

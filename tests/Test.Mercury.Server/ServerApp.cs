@@ -18,12 +18,18 @@ namespace Test.Mercury.ServerTest
 
             Server.ClientConnected += ClientConnected;
             Server.Received += Server_Received;
+            Server.ClientClosed += ClientClosed;
             Server.Start();
             Console.WriteLine("Server Started");
             while (true)
             {
 
             }
+        }
+
+        private static void ClientClosed(ClientConnection client)
+        {
+            Console.WriteLine("Client disconnected without exceptions");
         }
 
         private static void Server_Received(ClientConnection arg1, byte[] arg2)
@@ -33,7 +39,9 @@ namespace Test.Mercury.ServerTest
 
         private static void ClientConnected(ClientConnection obj)
         {
-            Console.WriteLine("Client connected");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Client {obj.ConnectionId} Connected");
+            Console.ResetColor();
         }
     }
 }

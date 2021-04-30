@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,7 +21,9 @@ namespace Thismaker.Mercury
             get { return TcpClient.Client; }
         }
 
-        public event Action<ClientConnection, byte[]> OnReceive;
+        public event Action<ClientConnection, byte[]> Received;
+
+        public event Action<ClientConnection> Closed;
 
         readonly CancellationTokenSource ctsMain;
 
@@ -28,33 +33,36 @@ namespace Thismaker.Mercury
             ctsMain = new CancellationTokenSource();
         }
 
-        public async void Start()
+        public void Start()
         {
-            await Receive(ctsMain.Token);
+            Task.Run(Receive);
         }
 
-        private async Task Receive(CancellationToken cancellationToken)
+        public void Close()
         {
-            await Task.Run(() =>
+            ctsMain.Cancel();
+        }
+
+        private void Receive()
+        {
+            while (true)
             {
-                while (true)
+                if (ctsMain.IsCancellationRequested)
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        break;
-                    }
-
-                    if (Socket.Available == 0) continue;
-                    var bufferSize = Socket.Available;
-
-                    var buffer = new byte[bufferSize];
-
-                    Socket.Receive(buffer);
-
-                    OnReceive?.Invoke(this, buffer);
+                    break;
                 }
-            });
-           
+
+                if (Socket.Available == 0) continue;
+                var bufferSize = Socket.Available;
+
+                var buffer = new byte[bufferSize];
+
+                Socket.Receive(buffer);
+
+                Received?.Invoke(this, buffer);
+            }
+
+            Closed?.Invoke(this);
         }
 
         public Task Send(byte[] data)

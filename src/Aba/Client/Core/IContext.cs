@@ -1,4 +1,4 @@
-﻿namespace Thismaker.Aba.Client
+﻿namespace Thismaker.Aba.Client.Core
 {
     /// <summary>
     /// The context of the client. Should be impelemeted as e.g WindowsClient, AndroidClient, GeneralClient etc.

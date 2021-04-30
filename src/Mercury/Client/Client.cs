@@ -16,13 +16,13 @@ namespace Thismaker.Mercury
         public event Action<byte[]> OnReceive;
         public event Action OnConnected;
 
-
-        public async void Connect()
+        public async Task ConnectAsync()
         {
             var ip = Dns.GetHostAddresses(ServerAddress).ElementAt(0);
-            client = new TcpClient(ip.ToString(), ServerPort);
+            client = new TcpClient();
+            await client.ConnectAsync(ip, ServerPort).ConfigureAwait(false);
             OnConnected?.Invoke();
-            await Listen();
+            _ = Task.Run(Listen).ConfigureAwait(false);
         }
 
         public Task Send(byte[] data)
@@ -32,30 +32,24 @@ namespace Thismaker.Mercury
             return Task.CompletedTask;
         }
 
-        private async Task Listen()
+        private void Listen()
         {
-            await Task.Run(() =>
+            while (true)
             {
-                while (true)
+                try
                 {
-                    try
-                    {
-                        var bufferSize = client.Available;
-
-                        if (bufferSize == 0) continue;
-
-                        var ns = client.GetStream();
-                        var buffer = new byte[bufferSize];
-                        ns.Read(buffer, 0, bufferSize);
-                        OnReceive?.Invoke(buffer);
-                    }
-                    catch
-                    {
-                        break;
-                    }
+                    var bufferSize = client.Available;
+                    if (bufferSize == 0) continue;
+                    var ns = client.GetStream();
+                    var buffer = new byte[bufferSize];
+                    ns.Read(buffer, 0, bufferSize);
+                    OnReceive?.Invoke(buffer);
                 }
-            });
-            
+                catch
+                {
+                    break;
+                }
+            }
         }
     }
 }

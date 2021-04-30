@@ -16,9 +16,13 @@ namespace Thismaker.Mercury
 
         protected TcpListener listener;
 
-        public List<ClientConnection> Clients { get; set; }
+        public Dictionary<string, ClientConnection> Clients { get; set; }
+
+        public Dictionary<string, ClientConnection> Groups { get; set; }
 
         public event Action<ClientConnection> ClientConnected;
+
+        public event Action<ClientConnection> ClientClosed;
 
         public event Action<ClientConnection, byte[]> Received;
 
@@ -26,12 +30,12 @@ namespace Thismaker.Mercury
 
         public Server()
         {
-            Clients = new List<ClientConnection>();
+            Clients = new Dictionary<string, ClientConnection>();
         }
 
-        public async void Start()
+        public void Start()
         {
-            await ServerRun();
+            Task.Run(ServerRun);
         }
 
         private async Task ServerRun()
@@ -49,10 +53,10 @@ namespace Thismaker.Mercury
                     {
                         TcpClient = tcpClient
                     };
-                    client.OnReceive += Client_OnReceive;
+                    client.Received += OnClientReceived;
+                    client.Closed += OnClientClosed;
                     client.Start();
-
-                    Clients.Add(client);
+                    Clients.Add(client.ConnectionId, client);
                     ClientConnected?.Invoke(client);
                 }
                 catch
@@ -62,7 +66,12 @@ namespace Thismaker.Mercury
             }
         }
 
-        private void Client_OnReceive(ClientConnection arg1, byte[] arg2)
+        private void OnClientClosed(ClientConnection client)
+        {
+            ClientClosed?.Invoke(client);
+        }
+
+        private void OnClientReceived(ClientConnection arg1, byte[] arg2)
         {
             Received?.Invoke(arg1, arg2);
         }

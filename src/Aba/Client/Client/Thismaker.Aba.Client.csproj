@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Thismaker.Core.csproj" />
+    <ProjectReference Include="..\Core\Thismaker.Aba.Client.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

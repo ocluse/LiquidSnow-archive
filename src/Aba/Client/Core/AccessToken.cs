@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace Thismaker.Aba.Client
+namespace Thismaker.Aba.Client.Core
 {
     public class AccessToken
     {
