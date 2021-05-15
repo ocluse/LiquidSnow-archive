@@ -1,47 +1,74 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Thismaker.Aba.Common.Mercury;
+using Thismaker.Aba.Server.Mercury;
 using Thismaker.Mercury;
 
 namespace Test.Mercury.ServerTest
 {
-    class ServerApp
+    class Program
     {
-        static Server Server { get; set; }
-        static void Main(string[] args)
+        static ServerApp App;
+
+        public static void Main()
         {
-            Console.WriteLine("Hello World!");
-            Server = new Server
+            App = new ServerApp
             {
-                Address = "192.168.100.7",
-                ListenPort = 32403
+                Address = "localhost",
+                Port = 32403
             };
+            var cert = new X509Certificate("certificate.pfx", "AceIK58$");
+            App.Start(null);
+            while (true) { }
+        }
+    }
 
-            Server.ClientConnected += ClientConnected;
-            Server.Received += Server_Received;
-            Server.ClientClosed += ClientClosed;
-            Server.Start();
-            Console.WriteLine("Server Started");
-            while (true)
-            {
-
-            }
+    class ServerApp : MercuryServer
+    {
+        public ServerApp()
+        {
+            
         }
 
-        private static void ClientClosed(ClientConnection client)
+        protected override T Deserialize<T>(string json)
         {
-            Console.WriteLine("Client disconnected without exceptions");
+            return JsonSerializer.Deserialize<T>(json);
         }
 
-        private static void Server_Received(ClientConnection arg1, byte[] arg2)
+        protected override string Serialize<T>(T obj)
         {
-            Console.WriteLine($"{arg1.ConnectionId}: {arg2.GetString<UTF8Encoding>()}");
+            return JsonSerializer.Serialize(obj);
         }
 
-        private static void ClientConnected(ClientConnection obj)
+        [Beamable]
+        public async Task Send(string arg1)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Client {obj.ConnectionId} Connected");
-            Console.ResetColor();
+            await BeamClientsAsync("Receive", arg1);
+        }
+
+        protected override void OnDisconnected(string connectionId, Exception ex)
+        {
+            Console.WriteLine("client disconnected");
+        }
+
+        protected override string Serialize(object obj, Type type)
+        {
+            return JsonSerializer.Serialize(obj, type);
+        }
+
+        protected override object Deserialize(string json, Type type)
+        {
+            return JsonSerializer.Deserialize(json, type);
+        }
+
+        protected override IPrincipal ValidateAccessToken(string accessToken, List<string> scopes)
+        {
+            throw new NotImplementedException();
         }
     }
 }

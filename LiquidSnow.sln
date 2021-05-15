@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aretha", "src\Aretha\Thismaker.Aretha.csproj", "{23396266-F6DD-4416-B0C6-B44B761B2B20}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Core", "src\Core\Thismaker.Core.csproj", "{AA55CE09-1259-4825-9954-87F2F837A9EB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Horus", "src\Horus\Thismaker.Horus.csproj", "{A69B5263-7B37-4DFD-AE7F-0CA53E4A3E7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Horus", "src\Horus\Horus\Thismaker.Horus.csproj", "{A69B5263-7B37-4DFD-AE7F-0CA53E4A3E7C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Horus.IO", "src\Horus\IO\Thismaker.Horus.IO.csproj", "{E8067227-61B0-4334-A587-BE33C5CF6396}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Horus.Classical", "src\Horus\Classical\Thismaker.Horus.Classical.csproj", "{44741159-EF9C-4D96-8E4F-1752DB038C31}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Anubis", "src\Anubis\Thismaker.Anubis.csproj", "{74E55723-E0FB-455A-8389-1386A7CD2542}"
 EndProject
@@ -15,17 +21,29 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Pluto", "src\Plut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Goro", "src\Goro\Thismaker.Goro.csproj", "{DC4FBE18-C8FD-4932-9D69-06414C54009E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client", "src\Aba\Client\Client\Thismaker.Aba.Client.csproj", "{73CAC99C-CBB4-4527-B6C0-56B5EE3B3464}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Common.Mercury", "src\Aba\Common\Mercury\Thismaker.Aba.Common.Mercury.csproj", "{C7C33474-4D9C-4EB7-9421-8954DEB8BF18}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Server", "src\Aba\Server\Server\Thismaker.Aba.Server.csproj", "{113AEF67-92D6-4AE2-9013-8130CC6E8547}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aretha", "src\Aretha\Thismaker.Aretha.csproj", "{23396266-F6DD-4416-B0C6-B44B761B2B20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Server.Mercury", "src\Aba\Server\Mercury\Mercury\Thismaker.Aba.Server.Mercury.csproj", "{AF753956-6FF5-484C-B003-5143F66C249C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thismaker.Aba.Server.Mercury.Hosted", "src\Aba\Server\Mercury\Hosted\Thismaker.Aba.Server.Mercury.Hosted.csproj", "{27821C9D-9EC7-4E50-8404-042ECA4D7A00}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Core", "src\Aba\Client\Core\Thismaker.Aba.Client.Core.csproj", "{4EBCA0B3-6D2E-4FB4-BE6B-316AD6B8C473}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client", "src\Aba\Client\Client\Thismaker.Aba.Client.csproj", "{73CAC99C-CBB4-4527-B6C0-56B5EE3B3464}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Mercury", "src\Aba\Client\Mercury\Thismaker.Aba.Client.Mercury.csproj", "{C94BFAF1-0797-42EC-B01C-A815F429DD10}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Msal", "src\Aba\Client\Msal\Thismaker.Aba.Client.Msal.csproj", "{CAF5B2C4-48DB-41FE-B2C5-8D74F6A1DE77}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Transfers", "src\Aba\Client\Transfers\Thismaker.Aba.Client.Transfers.csproj", "{B0893FD9-9DE0-4C9C-B828-64F041AA4881}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Configuration", "src\Aba\Client\Configuration\Thismaker.Aba.Client.Configuration.csproj", "{7F65F9B9-562E-431D-B12E-3E0A53E979E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Msal", "src\Aba\Client\Msal\Thismaker.Aba.Client.Msal.csproj", "{CAF5B2C4-48DB-41FE-B2C5-8D74F6A1DE77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Thoth", "src\Thoth\Thoth\Thismaker.Thoth.csproj", "{4B9A63AC-D485-4786-A5BD-5C4C43677F03}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Thoth.Manager.Wpf", "src\Thoth\Manager\Wpf\Thismaker.Thoth.Manager.Wpf.csproj", "{F7910D6C-70AA-48FA-9335-D21091B6EC2E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{39FC8FB2-E7D4-4535-AABF-DF71889E15AA}"
 EndProject
@@ -35,24 +53,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Enigma.NetCore", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Anubis.NetCore", "tests\Test.Anubis.NetCore\Test.Anubis.NetCore.csproj", "{ABCA411D-B855-43AF-BA9A-32F626709845}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Thoth", "src\Thoth\Thoth\Thismaker.Thoth.csproj", "{4B9A63AC-D485-4786-A5BD-5C4C43677F03}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Thoth.Wpf", "tests\Test.Thoth.Wpf\Test.Thoth.Wpf.csproj", "{FC75CF64-3679-4661-AA51-C59E4D5E45B7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Thoth.Manager.Wpf", "src\Thoth\Manager\Wpf\Thismaker.Thoth.Manager.Wpf.csproj", "{F7910D6C-70AA-48FA-9335-D21091B6EC2E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Mercury.Client", "tests\Test.Mercury.Client\Test.Mercury.Client.csproj", "{BC2E5C24-D7FE-4264-9F79-1E27F19D5E7C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Mercury.Server", "tests\Test.Mercury.Server\Test.Mercury.Server.csproj", "{95420D2A-B31A-4257-9817-CB6DBA67827F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Mercury", "src\Aba\Client\Mercury\Thismaker.Aba.Client.Mercury.csproj", "{C94BFAF1-0797-42EC-B01C-A815F429DD10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Mercury.AspServer", "tests\Test.Mercury.AspServer\Test.Mercury.AspServer.csproj", "{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Core", "src\Aba\Client\Core\Thismaker.Aba.Client.Core.csproj", "{4EBCA0B3-6D2E-4FB4-BE6B-316AD6B8C473}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thismaker.Aba.Common.Mercury", "src\Aba\Common\Mercury\Thismaker.Aba.Common.Mercury.csproj", "{C7C33474-4D9C-4EB7-9421-8954DEB8BF18}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thismaker.Aba.Server.Mercury", "src\Aba\Server\Mercury\Thismaker.Aba.Server.Mercury.csproj", "{AF753956-6FF5-484C-B003-5143F66C249C}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -743,6 +752,118 @@ Global
 		{AF753956-6FF5-484C-B003-5143F66C249C}.Release|x64.Build.0 = Release|Any CPU
 		{AF753956-6FF5-484C-B003-5143F66C249C}.Release|x86.ActiveCfg = Release|Any CPU
 		{AF753956-6FF5-484C-B003-5143F66C249C}.Release|x86.Build.0 = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|x64.Build.0 = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Debug|x86.Build.0 = Debug|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|ARM.Build.0 = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|ARM64.Build.0 = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|iPhone.Build.0 = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|x64.ActiveCfg = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|x64.Build.0 = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|x86.ActiveCfg = Release|Any CPU
+		{E8067227-61B0-4334-A587-BE33C5CF6396}.Release|x86.Build.0 = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|ARM.Build.0 = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|x64.Build.0 = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Debug|x86.Build.0 = Debug|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|ARM.ActiveCfg = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|ARM.Build.0 = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|ARM64.Build.0 = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|iPhone.Build.0 = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|x64.ActiveCfg = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|x64.Build.0 = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|x86.ActiveCfg = Release|Any CPU
+		{44741159-EF9C-4D96-8E4F-1752DB038C31}.Release|x86.Build.0 = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|ARM.Build.0 = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|x64.Build.0 = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Debug|x86.Build.0 = Debug|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|ARM.ActiveCfg = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|ARM.Build.0 = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|ARM64.Build.0 = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|iPhone.Build.0 = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|x64.ActiveCfg = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|x64.Build.0 = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|x86.ActiveCfg = Release|Any CPU
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732}.Release|x86.Build.0 = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|ARM.Build.0 = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|x64.Build.0 = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Debug|x86.Build.0 = Debug|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|ARM.ActiveCfg = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|ARM.Build.0 = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|ARM64.Build.0 = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|iPhone.Build.0 = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|x64.ActiveCfg = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|x64.Build.0 = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|x86.ActiveCfg = Release|Any CPU
+		{27821C9D-9EC7-4E50-8404-042ECA4D7A00}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -754,6 +875,7 @@ Global
 		{FC75CF64-3679-4661-AA51-C59E4D5E45B7} = {39FC8FB2-E7D4-4535-AABF-DF71889E15AA}
 		{BC2E5C24-D7FE-4264-9F79-1E27F19D5E7C} = {39FC8FB2-E7D4-4535-AABF-DF71889E15AA}
 		{95420D2A-B31A-4257-9817-CB6DBA67827F} = {39FC8FB2-E7D4-4535-AABF-DF71889E15AA}
+		{9BD3FC1A-A5A2-46FD-8617-03B1A0D53732} = {39FC8FB2-E7D4-4535-AABF-DF71889E15AA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2E9B0293-29AD-4490-AB93-4B936375754C}

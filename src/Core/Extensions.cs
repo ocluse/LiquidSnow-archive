@@ -119,6 +119,23 @@ public static class GlobalExtensions
         throw new ArgumentException("The encoding provided is unknown/unsupported");
     }
 
+    public static byte[] GetBytes(this int val)
+    {
+        return BitConverter.GetBytes(val);
+        //if (BitConverter.IsLittleEndian)
+        //{
+        //    Array.Reverse(bytes);
+        //}
+
+        //return bytes;
+    }
+
+    public static int GetInt(this byte[] bytes)
+    {
+        var i = BitConverter.ToInt32(bytes, 0);
+        return i;
+    }
+
     /// <summary>
     /// Returns the current value of a property with the provided name in the object.
     /// </summary>

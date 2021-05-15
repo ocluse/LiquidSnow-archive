@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Thismaker.Horus
 {
-	static class Extensions
+	internal static class Extensions
 	{
 		/// <summary>
 		/// Makes all letters uppercase and removes any spaces.

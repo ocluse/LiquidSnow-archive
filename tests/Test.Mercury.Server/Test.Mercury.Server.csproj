@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Mercury\Thismaker.Mercury.csproj" />
+    <ProjectReference Include="..\..\src\Aba\Server\Mercury\Mercury\Thismaker.Aba.Server.Mercury.csproj" />
   </ItemGroup>
 
 </Project>

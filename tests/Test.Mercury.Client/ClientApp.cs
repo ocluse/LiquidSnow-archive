@@ -1,41 +1,80 @@
 ﻿using System;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Thismaker.Aba.Client.Mercury;
+using Thismaker.Aba.Common.Mercury;
 using Thismaker.Mercury;
 
 namespace Test.Mercury.ClientTest
 {
-    class ClientApp
+    class Program
     {
-        static Client Client { get; set; }
-        static void Main(string[] args)
+        static ClientApp App;
+
+        public static async Task Main()
         {
-            Console.WriteLine("Starting Client!");
-            Client = new Client
+            App = new ClientApp
             {
-                ServerAddress = "192.168.100.7",
-                ServerPort = 32403
+                BaseAddress = "https://localhost",
+                Port = 32403
             };
-
-            Client.OnConnected += Client_OnConnected;
-            Client.OnReceive += OnClientReceived;
-            _ = Client.ConnectAsync();
-
+            App.MakeApp();
+            await App.Connect();
+            await App.Start(null);
+            
+            Console.WriteLine("Connected");
             while (true)
             {
-                string message = Console.ReadLine();
+                var line = Console.ReadLine();
 
-                Client.Send(message.GetBytes<UTF8Encoding>());
+                App.SendMessage(line);
+                
             }
         }
+    }
 
-        private static void OnClientReceived(byte[] obj)
+    class ClientApp : MercuryClient<ClientApp>
+    {
+        public override Task<string> GetCloudVersion()
         {
-            Console.WriteLine(obj.GetString<UTF8Encoding>());
+            throw new NotImplementedException();
         }
 
-        private static void Client_OnConnected()
+        public override Task Start(IProgress<string> progress)
         {
-            Console.WriteLine("Connected to Server");
+            Subscribe<string>(Receive);
+            return Task.CompletedTask;
+        }
+
+        public void SendMessage(string message)
+        {
+            Beam("Send", message);
+        }
+
+        public void Receive(string arg1)
+        {
+            Console.WriteLine(arg1);
+        }
+
+        protected override T Deserialize<T>(string json)
+        {
+            return JsonSerializer.Deserialize<T>(json);
+        }
+
+        protected override object Deserialize(string json, Type type)
+        {
+            return JsonSerializer.Deserialize(json, type);
+        }
+
+        protected override string Serialize(object obj, Type type)
+        {
+            return JsonSerializer.Serialize(obj, type);
+        }
+
+        protected override string Serialize<T>(T obj)
+        {
+            return JsonSerializer.Serialize<T>(obj);
         }
     }
 }

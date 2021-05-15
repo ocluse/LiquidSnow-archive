@@ -1,5 +1,5 @@
-﻿using System.Text;
-using Thismaker.Horus.Classical;
+﻿using System;
+using System.Text;
 
 namespace Thismaker.Horus.Symmetrics
 {
@@ -71,13 +71,13 @@ namespace Thismaker.Horus.Symmetrics
         {
             if (string.IsNullOrEmpty(_salt))
             {
-                var alpha = Alphabets.ASCII;
+                var alpha = GetASCIICharacters();
 
                 var builder = new StringBuilder();
 
                 for(int i = 0; i < 16; i++)
                 {
-                    var index= Horus.Random(0, alpha.Count);
+                    var index= Horus.Random(0, alpha.Length);
                     builder.Append(alpha[index]);
                 }
 
@@ -92,6 +92,18 @@ namespace Thismaker.Horus.Symmetrics
                 KeySize = _keySize,
                 Salt = _salt
             };
+        }
+
+        protected static string GetASCIICharacters()
+        {
+            StringBuilder alpha = new StringBuilder();
+            for (int i = 0x20; i <= 0x7e; i++)
+            {
+                char c = Convert.ToChar(i);
+                alpha.Append(c);
+            }
+
+            return alpha.ToString();
         }
     }
 }

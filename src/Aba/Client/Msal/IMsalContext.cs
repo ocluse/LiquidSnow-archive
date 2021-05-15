@@ -1,4 +1,5 @@
 ﻿using Microsoft.Identity.Client;
+using Thismaker.Aba.Client.Core;
 
 namespace Thismaker.Aba.Client.Msal
 {

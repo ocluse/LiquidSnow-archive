@@ -1,8 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
+
+[assembly:InternalsVisibleTo("Thismaker.Horus.Classical")]
+[assembly: InternalsVisibleTo("Thismaker.Horus.IO")]
 
 namespace Thismaker.Horus
 {
