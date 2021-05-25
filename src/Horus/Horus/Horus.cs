@@ -1,12 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
-
-[assembly:InternalsVisibleTo("Thismaker.Horus.Classical")]
-[assembly: InternalsVisibleTo("Thismaker.Horus.IO")]
 
 namespace Thismaker.Horus
 {
@@ -16,11 +12,10 @@ namespace Thismaker.Horus
         /// <summary>
         /// Generates an arguably unique string of characters to be used for unique identification. 
         /// The uniqueness strength boils down to the <see cref="IDKind"/> used, depending on the scenario.
-        /// Some IDs may not be suitable for different scenarios
+        /// Some IDs may not be suitable for certain scenarios
         /// </summary>
         /// <param name="kind">The kind of ID to be generated, determines the strength as well as the look</param>
         /// <param name="length">The length of the string to be generated, only applicable when the kind is set to Standard or Random</param>
-        /// <returns></returns>
         public static string GenerateID(IDKind kind = IDKind.GUID, int length = 12)
         {
             return kind switch
@@ -162,7 +157,7 @@ namespace Thismaker.Horus
         /// </summary>
         GUID,
         /// <summary>
-        /// Generates a standard ID, of 12 characters in length, conflicts are rare. Characters are all alphanumeric
+        /// Generates a GUID that is transformed into an alphanumeric squence.
         /// </summary>
         Standard,
 
@@ -172,13 +167,13 @@ namespace Thismaker.Horus
         Hash,
 
         /// <summary>
-        /// Generates an ID based on the System.DateTime, conflicts may occur depending on the time, but are rare. May contain hyphen
+        /// Generates an ID based on the System.DateTime, conflicts may occur depending on the time, but are rare.
         /// </summary>
         DateTime,
 
         /// <summary>
-        /// Generates an ID based on the System.Random, conflicts are a matter of pure randomnity, not suitable for conflict-sensitive scenarios
+        /// Generates an ID based on the System.Random
         /// </summary>
-        Random,
+        Random
     }
 }

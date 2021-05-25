@@ -28,6 +28,5 @@ namespace Thismaker.Aba.Client
         RequestFailed,
         AuthException,
         GenericException,
-
     }
 }

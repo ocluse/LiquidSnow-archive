@@ -61,7 +61,7 @@ namespace Thismaker.Goro
         private static ThemeMode _theme=ThemeMode.Light;
 
         private static Color _accent = DefaultColors.Briliet;
-        
+
         /// <summary>
         /// Dark theme or light theme. Changing calls the <see cref="AccentChanged"/>
         /// event and therefore instantly changes the theme. The default value is <see cref="ThemeMode.Light"/>
@@ -208,7 +208,6 @@ namespace Thismaker.Goro
                 _dictionary["PanelBackground"] = bright;
                 _dictionary["PanelForeground"] = dark;
                 _dictionary["PanelGrayResponsive"] = ColorUtility.CreateBrush("#F2F2F2");
-
             }
         }
 

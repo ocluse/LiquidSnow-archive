@@ -4,6 +4,9 @@ using System.Windows.Media;
 
 namespace Thismaker.Goro
 {
+    /// <summary>
+    /// A <see cref="Button"/> that shows up as an icon instead
+    /// </summary>
     public class ButtonIcon : Button
     {
         static ButtonIcon()
@@ -18,18 +21,27 @@ namespace Thismaker.Goro
         public static readonly DependencyProperty HighlightProperty
             = DependencyProperty.Register(nameof(Highlight), typeof(SolidColorBrush), typeof(ButtonIcon));
         
+        /// <summary>
+        /// The icon of the button
+        /// </summary>
         public Icon Icon
         {
             get { return (Icon)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
         }
 
+        /// <summary>
+        /// The design of the button's icon
+        /// </summary>
         public IconDesign Design
         {
             get { return (IconDesign)GetValue(DesignProperty); }
             set { SetValue(DesignProperty, value); }
         }
 
+        /// <summary>
+        /// The highlight of the button when shown
+        /// </summary>
         public SolidColorBrush Highlight
         {
             get { return (SolidColorBrush)GetValue(HighlightProperty); }

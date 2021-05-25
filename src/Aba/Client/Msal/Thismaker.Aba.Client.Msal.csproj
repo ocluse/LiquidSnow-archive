@@ -8,11 +8,13 @@
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
     <PackageTags>client-application client-app signalr webapi web-api azure-ad azure-adb2c</PackageTags>
-    <PackageReleaseNotes>First release. Generally frozen, most methods work well as expected.</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.1.0.0</Version>
+    <Version>2.0.0.0</Version>
+    <Company>Ocluse</Company>
+    <Copyright>©2021 Ocluse</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

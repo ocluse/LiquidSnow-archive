@@ -8,7 +8,7 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
     [Route(Route)]
     public class AuthenticatorController : ControllerBase
     {
-        public const string Route = "/thismaker/aba/mercury/server/authenticator";
+        public const string Route = "thismaker/aba/mercury/server/authenticator";
 
         [HttpGet]
         public ClaimsPrincipal Get()

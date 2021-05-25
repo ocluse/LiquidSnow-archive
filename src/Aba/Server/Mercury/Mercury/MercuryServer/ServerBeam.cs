@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using Thismaker.Aba.Common.Mercury;
-using Thismaker.Mercury;
 
 namespace Thismaker.Aba.Server.Mercury
 {
-    public partial class MercuryServer
+    public partial class MercuryServer: IBeamer
     {
         class CacheItem
         {
@@ -23,119 +21,161 @@ namespace Thismaker.Aba.Server.Mercury
 
         private Dictionary<string, CacheItem> _methodCache;
 
-        private Dictionary<string, Group> _groups;
+        #region Payload
 
-        private async void PayloadReceived(RPCPayload payload)
+        private void ConstructMethodCache()
         {
+            _methodCache = new Dictionary<string, CacheItem>();
+
+            var methods = GetType().GetMethods();
+
+            foreach (var method in methods)
+            {
+                var beamable = method.GetCustomAttribute<BeamableAttribute>();
+                if (beamable == null) continue;
+
+                string name = string.IsNullOrEmpty(beamable.MethodName) ?
+                    method.Name : beamable.MethodName;
+
+                var types = new List<Type>();
+                var pInfos = method.GetParameters();
+
+                foreach (var pInfo in pInfos)
+                {
+                    types.Add(pInfo.ParameterType);
+                }
+
+                var cache = new CacheItem
+                {
+                    MethodInfo = method,
+                    Types = types,
+                    Authorize = _requiresAuth || beamable.Authorized
+                };
+
+                if (cache.Types[0] == typeof(MercuryPrincipal))
+                {
+                    cache.InjectPrincipal = true;
+                    cache.Authorize = true;
+                }
+
+                if (beamable.Scopes.Count > 0)
+                {
+                    cache.Scopes = new List<string>(beamable.Scopes);
+                    cache.Authorize = true;
+                }
+
+                _methodCache.Add(name, cache);
+            }
+        }
+
+        private async Task SendPayloadAsync(string connectionId, RPCPayload payload)
+        {
+            await _mServer.SendAsync(connectionId, Serialize(payload).GetBytes<UTF8Encoding>())
+                .ConfigureAwait(false);
+        }
+
+        private async void PayloadReceivedAsync(string connectionId, RPCPayload payload)
+        {
+            //check if the method is an authentication payload
+            if (payload.MethodName == Globals.AuthResponsePayload)
+            {
+                AuthenticateUser(connectionId, payload.AccessToken);
+                return;
+            }
+
             if (_methodCache == null)
             {
-                _methodCache = new Dictionary<string, CacheItem>();
-
-                var methods=GetType().GetMethods();
-
-                foreach(var method in methods)
-                {
-                    var beamable= method.GetCustomAttribute<BeamableAttribute>();
-                    if (beamable == null) continue;
-
-                    string name = string.IsNullOrEmpty(beamable.MethodName) ?
-                        method.Name : beamable.MethodName;
-
-                    var types = new List<Type>();
-                    var pInfos = method.GetParameters();
-                    
-                    foreach(var pInfo in pInfos)
-                    {
-                        types.Add(pInfo.ParameterType);
-                    }
-
-                    var cache = new CacheItem 
-                    { 
-                        MethodInfo = method, 
-                        Types = types , 
-                        Authorize=beamable.Authorized
-                    };
-
-                    if (cache.Types[0] == typeof(IPrincipal))
-                    {
-                        cache.InjectPrincipal = true;
-                        cache.Authorize = true;
-                    }
-
-                    if (beamable.Scopes.Count > 0)
-                    {
-                        cache.Scopes = new List<string>(beamable.Scopes);
-                        cache.Authorize = true;
-                    }
-
-                    _methodCache.Add(name, cache);
-                }
+                ConstructMethodCache();
             }
 
             if (!_methodCache.ContainsKey(payload.MethodName)) return;
 
+            //if we require auth send
             var item = _methodCache[payload.MethodName];
-            
+
             var parameters = new List<object>();
 
             //first, validate the access token:
             if (item.Authorize)
             {
-                try
-                {
-                    IPrincipal principal = await ValidateAccessToken(payload.AccessToken, item.Scopes);
+                var principal = await ValidateAccessToken(payload.AccessToken, item.Scopes).ConfigureAwait(false);
 
-                    if (principal == null) return;
+                if (principal == null) return;
 
-                    if (item.InjectPrincipal)
-                    {
-                        parameters.Add(principal);
-                    }
-                }
-                catch
+                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                //If we require authentication, ensure that is done first:
+                if (_requiresAuth && User(userId) == null)
                 {
+                    await DisconnectClientAsync(connectionId, "NOT_AUTH").ConfigureAwait(false);
                     return;
                 }
+
+                //Add the user if not exists, only in non-auth mode.
+                if (!string.IsNullOrEmpty(userId) && !_requiresAuth)
+                {
+                    AddUserConnectionId(connectionId, userId);
+                }
+
+                //Inject the principal if so required
+                if (item.InjectPrincipal)
+                {
+                    var mPrincipal = new MercuryPrincipal(connectionId, this, principal);
+                    parameters.Add(mPrincipal);
+                }
             }
 
-            for(int i=0; i<payload.Parameters.Count; i++)
+            if (payload.Parameters.Count > 0)
             {
-                parameters.Add(Deserialize(payload.Parameters[i], item.Types[i]));
+                for (int i = 0; i < payload.Parameters.Count; i++)
+                {
+                    parameters.Add(Deserialize(payload.Parameters[i], item.Types[i]));
+                }
             }
-            item.MethodInfo.Invoke(this, parameters.ToArray());
+
+            if (parameters.Count == 0) item.MethodInfo.Invoke(this, null);
+
+            else item.MethodInfo.Invoke(this, parameters.ToArray());
         }
 
-        #region All Clients
+        #endregion
 
-        public async Task BeamClientsAsync<T1>(string methodName, T1 arg)
+        #region Beamer Implements
+
+        public async Task BeamAsync(string methodName)
         {
-            await BeamClientsAsync(methodName, 
+            await BeamAsync(methodName, null, null);
+        }
+
+        public async Task BeamAsync<T1>(string methodName, T1 arg)
+        {
+            await BeamAsync(methodName, 
                 new object[] { arg }, 
                 new Type[] { typeof(T1) });
         }
 
-        public async Task BeamClientsAsync<T1, T2>(string methodName, T1 arg1, T2 arg2)
+        public async Task BeamAsync<T1, T2>(string methodName, T1 arg1, T2 arg2)
         {
-            await BeamClientsAsync(methodName,
+            await BeamAsync(methodName,
                 new object[] { arg1, arg2 },
                 new Type[] { typeof(T1), typeof(T2)});
         }
 
-        public async Task BeamClientsAsync<T1, T2, T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
+        public async Task BeamAsync<T1, T2, T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
         {
-            await BeamClientsAsync(methodName,
+            await BeamAsync(methodName,
                 new object[] { arg1, arg2, arg3 },
                 new Type[] { typeof(T1), typeof(T2), typeof(T3) });
         }
 
-        public async Task BeamClientsAsync<T1, T2, T3, T4>(string methodName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        public async Task BeamAsync<T1, T2, T3, T4>(string methodName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            await BeamClientsAsync(methodName,
+            await BeamAsync(methodName,
                 new object[] { arg1, arg2, arg3, arg4 },
                 new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) });
         }
 
-        public async Task BeamClientsAsync(string methodName, object[] args, Type[] types)
+        public async Task BeamAsync(string methodName, object[] args, Type[] types)
         {
             var payload = new RPCPayload
             {
@@ -153,39 +193,7 @@ namespace Thismaker.Aba.Server.Mercury
             await _mServer.SendAllAsync(data).ConfigureAwait(false);
         }
 
-        #endregion
-
-        #region Specific Client
-
-        public async Task BeamClientAsync<T1>(string connectionId, string methodName, T1 arg)
-        {
-            await BeamClientAsync(connectionId, methodName,
-                new object[] { arg },
-                new Type[] { typeof(T1) });
-        }
-
-        public async Task BeamClientAsync<T1, T2>(string connectionId, string methodName, T1 arg1, T2 arg2)
-        {
-            await BeamClientAsync(connectionId, methodName,
-                new object[] { arg1, arg2 },
-                new Type[] { typeof(T1), typeof(T2) });
-        }
-
-        public async Task BeamClientAsync<T1, T2, T3>(string connectionId, string methodName, T1 arg1, T2 arg2, T3 arg3)
-        {
-            await BeamClientAsync(connectionId, methodName,
-                new object[] { arg1, arg2, arg3 },
-                new Type[] { typeof(T1), typeof(T2), typeof(T3) });
-        }
-
-        public async Task BeamClientAsync<T1, T2, T3, T4>(string connectionId, string methodName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            await BeamClientAsync(connectionId, methodName,
-                new object[] { arg1, arg2, arg3, arg4 },
-                new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) });
-        }
-
-        public async Task BeamClientAsync(string connectionId, string methodName, object[] args, Type[] types)
+        internal async Task BeamClientAsync(string connectionId, string methodName, object[] args, Type[] types)
         {
             if (!_mServer.HasClient(connectionId)) return;
 
@@ -195,124 +203,16 @@ namespace Thismaker.Aba.Server.Mercury
                 MethodName = methodName
             };
 
-            for (int i = 0; i < args.Length; i++)
+            if (args != null)
             {
-                payload.Parameters.Add(Serialize(args[i], types[i]));
+                for (int i = 0; i < args.Length; i++)
+                {
+                    payload.Parameters.Add(Serialize(args[i], types[i]));
+                }
             }
-
-            await _mServer.SendAsync(connectionId, Serialize(payload).GetBytes<UTF8Encoding>());
-
+            await SendPayloadAsync(connectionId, payload).ConfigureAwait(false);
         }
 
         #endregion
-
-        #region Groups
-
-        public async Task BeamGroupAsync<T1>(string groupName, string methodName, T1 arg)
-        {
-            await BeamGroupAsync(groupName, methodName,
-                new object[] { arg },
-                new Type[] { typeof(T1) });
-        }
-
-        public async Task BeamGroupAsync<T1, T2>(string groupName, string methodName, T1 arg1, T2 arg2)
-        {
-            await BeamGroupAsync(groupName, methodName,
-                new object[] { arg1, arg2 },
-                new Type[] { typeof(T1), typeof(T2) });
-        }
-
-        public async Task BeamGroupAsync<T1, T2, T3>(string groupName, string methodName, T1 arg1, T2 arg2, T3 arg3)
-        {
-            await BeamGroupAsync(groupName, methodName,
-                new object[] { arg1, arg2, arg3 },
-                new Type[] { typeof(T1), typeof(T2), typeof(T3) });
-        }
-
-        public async Task BeamGroupAsync<T1, T2, T3, T4>(string groupName, string methodName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
-        {
-            await BeamGroupAsync(groupName, methodName,
-                new object[] { arg1, arg2, arg3, arg4 },
-                new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) });
-        }
-
-        public async Task BeamGroupAsync(string groupName, string methodName, object[] args, Type[] types)
-        {
-            if (_groups == null || !_groups.ContainsKey(groupName))
-            {
-                return;
-            }
-            var payload = new RPCPayload
-            {
-                Parameters = new List<string>(),
-                MethodName = methodName
-            };
-
-            for (int i = 0; i < args.Length; i++)
-            {
-                payload.Parameters.Add(Serialize(args[i], types[i]));
-            }
-
-            var group = _groups[groupName];
-
-            foreach (var client in group.Clients)
-            {
-                await BeamClientAsync(client, methodName, args, types);
-            }
-        }
-
-        public void RemoveFromGroup(string connectionId, string groupName)
-        {
-            if (_groups == null || !_groups.ContainsKey(groupName)) return;
-
-            var group = _groups[connectionId];
-            group.Clients.Remove(connectionId);
-
-            if (group.Clients.Count == 0)
-            {
-                _groups.Remove(groupName);
-            }
-        }
-
-        public void AddToGroup(string connectionId, string groupName)
-        {
-            if (!_mServer.HasClient(connectionId)) return;
-
-            if (_groups == null) _groups = new Dictionary<string, Group>();
-
-            Group group;
-
-            if (_groups.ContainsKey(groupName))
-            {
-                group = _groups[groupName];
-            }
-            else
-            {
-                group = new Group(groupName);
-            }
-
-            if (group.Clients.Contains(connectionId)) return;
-
-            group.Clients.Add(connectionId);
-        }
-
-        #endregion
-    }
-
-    class Group
-    {
-        private readonly string _groupName;
-
-        public Group(string groupName)
-        {
-            Clients = new List<string>();
-            _groupName = groupName;
-        }
-
-        public string GroupName
-        {
-            get => _groupName;
-        }
-        public List<string> Clients { get; set; }
     }
 }

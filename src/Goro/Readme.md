@@ -27,7 +27,7 @@ Once you have done that, you will need to expose styles defined in Goro to your 
 ## Step 3
 Once that has been done, rebuild your solution/project for changes to take place. Immediately you should see changes in your project. You can therefore use other styles also declared in the library, for example the `ListView` component has an additional style called `ModerateList` that you can assign by adding the line: `Style={Dynamic Resource ModerateList}` to your list's xaml. Goro comes with a few predefined themes that you can assign by, anywere in the code writing the lines: `ThemeManager.SetTheme(DefaultTheme.Briliet);` for example. You can also set your own theme by calling the same method using the overload taht takes in `Theme` as the parameter.
 
-Goro further defines other components such as the ButtonIcon which is a button that uses an icon instead. To use it, add the xml namespace `xmlns:goro="clr-namespace:Thismaker.Goro;assembly=Thismaker.Goro"` to your `MainWindow.xaml` or other page or window xaml definition sections. Once that is done, you can easily access the Goro controls by simply going: `< goro:ButtonIcon />`
+Goro further defines other components such as the ButtonIcon which is a button that uses an icon instead. To use it, add the xml namespace `xmlns:goro="http://schemas.thismaker.com/liquidsnow/goro"` to your `MainWindow.xaml` or other page or window xaml definition sections. Once that is done, you can easily access the Goro controls by simply going: `< goro:ButtonIcon />`
 
 # Conclusion
 I will work to try and improve the documentation by adding a better Wiki. I hope for now this is sufficient enough to guide you through the first steps.

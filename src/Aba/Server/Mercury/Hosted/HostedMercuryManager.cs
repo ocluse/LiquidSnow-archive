@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,14 +15,19 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
         private readonly HostedManagerOptions _options;
         private readonly IServiceProvider _provider;
         private readonly List<HostedMercuryServer> _servers;
-        private string _hostAddress= "https://localhost:44316";
-        
+        private readonly string _hostAddress;
+
+        private Dictionary<string, MercuryUser> _users;
+
         public HostedMercuryManager(HostedManagerOptions options, IServiceProvider provider) 
         { 
             _options = options;
             _provider = provider;
             _servers = new List<HostedMercuryServer>();
+            _hostAddress = options.HostAddress;
         }
+
+        #region Hosted Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -79,13 +79,16 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
             }
         }
 
-        public async Task<IPrincipal> ValidateAccessToken(string accessToken)
+        #endregion
+
+        #region Hosted Specifics
+        public async Task<ClaimsPrincipal> ValidateAccessToken(string accessToken)
         {
             using (var httpClient = new HttpClient())
             {
-                httpClient.DefaultRequestHeaders.Authorization 
+                httpClient.DefaultRequestHeaders.Authorization
                     = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-                
+
                 httpClient.BaseAddress = new Uri(_hostAddress);
                 try
                 {
@@ -100,12 +103,71 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
                         return null;
                     }
                 }
-                catch(Exception ex)
+                catch
                 {
                     return null;
                 }
-                
             }
+        }
+
+        internal MercuryUser GetUser(string userId, HostedMercuryServer server)
+        {
+            if (_users == null) return null;
+
+            if (!_users.ContainsKey(userId)) return null;
+
+            var user = new MercuryUser(_users[userId]);
+
+            user.SetServer(server);
+
+            return user;
+        }
+
+        internal virtual MercuryUser GetUserWithConnectionId(string connectionId, HostedMercuryServer server)
+        {
+            if (_users == null) return null;
+
+            foreach (var user in _users)
+            {
+                if (user.Value.HasConnectionId(connectionId))
+                {
+                    var result = new MercuryUser(user.Value);
+                    result.SetServer(server);
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        internal void AddUserConnectionId(string connectionId, string userId)
+        {
+            MercuryUser user;
+
+            if (_users == null) _users = new Dictionary<string, MercuryUser>();
+
+            if (_users.ContainsKey(userId))
+            {
+                user = _users[userId];
+            }
+            else
+            {
+                user = new MercuryUser(userId, null);
+            }
+
+            user.AddConnectionId(connectionId);
+        }
+
+        #endregion
+
+        #region Helpers
+        /// <summary>
+        /// Called by the HTTP POST helper to create a string content out of a provided object. Override to customize the behaviour.
+        /// By default, the string content is encoded using UTF8 encoding with a mediatype of "application/json"
+        /// </summary>
+        protected virtual StringContent GetStringContent<T>(T o)
+        {
+            return new StringContent(Serialize(o), System.Text.Encoding.UTF8, "application/json");
         }
 
         private string Serialize<T>(T obj)
@@ -117,15 +179,8 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
         {
             return JsonSerializer.Deserialize<T>(json);
         }
+        #endregion
 
-        /// <summary>
-        /// Called by the HTTP POST helper to create a string content out of a provided object. Override to customize the behaviour.
-        /// By default, the string content is encoded using UTF8 encoding with a mediatype of "application/json"
-        /// </summary>
-        protected virtual StringContent GetStringContent<T>(T o)
-        {
-            return new StringContent(Serialize(o), System.Text.Encoding.UTF8, "application/json");
-        }
 
     }
 }

@@ -44,9 +44,7 @@ namespace Thismaker.Horus.Classical
 			while (true)
 			{
 				var str = strReader.ReadLine();
-				if (str == null) break;
-
-				str = str.CapitalizeAndCompress();
+				if (string.IsNullOrEmpty(str)) break;
 
 				if (type == DictionaryType.Key || type == DictionaryType.Combined)
 				{
@@ -62,6 +60,12 @@ namespace Thismaker.Horus.Classical
 			dictLoaded = true;
 		}
 
+		/// <summary>
+		/// Returns true if a similar value is found in the dictionary,
+		/// depending on the provided match length
+		/// </summary>
+		/// <param name="input">The string to check in the dictionary</param>
+		/// <returns></returns>
 		public bool CheckDictionary(string input)
         {
 			return CheckDictionary(input, MatchLength);

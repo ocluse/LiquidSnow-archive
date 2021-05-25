@@ -28,13 +28,16 @@
             
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Grid Background="{TemplateBinding Background}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Grid Background="{TemplateBinding Background}" 
+                          HorizontalAlignment="Stretch" 
+                          VerticalAlignment="Stretch">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
                             <RowDefinition Height="2"/>
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal"  VerticalAlignment="Center">
-                            <local:SymbolIcon Margin="6 4" x:Name="icon"
+                            <local:SymbolIcon Margin="10 0 0 4" x:Name="icon"
+                                              Height="14" Width="14"
                                                   Foreground="{TemplateBinding Foreground}" 
                                               Design="{Binding Path=(local:ControlExtensions.Design),
                                         RelativeSource={RelativeSource AncestorType=TabItem}}"
@@ -44,7 +47,7 @@
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Center"
                                         ContentSource="Header"
-                                        Margin="10,2">
+                                        Margin="4 0 10 4">
                                 <ContentPresenter.Resources>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="FontWeight" Value="SemiBold"/>
@@ -61,6 +64,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="local:ControlExtensions.Icon" Value="None">
                             <Setter Property="Visibility" Value="Collapsed" TargetName="icon"/>
+                            <Setter Property="Margin" Value="10 0" TargetName="ContentSite"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>

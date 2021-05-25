@@ -21,7 +21,7 @@
         {
             get => new SymmetricBuilder()
                 .WithAlgorithm(EncryptionAlgorithm.AES)
-                .WithSalt("aselrias38490a32")
+                .WithSalt("k39vn4p9;hsgpo4")
                 .Build();
         }
 
@@ -44,7 +44,7 @@
         {
             get => new SymmetricBuilder()
                 .WithAlgorithm(EncryptionAlgorithm.Rijndael)
-                .WithSalt("aselrias38490a32")
+                .WithSalt("k39vn4p9;hsgpo4")
                 .Build();
         }
     }

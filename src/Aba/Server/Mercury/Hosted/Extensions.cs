@@ -23,44 +23,4 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }
 
-public class MercuryOptions
-{
-    public string Address { get; set; }
-    public Type ServiceType { get; set; }
-    public int Port { get; set; }
-}
 
-public class HostedManagerOptions
-{
-    public string HostAddress { get; set; }
-    public List<MercuryOptions> ServerOptions { get; set; }
-
-    public HostedManagerOptions WithAddress(string address)
-    {
-        HostAddress = address;
-        return this;
-    }
-
-    public HostedManagerOptions AddServer<TServer>(int port) where TServer : HostedMercuryServer
-    {
-        return AddServer<TServer>(null, port);
-    }
-
-    public HostedManagerOptions AddServer<TServer>(string address, int port)where TServer : HostedMercuryServer
-    {
-        var option = new MercuryOptions
-        {
-            Address = address,
-            Port = port,
-            ServiceType = typeof(TServer)
-        };
-
-        if (ServerOptions == null)
-        {
-            ServerOptions = new List<MercuryOptions>();
-        }
-
-        ServerOptions.Add(option);
-        return this;
-    }
-}

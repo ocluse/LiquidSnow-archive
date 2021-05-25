@@ -42,8 +42,26 @@ namespace Thismaker.Aba.Client.Mercury
             Connected?.Invoke();
         }
 
-        private void OnReceive(byte[] obj)
+        private async void OnReceive(byte[] obj)
         {
+            //check the nature of the message:
+
+            if (obj.Length == 12)
+            {
+                if (obj.Compare(Globals.AuthSelf))
+                {
+                    var authLoad = new RPCPayload
+                    {
+                        MethodName = Globals.AuthResponsePayload,
+                        AccessToken = AccessToken.Value,
+
+                    };
+
+                    await SendPayloadAsync(authLoad).ConfigureAwait(false);
+                    return;
+                }
+            }
+
             //convert to string:
             var json = obj.GetString<UTF8Encoding>();
             var payload = Deserialize<RPCPayload>(json);

@@ -2,7 +2,6 @@
 {
     public class Transaction : Charge
     {
-
         #region Props
         private TransactionType _type;
 

@@ -31,6 +31,10 @@ namespace Thismaker.Horus.Symmetrics
             get=>Salt.GetBytes<UTF8Encoding>();
         }
 
+        public PaddingMode PaddingMode { get; set; } = PaddingMode.PKCS7;
+
+        public CipherMode CipherMode { get; set; } = CipherMode.CBC;
+
         /// <summary>
         /// The size of the algorithm's key. Usually 256
         /// </summary>
@@ -106,8 +110,8 @@ namespace Thismaker.Horus.Symmetrics
             var key = rdb.GetBytes(KeySize / 8);
             var iv = rdb.GetBytes(BlockSize / 8);
 
-            alg.Mode = CipherMode.CBC;
-            alg.Padding = PaddingMode.PKCS7;
+            alg.Mode = CipherMode;
+            alg.Padding = PaddingMode;
             alg.Key = key;
             alg.IV = iv;
 
@@ -142,8 +146,8 @@ namespace Thismaker.Horus.Symmetrics
             var key = rdb.GetBytes(KeySize / 8);
             var iv = rdb.GetBytes(BlockSize / 8);
 
-            alg.Mode = CipherMode.CBC;
-            alg.Padding = PaddingMode.PKCS7;
+            alg.Mode = CipherMode;
+            alg.Padding = PaddingMode;
             alg.Key = key;
             alg.IV = iv;
 

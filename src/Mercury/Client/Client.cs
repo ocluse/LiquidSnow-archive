@@ -199,10 +199,16 @@ namespace Thismaker.Mercury
                             await SendAsync(Globals.AckPing).ConfigureAwait(false);
                             continue;
                         }
+                        else if (buffer.Compare(Globals.Disconnect))
+                        {
+                            await SendAsync(Globals.AckDisconnect).ConfigureAwait(false);
+                            Close(null);
+                            break;
+                        }
                         else if (buffer.Compare(Globals.AckDisconnect))
                         {
                             _tcsDisconnect.SetResult(true);
-                            continue;
+                            break;
                         }
                     }
 

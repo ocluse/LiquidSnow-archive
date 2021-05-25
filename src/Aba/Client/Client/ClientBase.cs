@@ -17,6 +17,9 @@ namespace Thismaker.Aba.Client
 
         #region Properties 
         
+        /// <summary>
+        /// The hub endpoint
+        /// </summary>
         public string HubEndpoint { get; set; }
 
         /// <summary>

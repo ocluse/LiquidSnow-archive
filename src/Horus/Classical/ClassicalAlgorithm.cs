@@ -79,53 +79,58 @@ namespace Thismaker.Horus.Classical
 		}
 
 		///<inheritdoc/>
-        public override Task<List<AttackPossibility>> HackAsync(string input, CancellationToken cancellationToken = default, IProgress<float> progress = null)
+        public override async Task<List<AttackPossibility>> HackAsync(string input, CancellationToken cancellationToken = default, IProgress<float> progress = null)
         {
-			var storedKey = Key;
-
-			var result = new List<AttackPossibility>();
-			try
+			return await Task.Run(() =>
 			{
-				if (!dictLoaded) throw new InvalidOperationException("Dictionary not loaded");
-				float index = 0;
-				float size = KeyDictionary.Count;
-				foreach (var key in KeyDictionary)
+				var storedKey = Key;
+
+				var result = new List<AttackPossibility>();
+				try
 				{
-					//Check if we have been cancelled;
-					if (cancellationToken != default 
-						&& cancellationToken.IsCancellationRequested)
+					if (!dictLoaded) throw new InvalidOperationException("Dictionary not loaded");
+					float index = 0;
+					float size = KeyDictionary.Count;
+					foreach (var key in KeyDictionary)
 					{
-						result.Clear();
-						Key = storedKey;
-						cancellationToken.ThrowIfCancellationRequested();
+						//Check if we have been cancelled;
+						if (cancellationToken != default
+							&& cancellationToken.IsCancellationRequested)
+						{
+							result.Clear();
+							Key = storedKey;
+							cancellationToken.ThrowIfCancellationRequested();
+						}
+
+						//Run the decryption
+						Key = key;
+						var output = Decrypt(input);
+						if (CheckDictionary(output))
+						{
+							var poss = new AttackPossibility(key, output);
+							result.Add(poss);
+						}
+
+						index++;
+						//Report on progress:
+						if (progress != null)
+						{
+							progress.Report(index / size);
+						}
 					}
 
-					//Run the decryption
-					Key = key;
-					var output = Decrypt(input);
-					if (CheckDictionary(output))
-					{
-						var poss = new AttackPossibility(key, output);
-						result.Add(poss);
-					}
-
-					index++;
-                    //Report on progress:
-                    if (progress != null)
-                    {
-						progress.Report(index / size);
-                    }
+					return result;
 				}
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
-				Key = storedKey;
-			}
-			return Task.FromResult(result);
+				catch
+				{
+					throw;
+				}
+				finally
+				{
+					Key = storedKey;
+				}
+			});
+			
 		}
     }
 

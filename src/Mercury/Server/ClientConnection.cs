@@ -12,7 +12,7 @@ namespace Thismaker.Mercury
         #region Private Fields
         private readonly TcpClient _tcpClient;
         private readonly Timer _pingTimer, _timeoutTimer;
-        private TaskCompletionSource<bool> _tcsTimeout;
+        private TaskCompletionSource<bool> _tcsTimeout, _tcsDisconnect;
         private bool _connected;
         private readonly Stream _stream;
         private readonly Server _server;
@@ -151,43 +151,49 @@ namespace Thismaker.Mercury
 
         private async Task RunClient()
         {
-                while (_connected)
+            while (_connected)
+            {
+                try
                 {
-                    try
+                    var bufferSize = _tcpClient.Client.Available;
+
+                    if (bufferSize == 0) continue;
+
+                    var buffer = new byte[bufferSize];
+                    var readbytes = await _stream.ReadAsync(buffer, 0, bufferSize).ConfigureAwait(false);
+
+                    if (readbytes < bufferSize)
                     {
-                        var bufferSize = _tcpClient.Client.Available;
-
-                        if (bufferSize == 0) continue;
-
-                        var buffer = new byte[bufferSize];
-                        var readbytes = await _stream.ReadAsync(buffer, 0, bufferSize).ConfigureAwait(false);
-
-                        if (readbytes < bufferSize)
-                        {
-                            Array.Resize(ref buffer, readbytes);
-                        }
-
-                        //check if its a routine message
-                        if (buffer.Length == 12)
-                        {
-                            if (buffer.Compare(Globals.AckPing))
-                            {
-                                _tcsTimeout.SetResult(true);
-                                continue;
-                            }
-
-                            else if (buffer.Compare(Globals.Disconnect))
-                            {
-                                await SendAsync(Globals.AckDisconnect).ConfigureAwait(false);
-                                Close(null);
-                            }
-                        }
+                        Array.Resize(ref buffer, readbytes);
                     }
-                    catch (Exception ex)
+
+                    //check if its a routine message
+                    if (buffer.Length == 12)
                     {
-                        Close(ex);
+                        if (buffer.Compare(Globals.AckPing))
+                        {
+                            _tcsTimeout.SetResult(true);
+                            continue;
+                        }
+
+                        else if (buffer.Compare(Globals.Disconnect))
+                        {
+                            await SendAsync(Globals.AckDisconnect).ConfigureAwait(false);
+                            Close(null);
+                            break;
+                        }
+                        else if (buffer.Compare(Globals.AckDisconnect))
+                        {
+                            _tcsDisconnect.SetResult(true);
+                            break;
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Close(ex);
+                }
+            }
         }
 
         #endregion
@@ -196,7 +202,38 @@ namespace Thismaker.Mercury
 
         public async Task DisconnectAsync()
         {
+            if (!_connected) throw new InvalidOperationException("Client connection is already inactive");
 
+            var timer = new Timer(_server.DisconnectTimeoutMilliseconds)
+            {
+                Enabled = true,
+            };
+
+            timer.Elapsed += (o, e) =>
+            {
+                _tcsDisconnect.SetCanceled();
+            };
+
+            _tcsDisconnect = new TaskCompletionSource<bool>();
+
+            try
+            {
+                await SendAsync(Globals.Disconnect).ConfigureAwait(false);
+                await _tcsDisconnect.Task.ConfigureAwait(false);
+                Close(null);
+            }
+            catch(OperationCanceledException)
+            {
+                Close(new TimeoutException("Graceful disconnect failed"));
+            }
+            catch (Exception ex)
+            {
+                Close(ex);
+            }
+            finally
+            {
+                timer.Dispose();
+            }
         }
 
         public async Task SendAsync(byte[] data)

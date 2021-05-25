@@ -6,29 +6,32 @@
         xmlns:local="clr-namespace:Thismaker.Goro"
         mc:Ignorable="d"
         xmlns:goro="clr-namespace:Thismaker.Goro"
-        Title="MessageBox" WindowStartupLocation="CenterScreen" 
+        Title="" WindowStartupLocation="CenterScreen" 
         SizeToContent="WidthAndHeight" Height="auto" 
         ResizeMode="NoResize" Width="auto" 
         Style="{DynamicResource StandardWindow}" 
-        MinHeight="100" MinWidth="240" MaxWidth="400">
+        MinHeight="100" MinWidth="240" MaxWidth="450">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <goro:StatusIndicator x:Name="Status" Height="44" Width="44" Margin="20 20 20 10"/>
-            <TextBlock x:Name="ContentText"  Grid.Column="1" Text="Your message goes here. There are a lot of messages that one can potentially show to the user" Margin="10 10 20 10" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <TextBlock x:Name="ContentText"  Grid.Column="1" Text="message" Margin="10 10 20 10" VerticalAlignment="Center" TextWrapping="Wrap"/>
         </Grid>
-        
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10" HorizontalAlignment="Right">
-            <Button x:Name="Button1" Click="Button1_Click" Content="OK" Margin="0" Width="120" Height="36"/>
-            <Button x:Name="Button2" Click="Button2_Click" Content="Cancel" Margin="10" Width="120" Height="36"/>
+        <StackPanel Grid.Row="1">
+            <CheckBox x:Name="OptionalParameter" Content="Optional parameter" Margin="20, 10"/>
+            <StackPanel  Orientation="Horizontal" Margin="10" HorizontalAlignment="Right">
+                <Button x:Name="BtnPrimary" Click="OnBtnPrimary" Content="Primary" Margin="10" Width="120" Height="36"/>
+                <Button x:Name="BtnSecondary" Click="OnBtnSecondary" Content="Secondary" Margin="10" Width="120" Height="36"/>
+                <Button x:Name="BtnTertiary" Click="OnBtnTertiary" Content="Tertiary" Margin="10" Width="120" Height="36"/>
+            </StackPanel>
         </StackPanel>
+        
     </Grid>
 </Window>

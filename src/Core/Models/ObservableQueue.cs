@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace Thismaker.Core.Models
 {
     /// <summary>
-    /// A <see cref="Queue{T}"/> that raises events whenenevr it changes. Useful for binding scenarios
+    /// A <see cref="Queue{T}"/> that raises events whenever it is modified through adding or removing
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class ObservableQueue<T>:Queue<T>,INotifyPropertyChanged,INotifyCollectionChanged
@@ -15,10 +15,21 @@ namespace Thismaker.Core.Models
 
         public ObservableQueue() : base() { }
 
+        /// <summary>
+        /// Creates a queue with the capacity to hold the specified number of items
+        /// </summary>
+        /// <param name="capacity">The capacity for the queue</param>
         public ObservableQueue(int capacity) : base(capacity) { }
 
+        /// <summary>
+        /// Initializes a queue copying the items in the collection
+        /// </summary>
+        /// <param name="collection">the collection to copy the items from</param>
         public ObservableQueue(IEnumerable<T> collection) : base(collection) { }
 
+        /// <summary>
+        /// Queues a new item, raising the collection changed event
+        /// </summary>
         public new void Enqueue(T item)
         {
             base.Enqueue(item);
@@ -26,6 +37,10 @@ namespace Thismaker.Core.Models
             CollectionChanged?.Invoke(this, e); 
         }
 
+        /// <summary>
+        /// Dequeues an item, raising the collection changed event
+        /// </summary>
+        /// <returns></returns>
         public new T Dequeue()
         {
             var item = base.Dequeue();
@@ -35,6 +50,9 @@ namespace Thismaker.Core.Models
             return item;
         }
 
+        /// <summary>
+        /// Clears the items in the queue notifying collection change
+        /// </summary>
         public new void Clear()
         {
             var oldItems = new List<T>(this);

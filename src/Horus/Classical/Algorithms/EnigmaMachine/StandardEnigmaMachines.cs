@@ -22,6 +22,7 @@
                     Alphabet = new Alphabet("ABCDEFGHIJKLMNOPQRSTUVXYZÅÄÖ"),
                     Stator = StandardWheels.A133_ETW,
                     Reflector = StandardWheels.A133_UKW,
+                    DoubleStep=true
                 };
         }
 
@@ -41,7 +42,8 @@
                 {
                     Alphabet = new Alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
                     Stator = StandardWheels.A26_ETW,
-                    Reflector = StandardWheels.A26_UKW
+                    Reflector = StandardWheels.A26_UKW,
+                    DoubleStep = true
                 };
         }
 
@@ -61,7 +63,8 @@
                 {
                     Alphabet = new Alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
                     Stator = StandardWheels.E1_ETW,
-                    Reflector = StandardWheels.E1_UKW_B
+                    Reflector = StandardWheels.E1_UKW_B,
+                    DoubleStep = true
                 };
         }
 
@@ -82,7 +85,8 @@
                 {
                     Alphabet = new Alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
                     Stator = StandardWheels.NE_ETW,
-                    Reflector = StandardWheels.NE_UKW
+                    Reflector = StandardWheels.NE_UKW,
+                    DoubleStep = true
                 };
         }
 
@@ -102,7 +106,8 @@
                 {
                     Alphabet = new Alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
                     Stator = StandardWheels.SE_ETW,
-                    Reflector = StandardWheels.SE_UKW
+                    Reflector = StandardWheels.SE_UKW,
+                    DoubleStep = true
                 };
         }
 
@@ -122,7 +127,8 @@
                 {
                     Alphabet = new Alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
                     Stator = StandardWheels.M3_ETW,
-                    Reflector = StandardWheels.M3_UKW_B
+                    Reflector = StandardWheels.M3_UKW_B,
+                    DoubleStep = true
                 };
         }
 
@@ -144,7 +150,8 @@
                 {
                     Alphabet = new Alphabet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
                     Stator = StandardWheels.M4_ETW,
-                    Reflector = StandardWheels.M4_UKW_B
+                    Reflector = StandardWheels.M4_UKW_B,
+                    DoubleStep = true
                 };
         }
 

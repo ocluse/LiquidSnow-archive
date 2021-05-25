@@ -3,6 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
+    <Version>2.0.0.0</Version>
+    <PackageTags>ceasar-cipher playfair enigma enigma-machine</PackageTags>
+    <Authors>Thismaker</Authors>
+    <Description>This libary simplifies working with classical ciphers such as playfair, ceaser and vigenere, including working with Engima Machines which operate perfectly the same as the physical devices.</Description>
+    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <Copyright>©2021 Ocluse</Copyright>
+    <Company>Ocluse</Company>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +20,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Horus\Thismaker.Horus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

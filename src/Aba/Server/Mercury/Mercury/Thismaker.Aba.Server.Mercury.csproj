@@ -2,11 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>2.0.0.0</Version>
+    <Authors>Thismaker</Authors>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <Description>The server side library for working with Thismaker.Mercury for remote procedure calls and realtime communications between a server and client</Description>
+    <Copyright>©2021 Ocluse</Copyright>
+    <Company>Ocluse</Company>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Mercury\Thismaker.Mercury.csproj" />
     <ProjectReference Include="..\..\..\Common\Mercury\Thismaker.Aba.Common.Mercury.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

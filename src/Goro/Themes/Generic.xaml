@@ -10,6 +10,7 @@
         <Setter Property="Width" Value="30"/>
         <Setter Property="Height" Value="30"/>
         <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
+        <Setter Property="Design" Value="{DynamicResource DefaultDesign}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:StatusIndicator}">
@@ -145,7 +146,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:SymbolIcon}">
                     <Grid Visibility="Visible" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}">
-                        <Rectangle x:Name="PartSvg"  Grid.Row="1" Fill="{TemplateBinding Foreground}" 
+                        <Rectangle x:Name="PartSvg" Fill="{TemplateBinding Foreground}" 
                                    OpacityMask="{TemplateBinding Icon, Converter={StaticResource iconConverter},ConverterParameter={x:Static local:IconDesign.MaterialDesign}}"/>
                         <Viewbox x:Name="PartFont" Visibility="Collapsed">
                             <TextBlock TextAlignment="Center" Foreground="{TemplateBinding Foreground}" FontFamily="Segoe MDL2 Assets"
@@ -164,83 +165,4 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type local:GTextBox}">
-        <Setter Property="BorderBrush" Value="{DynamicResource PanelForeground}"/>
-        <Setter Property="Foreground" Value="{DynamicResource PanelForeground}"/>
-        <Setter Property="Background" Value="{DynamicResource PanelBackground}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="MinHeight" Value="36"/>
-        <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
-        <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="AllowDrop" Value="true"/>
-        <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
-        <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-        <Setter Property="SelectionBrush" Value="{DynamicResource Accent}"/>
-        <Setter Property="SelectionOpacity" Value="0.4"/>
-        <Setter Property="MinWidth" Value="10"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:GTextBox}">
-                    <StackPanel>
-                        <TextBlock x:Name="header" Margin="{DynamicResource HeaderMargin}" Text="{TemplateBinding Header}"/>
-                        <Border 
-                            CornerRadius="{DynamicResource CornerRadius}"
-                            MinHeight="{TemplateBinding MinHeight}" 
-                            Height="{TemplateBinding Height}" 
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
-                            x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" 
-                            
-                            BorderThickness="1" SnapsToDevicePixels="True">
-                            <Grid VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
-                                  Margin="10 0">
-                                <TextBlock x:Name="placeholder" Text="{TemplateBinding PlaceholderText}" 
-                                           FontSize="{TemplateBinding FontSize}"
-                                           FontStyle="Italic"
-                                           Foreground="{DynamicResource AccentDisabled}"
-                                           Visibility="Collapsed"/>
-                                <ScrollViewer x:Name="PART_ContentHost" Focusable="false" 
-                                      HorizontalScrollBarVisibility="Hidden" 
-                                      VerticalScrollBarVisibility="Auto" 
-                                      />
-                            </Grid>
-
-                        </Border>
-                    </StackPanel>
-
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Opacity" TargetName="border" Value="{DynamicResource InactiveOpacity}"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource AccentLight}"/>
-                        </Trigger>
-                        <Trigger Property="IsFocused" Value="True">
-                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource Accent}"/>
-                            <Setter Property="Visibility" TargetName="placeholder" Value="Collapsed"/>
-                        </Trigger>
-                        <Trigger Property="Text" Value="">
-                            <Setter Property="Visibility" TargetName="placeholder" Value="Visible"/>
-                        </Trigger>
-                        <Trigger Property="Header" Value="">
-                            <Setter Property="Visibility" TargetName="header" Value="Collapsed"/>
-                        </Trigger>
-                        <Trigger Property="Header" Value="{x:Null}">
-                            <Setter Property="Visibility" TargetName="header" Value="Collapsed"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
-                    <Condition Property="IsSelectionActive" Value="false"/>
-                </MultiTrigger.Conditions>
-                <Setter Property="SelectionBrush" Value="{DynamicResource AccentLight}"/>
-            </MultiTrigger>
-        </Style.Triggers>
-    </Style>
 </ResourceDictionary>

@@ -44,6 +44,11 @@ namespace Thismaker.Mercury
         public double TimeoutMiliseconds { get; set; }
 
         /// <summary>
+        /// The amout of time to wait until an attempted graceful disconnect is considered ungraceful
+        /// </summary>
+        public double DisconnectTimeoutMilliseconds { get; set; } = 5000;
+
+        /// <summary>
         /// If provided, the length of time to periodically send ping messages in milliseconds.
         /// </summary>
         public double? PingInterval { get; set; }
@@ -74,22 +79,34 @@ namespace Thismaker.Mercury
         public void Start()
         {
             _connected = true;
+
+            var ip = Dns.GetHostAddresses(Address);
+
+            _listener = new TcpListener(ip.First(), Port);
+            _listener.Start();
+
             Task.Run(RunInternal);
         }
 
-        public void Stop()
+        public async Task StopAsync()
         {
             _connected = false;
 
             while (_clients.Count > 0)
             {
-                _clients.First().Value.Disconnect();
+                await _clients.First().Value.DisconnectAsync();
             }
         }
 
         public bool HasClient(string connectionId)
         {
             return _clients.ContainsKey(connectionId);
+        }
+
+        public async Task DisconnectClientAsync(string connectionId)
+        {
+            if (!_clients.ContainsKey(connectionId)) return;
+            await _clients[connectionId].DisconnectAsync();
         }
 
         public async Task SendAsync(string connectionId, byte[] data)
@@ -107,11 +124,6 @@ namespace Thismaker.Mercury
 
         private async Task RunInternal()
         {
-            var ip = Dns.GetHostAddresses(Address);
-
-            _listener = new TcpListener(ip.First(), Port);
-            _listener.Start();
-            
             while (_connected)
             {
                 var tcpClient = await _listener.AcceptTcpClientAsync();

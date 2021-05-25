@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>2.0.0.0</Version>
+    <Authors>Thismaker</Authors>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <Description>This subset of Aba Mercury server works well in hosted environments, such as AspNetCore</Description>
+    <Company>Ocluse</Company>
+    <Copyright>©2021 Ocluse</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +21,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mercury\Thismaker.Aba.Server.Mercury.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

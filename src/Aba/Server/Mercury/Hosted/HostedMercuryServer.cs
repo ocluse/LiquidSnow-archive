@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
-using System.Security.Principal;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,13 +15,13 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
         #region HostedServiceImplements
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            Start(null);
+            Start();
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            await StopAsync();
         }
 
         #endregion
@@ -30,6 +29,21 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
         internal void SetManager(HostedMercuryManager manager)
         {
             _manager = manager;
+        }
+
+        internal override void AddUserConnectionId(string connectionId, string userId)
+        {
+            _manager.AddUserConnectionId(connectionId, userId);
+        }
+
+        public override MercuryUser User(string userId)
+        {
+            return _manager.GetUser(userId, this);
+        }
+
+        public override MercuryUser UserWithConnectionId(string connectionId)
+        {
+            return _manager.GetUserWithConnectionId(connectionId, this);
         }
 
         protected override T Deserialize<T>(string json)
@@ -52,7 +66,7 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
             return JsonSerializer.Serialize<T>(obj);
         }
 
-        protected override async Task<IPrincipal> ValidateAccessToken(string accessToken, List<string> scopes)
+        protected override async Task<ClaimsPrincipal> ValidateAccessToken(string accessToken, List<string> scopes)
         {
             return await _manager.ValidateAccessToken(accessToken);
         }

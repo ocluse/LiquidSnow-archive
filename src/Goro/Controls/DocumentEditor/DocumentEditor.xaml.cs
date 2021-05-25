@@ -18,7 +18,6 @@ namespace Thismaker.Goro
             try
             {
                 ((DocumentEditorViewModel)DataContext).Attach(Doc);
-                Design = ThemeManager.DefaultDesign;
             }
             catch
             {
@@ -26,15 +25,6 @@ namespace Thismaker.Goro
             }
             
         }
-
-        public IconDesign Design
-        {
-            get { return (IconDesign)this.GetValue(DesignProperty); }
-            set { SetValue(DesignProperty, value); }
-        }
-
-        public static readonly DependencyProperty DesignProperty =
-            DependencyProperty.Register(nameof(Design), typeof(IconDesign), typeof(DocumentEditor));
 
         public void Save(Stream stream)
         {
@@ -60,11 +50,6 @@ namespace Thismaker.Goro
             {
                 throw;
             }
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            
         }
     }
 }

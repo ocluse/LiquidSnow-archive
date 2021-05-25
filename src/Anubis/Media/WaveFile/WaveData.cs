@@ -3,6 +3,11 @@ using System.IO;
 
 namespace Thismaker.Anubis.Media
 {
+    /// <summary>
+    /// This class is typically used by the <see cref="WaveFileJector"/> to read the wavefile data
+    /// of a WAV file, though it can be easily modified to provide the data to a player, 
+    /// if you know what you are doing.
+    /// </summary>
     public partial class WaveFile : IDisposable
     {
         private bool _hasHeader = false;

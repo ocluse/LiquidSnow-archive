@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Thismaker.Aba.Common.Mercury;
 
 namespace Thismaker.Aba.Client.Mercury
 {
-    public abstract partial class MercuryClient<TClient>
+    public abstract partial class MercuryClient<TClient> : IBeamer
     {
         private readonly Dictionary<string, InvocationHandler> _subs
             = new Dictionary<string, InvocationHandler>();
@@ -19,14 +20,24 @@ namespace Thismaker.Aba.Client.Mercury
 
             var handler = _subs[payload.MethodName];
 
-            var parameters = new List<object>();
-
-            for (int i = 0; i < payload.Parameters.Count; i++)
+            if (handler.Types == null||handler.Types.Count==0)
             {
-                parameters.Add(Deserialize(payload.Parameters[i], handler.Types[i]));
+                handler.Invoke(null);
             }
+            else
+            {
+                var parameters = new List<object>();
+                for (int i = 0; i < payload.Parameters.Count; i++)
+                {
+                    parameters.Add(Deserialize(payload.Parameters[i], handler.Types[i]));
+                }
+                handler.Invoke(parameters.ToArray());
+            }
+        }
 
-            handler.Invoke(parameters.ToArray());
+        public void Unsubscribe(string methodName)
+        {
+            _subs.Remove(methodName);
         }
 
         public void Subscribe(string methodName, object target, MethodInfo method, Type[] types)
@@ -42,7 +53,7 @@ namespace Thismaker.Aba.Client.Mercury
                 handler = new InvocationHandler()
                 {
                     Binds = new List<InvocationBind>(),
-                    Types = new List<Type>(types)
+                    Types = types==null ? null : new List<Type>(types)
                 };
 
                 _subs.Add(methodName, handler);
@@ -55,6 +66,16 @@ namespace Thismaker.Aba.Client.Mercury
             };
 
             handler.Binds.Add(bind);
+        }
+
+        public void Subscribe(Action action, string methodName=null)
+        {
+            if (methodName == null)
+            {
+                methodName = action.Method.Name;
+            }
+
+            Subscribe(methodName, action.Target, action.Method, null);
         }
 
         public void Subscribe<T1>(Action<T1> action, string methodName=null)
@@ -126,13 +147,13 @@ namespace Thismaker.Aba.Client.Mercury
 
         #region Sending
 
-        private void SendPayload(RPCPayload payload)
+        private async Task SendPayloadAsync(RPCPayload payload)
         {
             var bytes = Serialize(payload).GetBytes<UTF8Encoding>();
-            _mClient.SendAsync(bytes);
+            await _mClient.SendAsync(bytes).ConfigureAwait(false);
         }
 
-        public void Beam(string methodName, object[] args, Type[] types)
+        public async Task BeamAsync(string methodName, object[] args, Type[] types)
         {
             var payload = new RPCPayload
             {
@@ -140,35 +161,42 @@ namespace Thismaker.Aba.Client.Mercury
                 Parameters = new List<string>()
             };
 
-            for (int i = 0; i < args.Length; i++)
+            if (args != null)
             {
-                payload.Parameters.Add(Serialize(args[i], types[i]));
+                for (int i = 0; i < args.Length; i++)
+                {
+                    payload.Parameters.Add(Serialize(args[i], types[i]));
+                }
             }
-
-            SendPayload(payload);
+            await SendPayloadAsync(payload);
         }
 
-        public void Beam<T1>(string methodName, T1 arg)
+        public async Task BeamAsync(string methodName)
         {
-            Beam(methodName, new object[] { arg }, 
+            await BeamAsync(methodName, null, null);
+        }
+
+        public async Task BeamAsync<T1>(string methodName, T1 arg)
+        {
+            await BeamAsync(methodName, new object[] { arg }, 
                 new Type[] { typeof(T1) });
         }
 
-        public void Beam<T1, T2>(string methodName, T1 arg1, T2 arg2)
+        public async Task BeamAsync<T1, T2>(string methodName, T1 arg1, T2 arg2)
         {
-            Beam(methodName, new object[] { arg1, arg2 }, 
+            await BeamAsync(methodName, new object[] { arg1, arg2 }, 
                 new Type[] { typeof(T1), typeof(T2) });
         }
 
-        public void Beam<T1, T2, T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
+        public async Task BeamAsync<T1, T2, T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
         {
-            Beam(methodName, new object[] { arg1, arg2, arg3 }, 
+            await BeamAsync(methodName, new object[] { arg1, arg2, arg3 }, 
                 new Type[] { typeof(T1), typeof(T2), typeof(T3) });
         }
 
-        public void Beam<T1, T2, T3, T4>(string methodName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+        public async Task BeamAsync<T1, T2, T3, T4>(string methodName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            Beam(methodName, new object[] { arg1, arg2, arg3, arg4 }, 
+            await BeamAsync(methodName, new object[] { arg1, arg2, arg3, arg4 }, 
                 new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4)});
         }
 

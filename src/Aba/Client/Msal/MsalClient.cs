@@ -162,7 +162,7 @@ namespace Thismaker.Aba.Client.Msal
             if (args == ApiTokenAccessArgs)
             {
                 AccessToken.ExpiresOn = result.ExpiresOn;
-                AccessToken = AccessToken.Bearer(result.AccessToken);
+                AccessToken = Core.AccessToken.Bearer(result.AccessToken);
             }
 
             return result.AccessToken;
