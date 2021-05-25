@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Thismaker.Aba.Client
 {
@@ -27,5 +25,8 @@ namespace Thismaker.Aba.Client
         NoEntitlements,
         RegisterFailure,
         ConnectionException,
+        RequestFailed,
+        AuthException,
+        GenericException,
     }
 }

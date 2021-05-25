@@ -6,29 +6,25 @@ using System.Threading.Tasks;
 using System.Threading;
 using Thismaker.Core.Utilities;
 using Thismaker.Horus.Symmetrics;
+using System.Text;
 
 namespace Thismaker.Horus.IO
 {
     /// <summary>
     /// A package that allows for manipulation and use of several <see cref="CryptoFile"/>s
-    /// Useful where several files need to be encrypted but are under the same roof.
+    /// Useful where several files need to be encrypted under the same roof using the same key
     /// </summary>
     public class CryptoContainer : IDisposable
     {
-        readonly Package _package;
-        readonly Stream _source;
+        #region Private Fields
 
-        /// <summary>
-        /// The key/Password used in encrypting, decrypting contents of the container.
-        /// </summary>
-        public string Key { get; set; }
+        private readonly Package _package;
 
-        /// <summary>
-        /// The symmetric algorithm to use, if not provided,
-        /// the process will use <see cref="PredefinedSymmetric.AesFixed"/>
-        /// </summary>
-        public Symmetric Alogrithm { get; set; }
-        = PredefinedSymmetric.AesFixed;
+        private readonly Stream _source;
+
+        #endregion
+
+        #region Constructors
 
         /// <summary>
         /// Creates a new container with the provided key, 
@@ -55,6 +51,23 @@ namespace Thismaker.Horus.IO
             _package = Package.Open(stream, FileMode.OpenOrCreate);
         }
 
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// The key/Password used in encrypting, decrypting contents of the container.
+        /// </summary>
+        public string Key { get; set; }
+
+        /// <summary>
+        /// The symmetric algorithm to use, if not provided,
+        /// the process will use <see cref="PredefinedSymmetric.AesFixed"/>
+        /// </summary>
+        public Symmetric Alogrithm { get; set; }
+        = PredefinedSymmetric.AesFixed;
+        #endregion
+
+        #region Stream IO
         /// <summary>
         /// Adds an item to the container, overwriting it if requested and it exists
         /// </summary>
@@ -90,7 +103,8 @@ namespace Thismaker.Horus.IO
                 }
                 var output = part.GetStream();
                 using var ef = new CryptoFile(output, Key);
-                await ef.WriteAsync(input, progress, cancellationToken);
+                ef.Algorithm = Alogrithm;
+                await ef.WriteAsync(input, progress, cancellationToken).ConfigureAwait(false);
             }
             catch
             {
@@ -98,6 +112,38 @@ namespace Thismaker.Horus.IO
             }
         }
 
+        /// <summary>
+        /// Copies the unencrypted contents of a file to the provided stream
+        /// </summary>
+        /// <param name="filename">The name of the file</param>
+        /// <param name="output">The destination of the unencrypted data</param>
+        /// <param name="progress">If provided, reports on the progress of the operation</param>
+        /// <param name="cancellationToken">If provided, can be used to cancel the operation</param>
+        /// <returns></returns>
+        public async Task GetAsync(string filename, Stream output, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var uri = PackUriHelper.CreatePartUri(new Uri(filename, UriKind.Relative));
+
+                if (!_package.PartExists(uri))
+                {
+                    throw new FileNotFoundException("The specified item does not exist");
+                }
+
+                var input = _package.GetPart(uri).GetStream();
+                using var ef = new CryptoFile(input, Key);
+                ef.Algorithm = Alogrithm;
+                await ef.ReadAsync(output, progress, cancellationToken).ConfigureAwait(false);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region Object IO
         /// <summary>
         /// Adds a <see cref="object"/> to the container by means of XML serialization.
         /// Therefore the object, and the data you wish to persist, must be XML serializable
@@ -129,36 +175,8 @@ namespace Thismaker.Horus.IO
                 }
                 var output = part.GetStream();
                 using var ef = new CryptoFile(output, Key);
-                await ef.SerializeAsync(o);
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Copies the unencrypted contents of a file to the provided stream
-        /// </summary>
-        /// <param name="filename">The name of the file</param>
-        /// <param name="output">The destination of the unencrypted data</param>
-        /// <param name="progress">If provided, reports on the progress of the operation</param>
-        /// <param name="cancellationToken">If provided, can be used to cancel the operation</param>
-        /// <returns></returns>
-        public async Task GetAsync(string filename, Stream output, IProgress<float> progress=null, CancellationToken cancellationToken=default)
-        {
-            try
-            {
-                var uri = PackUriHelper.CreatePartUri(new Uri(filename, UriKind.Relative));
-
-                if (!_package.PartExists(uri))
-                {
-                    throw new FileNotFoundException("The specified item does not exist");
-                }
-
-                var input = _package.GetPart(uri).GetStream();
-                using var ef = new CryptoFile(input, Key);
-                await ef.ReadAsync(output, progress, cancellationToken);
+                ef.Algorithm = Alogrithm;
+                await ef.SerializeAsync(o).ConfigureAwait(false);
             }
             catch
             {
@@ -185,14 +203,75 @@ namespace Thismaker.Horus.IO
 
                 var input = _package.GetPart(uri).GetStream();
                 using var ef = new CryptoFile(input, Key);
-                return await ef.DeserializeAsync<T>();
+                ef.Algorithm = Alogrithm;
+                return await ef.DeserializeAsync<T>().ConfigureAwait(false);
             }
             catch
             {
                 throw;
             }
         }
+        #endregion
 
+        #region Byte IO
+        /// <summary>
+        /// Adds byte content to the container under the specified name
+        /// </summary>
+        /// <param name="filename">The name of the file</param>
+        /// <param name="data">The byte array data to add to the file</param>
+        /// <param name="overwrite">If true, overwrites an exisitng file, otherwise throws an exception</param>
+        /// <param name="progress">Reports the progress of the operation</param>
+        /// <param name="cancellationToken">Allows cancellation fo the operation</param>
+        /// <returns></returns>
+        public async Task AddBytesAsync(string filename, byte[] data, bool overwrite = false, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        {
+            using var msData = new MemoryStream(data);
+            await AddAsync(filename, msData, overwrite, progress, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Returns the byte content of a file in the container
+        /// </summary>
+        /// <param name="filename">The name of the file</param>
+        /// <param name="progress">If provided, reports on the progress of the operation</param>
+        /// <param name="cancellationToken">Allows cancelling the operation</param>
+        /// <returns></returns>
+        public async Task<byte[]> GetBytesAsync(string filename, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        {
+            using var msData = new MemoryStream();
+            await GetAsync(filename, msData, progress, cancellationToken).ConfigureAwait(false);
+            return msData.ToArray();
+        }
+        #endregion
+
+        #region String IO
+        /// <summary>
+        /// Adds text contents to the container that will be accessable through the provided filename
+        /// </summary>
+        /// <param name="filename">The name of the file in the cryptocontainer</param>
+        /// <param name="contents">The string contents of the file</param>
+        /// <param name="overwrite">If true, overwrites an exisitng file, otherwise, an exception is thrown if the file already exists</param>
+        /// <param name="progress">If provided, reports the progress of the process</param>
+        /// <param name="cancellationToken">If provided, alows the canceling of the task</param>
+        public async Task AddTextAsync(string filename, string contents, bool overwrite = false, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        {
+            await AddBytesAsync(filename, contents.GetBytes<UTF8Encoding>(), overwrite, progress, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Reads the contents of a file as a UTF8 string
+        /// </summary>
+        /// <param name="filename">The name of the file</param>
+        /// <param name="progress">Reports the progress if provided</param>
+        /// <param name="cancellationToken">Cancels the task when called</param>
+        public async Task<string> GetTextAsync(string filename, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        {
+            var bytes = await GetBytesAsync(filename, progress, cancellationToken).ConfigureAwait(false);
+            return bytes.GetString<UTF8Encoding>();
+        }
+        #endregion
+
+        #region Misc Methods
         /// <summary>
         /// Extracts the contents of the container to the provided directory
         /// </summary>
@@ -282,5 +361,7 @@ namespace Thismaker.Horus.IO
             _package.Close();
             _source.Dispose();
         }
+
+        #endregion
     }
 }

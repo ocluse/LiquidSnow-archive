@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Identity.Client;
+using Thismaker.Aba.Client.Core;
 
 namespace Thismaker.Aba.Client.Msal
 {
@@ -14,5 +13,11 @@ namespace Thismaker.Aba.Client.Msal
         /// </summary>
         /// <returns></returns>
         object GetMainWindow();
+
+        /// <summary>
+        /// A handle to allow serialization(storage) of access tokens depending on the executing platform
+        /// </summary>
+        /// <param name="cache"></param>
+        void EnableSerialization(ITokenCache cache);
     }
 }

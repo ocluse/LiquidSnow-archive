@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Thismaker.Aba.Client.Core;
 
 [assembly: InternalsVisibleTo("Thismaker.Aba.Client.Configuration")]
 namespace Thismaker.Aba.Client
@@ -49,10 +50,23 @@ namespace Thismaker.Aba.Client
             return this;
         }
 
+        /// <summary>
+        /// Makes the app by calling <see cref="ClientBase{TClient}.MakeApp"/>
+        /// </summary>
+        /// <returns></returns>
+        public AbaClientBuilder<T> Make()
+        {
+            client.MakeApp();
+            return this;
+        }
+
+        /// <summary>
+        /// Returns the client App built by this builder
+        /// </summary>
+        /// <returns></returns>
         public T Build()
         {
             return client;
         }
-
     }
 }

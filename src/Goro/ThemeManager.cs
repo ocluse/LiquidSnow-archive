@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -64,7 +61,7 @@ namespace Thismaker.Goro
         private static ThemeMode _theme=ThemeMode.Light;
 
         private static Color _accent = DefaultColors.Briliet;
-        
+
         /// <summary>
         /// Dark theme or light theme. Changing calls the <see cref="AccentChanged"/>
         /// event and therefore instantly changes the theme. The default value is <see cref="ThemeMode.Light"/>
@@ -95,6 +92,12 @@ namespace Thismaker.Goro
                 _accent = value;
                 AccentChanged?.Invoke(Accent);
             }
+        }
+
+        public static IconDesign DefaultDesign
+        {
+            get { return (IconDesign)_dictionary["DefaultDesign"]; }
+            set { _dictionary["DefaultDesign"] = value; }
         }
 
         private static ResourceDictionary _dictionary;
@@ -187,6 +190,7 @@ namespace Thismaker.Goro
             _dictionary["AccentDark"] = accentDark;
             _dictionary["AccentDisabled"] = accentDisabled;
             _dictionary["AccentGradient"] = ColorUtility.CreateBrush(Accent, accentShifted);
+            
             if (Theme == ThemeMode.Dark)
             {
                 _dictionary["AccentDarkDynamic"] = accentDark;
@@ -194,7 +198,7 @@ namespace Thismaker.Goro
                 _dictionary["PanelGray"] = ColorUtility.CreateBrush("#4D4D4D");
                 _dictionary["PanelBackground"] = dark;
                 _dictionary["PanelForeground"] = bright;
-
+                _dictionary["PanelGrayResponsive"] = ColorUtility.CreateBrush("#303030");
             }
             else
             {
@@ -203,9 +207,10 @@ namespace Thismaker.Goro
                 _dictionary["PanelGray"] = ColorUtility.CreateBrush("#999999");
                 _dictionary["PanelBackground"] = bright;
                 _dictionary["PanelForeground"] = dark;
-
+                _dictionary["PanelGrayResponsive"] = ColorUtility.CreateBrush("#F2F2F2");
             }
         }
+
         #endregion
 
         

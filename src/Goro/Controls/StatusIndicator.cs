@@ -3,6 +3,9 @@ using System.Windows.Controls;
 
 namespace Thismaker.Goro
 {
+    /// <summary>
+    /// A control that can be used to show statuses as icons
+    /// </summary>
     public class StatusIndicator : Control
     {
         static StatusIndicator()
@@ -16,12 +19,18 @@ namespace Thismaker.Goro
         public static readonly DependencyProperty DesignProperty
             = DependencyProperty.Register(nameof(Design), typeof(IconDesign), typeof(StatusIndicator), new PropertyMetadata(IconDesign.Segoe));
 
+        /// <summary>
+        /// The status state of the indicator
+        /// </summary>
         public StatusInfo Status
         {
             get { return (StatusInfo)GetValue(StatusProperty); }
             set { SetValue(StatusProperty, value); }
         }
 
+        /// <summary>
+        /// The icon design of the status indicator
+        /// </summary>
         public IconDesign Design
         {
             get { return (IconDesign)GetValue(DesignProperty); }

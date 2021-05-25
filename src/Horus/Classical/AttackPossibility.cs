@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Net;
-using System.Threading.Tasks;
-
-namespace Thismaker.Horus.Classical
+﻿namespace Thismaker.Horus.Classical
 {
     public class AttackPossibility
 	{

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Collections;
@@ -98,7 +97,7 @@ namespace Thismaker.Anubis.Imaging
                             pos++;
                         }
 
-                        vals[v] = (int)bitArray.ToInt();
+                        vals[v] = (int)bitArray.ToULong();
                         if (stop) break;
                     }
 

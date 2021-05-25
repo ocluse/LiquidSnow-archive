@@ -5,14 +5,16 @@
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>Very useful library that provide some fundamental utlilities, extensions and abilities that are usually used in almost every other development scenario.</Description>
+    <Description>Very useful library that provide some fundamental utlilities, extensions and models that are useful for speeding up development.</Description>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>thismaker core extensions fundamentals  generic</PackageTags>
+    <PackageTags>thismaker core extensions fundamentals generic</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.3</Version>
-    <PackageReleaseNotes>Fixed namespaces.</PackageReleaseNotes>
+    <Version>2.0.0.0</Version>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Company>Ocluse</Company>
+    <Copyright>©2021 Ocluse</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

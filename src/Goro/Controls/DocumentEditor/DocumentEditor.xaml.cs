@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Media = System.Windows.Media;
-using System.Linq;
 using System.IO;
 
 namespace Thismaker.Goro
@@ -24,17 +13,18 @@ namespace Thismaker.Goro
         public DocumentEditor()
         {
             InitializeComponent();
-            ((DocumentEditorViewModel)DataContext).Attach(Doc);
-        }
+            
 
-        public IconDesign Design
-        {
-            get { return (IconDesign)this.GetValue(DesignProperty); }
-            set { SetValue(DesignProperty, value); }
-        }
+            try
+            {
+                ((DocumentEditorViewModel)DataContext).Attach(Doc);
+            }
+            catch
+            {
 
-        public static readonly DependencyProperty DesignProperty =
-            DependencyProperty.Register(nameof(Design), typeof(IconDesign), typeof(DocumentEditor));
+            }
+            
+        }
 
         public void Save(Stream stream)
         {

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 namespace Thismaker.Goro
 {
+    /// <summary>
+    /// A WPF control for displaying simple icon or symbol from the various design collections e.g the Segoe MDL2 Assets
+    /// </summary>
     public class SymbolIcon : Control
     {
         static SymbolIcon()

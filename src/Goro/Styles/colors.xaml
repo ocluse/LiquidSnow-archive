@@ -2,11 +2,14 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Thismaker.Goro"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
     
-    <FontFamily x:Key="Password">#Password</FontFamily>
-    <Thickness x:Key="HeaderMargin" Left="0" Top="0" Right="0" Bottom="8"/>
-    <!--#region Image Resources-->
+    <!--#region MISC Resources-->
     <BitmapImage x:Key="DefaultDP" UriSource="/Assets/defaultprofile.png"/>
+    <local:IconDesign x:Key="DefaultDesign">Segoe</local:IconDesign>
+    <sys:Double x:Key="InactiveOpacity">0.4</sys:Double>
+    <CornerRadius x:Key="CornerRadius">4</CornerRadius>
+    <Thickness x:Key="HeaderMargin" Left="0" Top="0" Right="0" Bottom="8"/>
     <!--#endregion-->
 
     <!--#region  Colors-->
@@ -26,6 +29,7 @@
     <SolidColorBrush x:Key="AccentDisabled" Color="#4D4D4D"/>
 
     <SolidColorBrush x:Key="PanelForeground" Color="#1A1A1A"/>
+    <SolidColorBrush x:Key="PanelGrayResponsive" Color="#E6E6E6"/>
     <SolidColorBrush x:Key="PanelGray" Color="#999999"/>
     <SolidColorBrush x:Key="PanelGrayDark" Color="#FF3F3F3F"/>
     <SolidColorBrush x:Key="PanelBackground" Color="White"/>
@@ -33,8 +37,5 @@
     <SolidColorBrush x:Key="PanelPositive" Color="#41B568"/>
     <SolidColorBrush x:Key="PanelNegative" Color="#D82B72"/>
     <SolidColorBrush x:Key="PanelHighlight" Color="#666666" Opacity="0.4"/>
-    <sys:Double x:Key="InactiveOpacity">0.4</sys:Double>
-    <CornerRadius x:Key="CornerRadius">4</CornerRadius>
-    
     <!--#endregion-->
 </ResourceDictionary>

@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Thismaker</Authors>
+    <LangVersion>8.0</LangVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>Horus greatly simplifies cryptography and encryption, allowing you to work with symmetric algorithms by taking care of the difficult part of setting them to work properly</Description>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>encryption security symmetric-algorithm aes encrypted</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>2.0.0.0</Version>
+    <Copyright>©2021 Ocluse</Copyright>
+    <Company>Ocluse</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Symmetrics\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Thismaker.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Thismaker.Goro
 {
+    /// <summary>
+    /// A <see cref="CheckBox"/> that shows up as an icon
+    /// </summary>
     public class CheckboxIcon : CheckBox
     {
         static CheckboxIcon()
@@ -24,17 +18,34 @@ namespace Thismaker.Goro
             = DependencyProperty.Register(nameof(Icon), typeof(Icon), typeof(CheckboxIcon), new PropertyMetadata(Icon.None));
         public static readonly DependencyProperty DesignProperty
             = DependencyProperty.Register(nameof(Design), typeof(IconDesign), typeof(CheckboxIcon), new PropertyMetadata(IconDesign.Segoe));
+        public static readonly DependencyProperty HighlightProperty
+            = DependencyProperty.Register(nameof(Highlight), typeof(SolidColorBrush), typeof(CheckboxIcon));
 
+        /// <summary>
+        /// The icon of the button
+        /// </summary>
         public Icon Icon
         {
             get { return (Icon)GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
         }
 
+        /// <summary>
+        /// The design of the button's icon
+        /// </summary>
         public IconDesign Design
         {
             get { return (IconDesign)GetValue(DesignProperty); }
             set { SetValue(DesignProperty, value); }
+        }
+
+        /// <summary>
+        /// The highlight of the button when shown
+        /// </summary>
+        public SolidColorBrush Highlight
+        {
+            get { return (SolidColorBrush)GetValue(HighlightProperty); }
+            set { SetValue(HighlightProperty, value); }
         }
     }
 }

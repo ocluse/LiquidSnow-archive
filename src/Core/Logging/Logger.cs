@@ -4,11 +4,13 @@ using System.IO;
 
 namespace Thismaker.Core.Logging
 {
+    /// <summary>
+    /// Provides an easy way to quickly log without the complexities
+    /// </summary>
     public static class Logger
     {
         public static event Action<LogObject> LogEntered;
         public static string LogFilePath { get; set; }
-        public static LogLevel Verbosity { get; set; }
 
         /// <summary>
         /// Logs to the set <see cref="LogFilePath"/>. If no file is set, an exception will be thrown.
@@ -22,13 +24,77 @@ namespace Thismaker.Core.Logging
             {
                 log.ToString()
             };
-            if ((int)Verbosity <= (int)log.Level)
-            {
-                File.AppendAllLines(LogFilePath, list);
-            }
-            
+            File.AppendAllLines(LogFilePath, list);
             if (log.Notifiable)
                 LogEntered?.Invoke(log);
+        }
+
+        /// <summary>
+        /// Log an error
+        /// </summary>
+        /// <param name="message">The message of the error</param>
+        public static void Error(string message)
+        {
+            var obj = new LogObject
+            {
+                Level = LogLevel.Error,
+                Message = message,
+                Notifiable = true,
+                Timestamp = DateTime.Now
+            };
+
+            Log(obj);
+        }
+
+        /// <summary>
+        /// Log some info
+        /// </summary>
+        /// <param name="message">The message of the info</param>
+        public static void Info(string message)
+        {
+            var obj = new LogObject
+            {
+                Level = LogLevel.Info,
+                Message = message,
+                Notifiable = true,
+                Timestamp = DateTime.Now
+            };
+
+            Log(obj);
+        }
+
+        /// <summary>
+        /// Log some success
+        /// </summary>
+        /// <param name="message">The message of the success</param>
+        public static void Success(string message)
+        {
+            var obj = new LogObject
+            {
+                Level = LogLevel.Success,
+                Message = message,
+                Notifiable = true,
+                Timestamp = DateTime.Now
+            };
+
+            Log(obj);
+        }
+
+        /// <summary>
+        /// Log a warning
+        /// </summary>
+        /// <param name="message">The message of the warning</param>
+        public static void Warning(string message)
+        {
+            var obj = new LogObject
+            {
+                Level = LogLevel.Warning,
+                Message = message,
+                Notifiable = true,
+                Timestamp = DateTime.Now
+            };
+
+            Log(obj);
         }
     }
 

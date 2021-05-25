@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Thismaker.Goro"
              mc:Ignorable="d" 
+             local:ControlExtensions.Design="{DynamicResource DefaultDesign}"
              xmlns:sys="System.Windows.Media"
              d:DesignHeight="450" d:DesignWidth="800" Background="{DynamicResource PanelBackground}">
     <UserControl.DataContext>
@@ -15,35 +16,35 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <WrapPanel Orientation="Horizontal" FocusManager.IsFocusScope="True" Margin="4">
+        <WrapPanel Orientation="Horizontal" FocusManager.IsFocusScope="True" Background="{DynamicResource PanelGrayResponsive}">
             <local:ButtonIcon Icon="Copy" 
                               Margin="4 0" 
-                              Design="{Binding Design, RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
+                              Design="{Binding Path=(local:ControlExtensions.Design), RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
                               Command="{x:Static ApplicationCommands.Copy}" 
                               ToolTip="Copy"/>
             <local:ButtonIcon Icon="Cut" 
                               Margin="4 0" 
-                              Design="{Binding Design, RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
+                              Design="{Binding Path=(local:ControlExtensions.Design), RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
                               Command="{x:Static ApplicationCommands.Cut}" 
                               ToolTip="Cut"/>
             <local:ButtonIcon Icon="Paste"
                               Margin="4 0" 
-                              Design="{Binding Design, RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
+                              Design="{Binding Path=(local:ControlExtensions.Design), RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
                               Command="{x:Static ApplicationCommands.Paste}" 
                               ToolTip="Paste"/>
             <local:CheckboxIcon Icon="FormatBold" 
                                 Margin="4 0" 
-                                Design="{Binding Design, RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
+                                Design="{Binding Path=(local:ControlExtensions.Design), RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
                                 IsChecked="{Binding IsBold}" 
                                 ToolTip="Bold"/>
             <local:CheckboxIcon Icon="FormatItalic"
                                 Margin="4 0" 
-                                Design="{Binding Design, RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
+                                Design="{Binding Path=(local:ControlExtensions.Design), RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
                                 IsChecked="{Binding IsItalic}" 
                                 ToolTip="Italics"/>
             <local:CheckboxIcon Icon="FormatUnderline" 
                                 Margin="4 0" 
-                                Design="{Binding Design, RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
+                                Design="{Binding Path=(local:ControlExtensions.Design), RelativeSource={RelativeSource AncestorType=local:DocumentEditor}}" 
                                 IsChecked="{Binding IsUnderline}" 
                                 ToolTip="Underline"/>
             <ComboBox MinWidth="100" VerticalAlignment="Center" 

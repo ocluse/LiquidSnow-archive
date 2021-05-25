@@ -2,9 +2,9 @@
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Thismaker.Aba.Common;
+using Thismaker.Aba.Client.Core;
 
 namespace Thismaker.Aba.Client
 {
@@ -12,73 +12,20 @@ namespace Thismaker.Aba.Client
     /// The <see cref="ClientBase{T}"/> is an abstract class with the very basic fundamentals of what
     /// all apps are supposed to contain
     /// </summary>
-    public abstract class ClientBase<T> where T : ClientBase<T>
+    public abstract partial class ClientBase<TClient> : CoreClient<TClient>where TClient:ClientBase<TClient>
     {
-        private AccessToken accessToken;
 
-        #region Properties
-        public virtual IContext Context { get; set; }
-
-        public static T Instance { get; private set; }
-
+        #region Properties 
+        
         /// <summary>
-        /// The version number of the current <b>local</b> client.
+        /// The hub endpoint
         /// </summary>
-        public string Version { get; set; }
-
-        /// <summary>
-        /// Represents the base url address to the server api endpoint e.g www.liquidsnow.com
-        /// </summary>
-        public string BaseAddress { get; set; }
-
-        /// <summary>
-        /// The default address where the Api calls will be made. 
-        /// If left null, the endpoint must be included in the requestUri 
-        /// when calling <see cref="ApiGetAsync(string)"/> or any of the related methods
-        /// </summary>
-        public string ApiEndpoint { get; set; }
-
         public string HubEndpoint { get; set; }
-
-        /// <summary>
-        /// The access token that is usually added as an authorization header
-        /// to the app's <see cref="HubConnection"/> and <see cref="HttpClient"/>.
-        /// </summary>
-        public AccessToken AccessToken 
-        {
-            get
-            {
-                return accessToken;
-            } 
-            protected set
-            {
-                if (accessToken != null && accessToken.Kind==AccessTokenKind.Custom)
-                {
-                    HttpClient.DefaultRequestHeaders.Remove(accessToken.Key);
-                }
-                accessToken = value;
-
-                if (accessToken.Kind == AccessTokenKind.Custom)
-                {
-                    HttpClient.DefaultRequestHeaders.Add(accessToken.Key, accessToken.Value);
-                }
-                else
-                {
-                    HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(accessToken.Key, accessToken.Value);
-                }
-            } 
-        }
-
-        /// <summary>
-        /// The client used to access the server api
-        /// </summary>
-        protected HttpClient HttpClient { get; set; }
 
         /// <summary>
         /// The connection to the server's hub
         /// </summary>
         protected HubConnection HubConnection { get; set; }
-
         #endregion
 
         #region Events
@@ -99,53 +46,28 @@ namespace Thismaker.Aba.Client
         public event Action<Exception> HubClosed;
         #endregion
 
-        #region Abstract Methods
-        /// <summary>
-        /// When overriden in a derived class, starts the ClientApp, 
-        /// allowing for performing basic tasks.
-        /// Should be called once <see cref="MakeApp"/> has been called.
-        /// </summary>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        public abstract Task Start(IProgress<string> progress);
-
-        /// <summary>
-        /// When overidden in a derived class, returns the version of the cloud client.
-        /// </summary>
-        /// <returns></returns>
-        public abstract Task<string> GetCloudVersion();
-        #endregion
-
         #region Initialization
         /// <summary>
-        /// Should be called before accessing the Client-App's methods. Initializes the basics.
-        /// Where a costom <see cref="AccessToken"/> is used, this should be called again to refresh the AccessToken.
-        /// Note that this destroys previous bindings to the Hub and HttpClient, and therefore those must be refreshed.
+        /// Initializes the HttpClient and the HubConnection. Should be called only onces during the lifetime of the application.
+        /// This method must be called before accessing any of the Hub and HttpClient methods.
+        /// Overriding this method allows you to specify how the HttpClient and HubConnection should be initialized.
         /// </summary>
-        public virtual void MakeApp()
+        public override void MakeApp()
         {
-            HttpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
+            base.MakeApp();
+
             HubConnection = new HubConnectionBuilder()
                    .WithAutomaticReconnect()
                    .WithUrl($"{BaseAddress}/{HubEndpoint}/",
                    options =>
                    {
-                       options.AccessTokenProvider = GetAccessTokenAsync;
+                       options.AccessTokenProvider = ReadHubAccessToken;
                    })
                    .Build();
 
             HubConnection.Reconnected += OnHubConnectionReconnected;
             HubConnection.Reconnecting += OnHubConnectionReconnecting;
             HubConnection.Closed += OnHubConnectionClosed;
-        }
-
-        /// <summary>
-        /// Makes the app the singleton that can be easily accessed by <see cref="ClientBase{T}.Instance"/>
-        /// Can be used for persistance accross the environment's lifetime.
-        /// </summary>
-        public void MakeSingleton()
-        {
-            Instance = (T)this;
         }
 
         #endregion
@@ -169,104 +91,61 @@ namespace Thismaker.Aba.Client
             return Task.CompletedTask;
         }
 
-        private Task<string> GetAccessTokenAsync()
+        protected virtual async Task<string> ReadHubAccessToken()
         {
-            return Task.FromResult(AccessToken?.Value);
+            if (ReadAccessToken == null)
+            {
+                return AccessToken?.Value;
+            }
+            else
+            {
+                return await ReadAccessToken.Invoke();
+            }
         }
+
         #endregion
 
-        #region Api Methods
+        #region Helpers Implementations
         /// <summary>
-        /// Calls the HTTP GET on the server's Api
+        /// Called by the HTTP helpers to deserialize a response. Override to customize how deserialization works
         /// </summary>
-        /// <param name="requestUri">The specific request uri, will be combined with the path info</param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> ApiGetAsync(string requestUri)
+        /// <typeparam name="T">The type of required result</typeparam>
+        /// <param name="args">The string to deserialize</param>
+        protected override T Deserialize<T>(string args)
         {
-            try
-            {
-                return await HttpClient.GetAsync(ApiEndpoint==null?$"/{requestUri}"
-                    :$"/{ApiEndpoint}/{requestUri}");
-            }
-            catch
-            {
-                throw;
-            }
+            return JsonSerializer.Deserialize<T>(args, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         /// <summary>
-        /// Sends a HTTP GET request to the specified endpoint
+        /// Called by the HTTP helpers, particularly the POST helper to serialize an object to be added to the body of the request
         /// </summary>
-        /// <param name="endpoint">The endpoint that will be attached to the base address and called.</param>
-        /// <param name="requestUri">The request Url</param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> EndpointGetAsync(string endpoint, string requestUri)
+        /// <typeparam name="T">The type of object being serialized</typeparam>
+        /// <param name="args">The object to serialize</param>
+        protected override string Serialize<T>(T args)
         {
-            try
-            {
-                return await HttpClient.GetAsync($"{endpoint}/{requestUri}");
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Sends a HTTP GET request to the specified endpoint
-        /// </summary>
-        /// <param name="endpoint">The endpoint that will be attached to the base address and called.</param>
-        /// <param name="requestUri">The request Url</param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> EndpointPostAsync(string endpoint, string requestUri, HttpContent content)
-        {
-            try
-            {
-                return await HttpClient.PostAsync($"{endpoint}/{requestUri}", content);
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Calls a HTTP POST on the server's Api
-        /// </summary>
-        /// <param name="requestUri">The specific uri to the post resource</param>
-        /// <param name="content">The content to send to the server</param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> ApiPostAsync(string requestUri, HttpContent content)
-        {
-            try
-            {
-                return await HttpClient.PostAsync(ApiEndpoint == null ? $"/{requestUri}"
-                    : $"/{ApiEndpoint}/{requestUri}", content);
-            }
-            catch
-            {
-                throw;
-            }
+            return JsonSerializer.Serialize(args);
         }
         #endregion
 
         #region Hub
-
+        /// <summary>
+        /// When overriden, allows the client to subscribe methods to the Hub
+        /// </summary>
         public abstract void SubscribeHub();
 
+        /// <summary>
+        /// When overriden, allows the client to unsubscribe methods from the Hub
+        /// </summary>
         public abstract void UnsubscribeHub();
 
+        /// <summary>
+        /// Attempts to connect to the hub. Should be called only once during the lifetime of the application,
+        /// unless the client was disconnected and they wish to reconnect.
+        /// Calling this method when the hub was already online throws an exception.
+        /// </summary>
+        /// <returns></returns>
         public async Task ConnectHub()
         {
-            try
-            {
-                await HubConnection.StopAsync();
-            }
-            catch
-            {
-                //do nothing
-            }
-
             try
             {
                 await HubConnection.StartAsync();
@@ -275,105 +154,188 @@ namespace Thismaker.Aba.Client
             {
                 throw ex;
             }
-            
         }
 
+        /// <summary>
+        /// Send an RPC to the connected hub.
+        /// </summary>
         public async Task HubSend(string methodName)
         {
             await HubConnection.SendAsync(methodName);
         }
 
-        public async Task HubSend<T1>(string methodName, T1 arg1)
+        /// <summary>
+        /// Send an RPC to the connected hub.
+        /// </summary>
+        public async Task HubSend(string methodName, object arg1)
         {
             await HubConnection.SendAsync(methodName, arg1);
         }
 
-        public async Task HubSend<T1, T2>(string methodName, T1 arg1, T2 arg2)
+        /// <summary>
+        /// Send an RPC to the connected hub.
+        /// </summary>
+        public async Task HubSend(string methodName, object arg1, object arg2)
         {
             await HubConnection.SendAsync(methodName, arg1, arg2);
         }
 
-        public async Task HubSend<T1,T2,T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
+        /// <summary>
+        /// Send an RPC to the connected hub.
+        /// </summary>
+        public async Task HubSend(string methodName, object arg1, object arg2, object arg3)
         {
             await HubConnection.SendAsync(methodName, arg1, arg2, arg3);
         }
 
+        /// <summary>
+        /// Send an RPC to the connected hub. If you wish to send more than four arguments, consider using <see cref="HubConnection"/> directly
+        /// </summary>
+        public async Task HubSend(string methodName, object arg1, object arg2, object arg3, object arg4)
+        {
+            await HubConnection.SendAsync(methodName, arg1, arg2, arg3, arg4);
+        }
+
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub(Action action)
         {
             var name = action.Method.Name;
             HubConnection.Remove(name);
         }
 
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub<T1>(Action<T1> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
-        
+
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub<T1,T2>(Action<T1,T2> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
-        
+
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
         public void UnbindHub<T1,T2,T3>(Action<T1,T2,T3> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Unsubscribes a method from the hub
+        /// </summary>
+        public void UnbindHub<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action)
+        {
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
+        }
+
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub(Action action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub<T1>(Action<T1> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub<T1,T2>(Action<T1,T2> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
         public void BindHub<T1,T2,T3>(Action<T1,T2,T3> action)
         {
             var name = action.Method.Name;
             HubConnection.On(name, action);
         }
 
-        [Obsolete("Still under construction", true)]
-        public async Task<Result> CallHubAsync<Result>(string methodName)
+        /// <summary>
+        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
+        /// </summary>
+        public void BindHub<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action)
         {
-            var tcs = new TaskCompletionSource<Result>();
-            HubConnection.On<Result>(methodName, result =>
-            {
-                HubConnection.Remove(methodName);
-                tcs.SetResult(result);
-            });
-            await HubConnection.SendAsync(methodName);
-
-            return await tcs.Task;
+            var name = action.Method.Name;
+            HubConnection.On(name, action);
         }
 
-        [Obsolete("Still under construction", true)]
-        public async Task<Result> CallHubAsync<Result, TPack>(IAbaPackage<TPack> package, [CallerMemberName] string methodName = null)
-        {
-            var tcs = new TaskCompletionSource<Result>();
-            HubConnection.On<Result>(methodName, result =>
-            {
-                HubConnection.Remove(methodName);
-                tcs.SetResult(result);
-            });
-            await HubConnection.SendAsync(methodName, package.ToJson());
 
+        /// <summary>
+        /// Sends a request to the hub and holds the calling thread until a response is received.
+        /// To use this method, ensure that the SignalR hub server must sends response after recieving this call through all paths.
+        /// </summary>
+        /// <typeparam name="TResult">The result expected from the hub. This method is only useful from single results</typeparam>
+        /// <param name="requestName">The name of the method to be called on the Server Hub</param>
+        /// <param name="responseName">The name of the method expected to be called by the server for response. If null, then the<paramref name="requestName"/> is used instead</param>
+        /// <param name="content">The content to send to the method, , if null, no content is sent</param>
+        /// <param name="timeOut">If provided, the method throws a <see cref="TaskCanceledException"/> if the time  in miliseconds elapses without receiving a response</param>
+        public async Task<TResult> CallHubAsync<TResult>(string requestName, string responseName=null, object content=null, double? timeOut=null)
+        {
+            if (string.IsNullOrEmpty(responseName))
+            {
+                responseName = requestName;
+            }
+            var tcs = new TaskCompletionSource<TResult>();
+
+            if (timeOut.HasValue)
+            {
+                var timer = new System.Timers.Timer(timeOut.Value)
+                {
+                    Enabled = true
+                };
+
+                void TimerElapsed(object sender, EventArgs e)
+                {
+                    HubConnection.Remove(responseName);
+                    timer.Elapsed -= TimerElapsed;
+                    tcs.SetCanceled();
+                }
+                timer.Elapsed += TimerElapsed;
+            }
+
+            void OnHubResponse(TResult result)
+            {
+                HubConnection.Remove(responseName);
+                tcs.SetResult(result);
+            }
+            HubConnection.On<TResult>(responseName, OnHubResponse);
+            if (content == null)
+            {
+                await HubSend(requestName);
+            }
+            else
+            {
+                await HubSend(requestName, content);
+            }
             return await tcs.Task;
         }
-
         #endregion
     }
 }

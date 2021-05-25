@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
 using System.Text;
-using System.Text.Json;
 
 namespace Thismaker.Horus.Classical
 {
@@ -12,17 +10,14 @@ namespace Thismaker.Horus.Classical
     /// Represents an Enigma Machine, true to the physical device.
     /// The Enigma was famously used by the German's in WWII to send secret messages.
     /// Due to the enormous size of the mathematical probabilities (in the quitntillions or sth)
-    /// the German's errenously believed that it was <b>unbreakable</b>
+    /// the German's erroneously believed that it was <b>unbreakable</b>
     /// This is what inspired me to create the entire Enigma library, and by extension Liquid Snow.
     /// So glad that this thing actually works, like the real machine :) Enjoy
     /// </summary>
     public partial class EnigmaMachine : ClassicalAlgorithm
     {
-        #region Private Fields
-        #endregion
 
         #region Constructors
-        
 
         public EnigmaMachine()
         {
@@ -39,7 +34,7 @@ namespace Thismaker.Horus.Classical
         private void Rotors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add
-                ||e.Action==NotifyCollectionChangedAction.Replace)
+                || e.Action == NotifyCollectionChangedAction.Replace)
             {
                 foreach (var item in e.NewItems)
                 {
@@ -48,8 +43,8 @@ namespace Thismaker.Horus.Classical
                 }
             }
             if (e.Action == NotifyCollectionChangedAction.Remove
-                ||e.Action==NotifyCollectionChangedAction.Replace
-                ||e.Action==NotifyCollectionChangedAction.Reset)
+                || e.Action == NotifyCollectionChangedAction.Replace
+                || e.Action == NotifyCollectionChangedAction.Reset)
             {
                 foreach (var item in e.OldItems)
                 {
@@ -57,7 +52,7 @@ namespace Thismaker.Horus.Classical
                     rotor.HitNotch -= OnRotorHitNotch;
                 }
             }
-            
+
         }
         #endregion
 
@@ -78,7 +73,7 @@ namespace Thismaker.Horus.Classical
         public bool AutoReset { get; set; } = false;
 
         /// <summary>
-        /// The intention is to allow the simulation of the double step. Currently not implemented.
+        /// The intention is to allow the simulation of the double step.
         /// </summary>
         public bool DoubleStep { get; set; } = false;
 
@@ -91,6 +86,11 @@ namespace Thismaker.Horus.Classical
         /// Reflects the current back through the wheels. Is what causes the Enigma to be able to decrypt the message properly
         /// </summary>
         public EnigmaWheel Reflector { get; set; }
+
+        /// <summary>
+        /// The plugboard switch allows for further scrambling by substituting character pairs.
+        /// </summary>
+        public Plugboard Plugboard { get; set; }
 
         /// <summary>
         /// The current rotation of each of the rotors
@@ -144,6 +144,15 @@ namespace Thismaker.Horus.Classical
             if (index == -1) throw new NullReferenceException("The rotor that hit the notch was not found");
 
             if (index == Rotors.Count - 1) return;//the last rotor, no need to rotate
+
+            //Perform any necessary double stepping
+            if (DoubleStep && index+1>=Rotors.Count)
+            {
+                if (Rotors[index + 1].IsTurnOver())
+                {
+                    Rotors[index + 1].Rotate();
+                }
+            }
 
             index++; //Rotate the next rotor;
             Rotors[index].Rotate(forward);
@@ -219,7 +228,14 @@ namespace Thismaker.Horus.Classical
             //Pass the current through the Stator:
             index = Stator.GetPath(index, false);
 
-            return Alphabet[index];
+            var result= Alphabet[index];
+
+            //perform plugboard simulation:
+            if (Plugboard != null)
+            {
+                result = Plugboard.Simulate(result);
+            }
+            return result;
             
         }
         #endregion

@@ -4,16 +4,19 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>Allows Server-Client communications directly over Sockets</Description>
+    <Description>Simplifies Server-Client communications directly over TCP Sockets</Description>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.2</Version>
+    <Version>2.0.0.0</Version>
+    <PackageTags>server-client tcp tcp-sockets</PackageTags>
+    <Copyright>©2021 Ocluse</Copyright>
+    <Company>Ocluse</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Horus\Thismaker.Horus.csproj" />
+    <ProjectReference Include="..\Horus\Horus\Thismaker.Horus.csproj" />
   </ItemGroup>
 
   <ItemGroup>

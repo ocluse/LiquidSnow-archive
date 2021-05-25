@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Thismaker.Horus.Classical
 {
     public class Rotor : EnigmaWheel
     {
+        #region Private Fields
+        private bool _raiseHitNotch = false;
+        #endregion
+
         #region Constructors
         /// <summary>
         /// Creates an empty rotor.
@@ -100,10 +103,14 @@ namespace Thismaker.Horus.Classical
             Indexing.Rotate(offset);
             Wiring.Rotate(offset);
 
-
-            if (TurnOver.Contains(Indexing[0]))
+            if (_raiseHitNotch)
             {
                 HitNotch?.Invoke(this, forward);
+                _raiseHitNotch = false;
+            }
+            else if (IsTurnOver())
+            {
+                _raiseHitNotch = true;
             }
         }
 
@@ -118,6 +125,16 @@ namespace Thismaker.Horus.Classical
 
             Indexing.Rotate(offset);
             Wiring.Rotate(offset);
+        }
+
+        /// <summary>
+        /// Checks if the rotor is in a turn over position, i.e a turnover character
+        /// is currently visible through the window
+        /// </summary>
+        /// <returns>True if the rotor is in it's turnover position</returns>
+        public bool IsTurnOver()
+        {
+            return TurnOver.Contains(Indexing[0]);
         }
         #endregion
         

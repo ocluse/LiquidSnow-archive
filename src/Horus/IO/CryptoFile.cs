@@ -1,8 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +20,7 @@ namespace Thismaker.Horus.IO
         private readonly Stream _stream;
         #endregion
 
-        #region Initialization
+        #region Constructors
 
         /// <summary>
         /// Creates a <see cref="CryptoFile"/> with the specified key, 
@@ -127,20 +124,6 @@ namespace Thismaker.Horus.IO
         }
 
         /// <summary>
-        /// Writes all the data in the <paramref name="buffer"/> to the underlying stream, encrypting it of course.
-        /// </summary>
-        /// <param name="buffer">The array of bytes to write</param>
-        /// <param name="progress">The overall progress of the process</param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task WriteAsync(byte[] buffer, IProgress<float> progress=null, CancellationToken cancellationToken=default)
-        {
-            using var msData = new MemoryStream(buffer);
-            await WriteAsync(msData, progress, cancellationToken);
-
-        }
-
-        /// <summary>
         /// Writes all the data from a provided <paramref name="stream"/> to the <see cref="CryptoFile"/>
         /// </summary>
         /// <param name="stream">The source stream, where the plaintext resides</param>
@@ -156,14 +139,46 @@ namespace Thismaker.Horus.IO
         /// Saves the decrypted contents of the <see cref="CryptoFile"/> to the specified <paramref name="stream"/>
         /// </summary>
         /// <param name="stream">The stream to save the data to</param>
-        public async Task ReadAsync(Stream stream, IProgress<float>progress=null, CancellationToken cancellationToken=default)
+        public async Task ReadAsync(Stream stream, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
             _stream.Position = 0;
             await Algorithm.DecryptAsync(input: _stream, output: stream, _key, progress, cancellationToken);
         }
 
         /// <summary>
-        /// Closes and releases the underlying stream
+        /// Writes all the data in the <paramref name="buffer"/> to the underlying stream, encrypting it of course.
+        /// </summary>
+        /// <param name="buffer">The array of bytes to write</param>
+        /// <param name="progress">The overall progress of the process</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task WriteBytesAsync(byte[] buffer, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        {
+            using var msData = new MemoryStream(buffer);
+            await WriteAsync(msData, progress, cancellationToken);
+
+        }
+
+        public async Task<byte[]> ReadBytesAsync(IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        {
+            using var ms = new MemoryStream();
+            await ReadAsync(ms, progress, cancellationToken);
+            return ms.ToArray();
+        }
+
+        public async Task WriteTextAsync(string contents, IProgress<float> progress=null, CancellationToken cancellationToken = default)
+        {
+            await WriteBytesAsync(contents.GetBytes<UTF8Encoding>(), progress, cancellationToken);
+        }
+
+        public async Task<string> ReadTextAsync(IProgress<float> progress=null, CancellationToken cancellationToken = default)
+        {
+            var data = await ReadBytesAsync(progress, cancellationToken);
+            return data.GetString<UTF8Encoding>();
+        }
+        
+        /// <summary>
+        /// Releases all resources used by the file, closing the underlying stream
         /// </summary>
         public void Dispose()
         {

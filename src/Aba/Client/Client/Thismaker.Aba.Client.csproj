@@ -9,19 +9,21 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
     <Copyright></Copyright>
-    <PackageReleaseNotes>General fixes.</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.2</Version>
+    <Version>2.0.0.0</Version>
+    <Company>Ocluse</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.8" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Thismaker.Core.csproj" />
-    <ProjectReference Include="..\..\Common\Thismaker.Aba.Common.csproj" />
+    <ProjectReference Include="..\Core\Thismaker.Aba.Client.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

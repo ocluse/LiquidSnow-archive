@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Thismaker.Goro
+﻿namespace Thismaker.Goro
 {
     public enum IconDesign
     {
@@ -299,6 +295,5 @@ namespace Thismaker.Goro
         Sync,
         SyncError,
         Buildings,
-
     }
 }
