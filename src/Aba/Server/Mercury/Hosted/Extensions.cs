@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using Thismaker.Aba.Server.Mercury.Hosted;
 
 namespace Microsoft.Extensions.DependencyInjection

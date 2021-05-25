@@ -188,6 +188,8 @@ namespace Thismaker.Mercury
                             break;
                         }
                     }
+
+                    Received?.Invoke(this, buffer);
                 }
                 catch (Exception ex)
                 {

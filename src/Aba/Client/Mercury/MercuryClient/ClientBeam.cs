@@ -14,8 +14,20 @@ namespace Thismaker.Aba.Client.Mercury
 
         #region Receiving
 
-        private void PayloadReceived(RPCPayload payload)
+        private async void PayloadReceived(RPCPayload payload)
         {
+            //See if the payload wants us to close the connection
+            if (payload.MethodName == Globals.CloseConnection)
+            {
+                Exception ex = null;
+                if (payload.Parameters.Count > 0)
+                {
+                    ex = new OperationCanceledException(payload.Parameters[0]);
+                }
+                await _mClient.DisconnectAsync(ex).ConfigureAwait(false);
+                return;
+            }
+
             if (!_subs.ContainsKey(payload.MethodName)) return;
 
             var handler = _subs[payload.MethodName];
@@ -40,6 +52,9 @@ namespace Thismaker.Aba.Client.Mercury
             _subs.Remove(methodName);
         }
 
+        /// <summary>
+        /// Subscribe a method to the RPC Beam, invoking the method when a payload of the same name is received.
+        /// </summary>
         public void Subscribe(string methodName, object target, MethodInfo method, Type[] types)
         {
             InvocationHandler handler;
@@ -68,6 +83,9 @@ namespace Thismaker.Aba.Client.Mercury
             handler.Binds.Add(bind);
         }
 
+        /// <summary>
+        /// Subscribe a method to the RPC Beam, invoking the method when a payload of the same name is received.
+        /// </summary>
         public void Subscribe(Action action, string methodName=null)
         {
             if (methodName == null)
@@ -78,6 +96,9 @@ namespace Thismaker.Aba.Client.Mercury
             Subscribe(methodName, action.Target, action.Method, null);
         }
 
+        /// <summary>
+        /// Subscribe a method to the RPC Beam, invoking the method when a payload of the same name is received.
+        /// </summary>
         public void Subscribe<T1>(Action<T1> action, string methodName=null)
         {
             if (methodName == null)
@@ -88,6 +109,9 @@ namespace Thismaker.Aba.Client.Mercury
             Subscribe(methodName, action.Target, action.Method, new Type[] { typeof(T1)});
         }
 
+        /// <summary>
+        /// Subscribe a method to the RPC Beam, invoking the method when a payload of the same name is received.
+        /// </summary>
         public void Subscribe<T1, T2>(Action<T1, T2> action, string methodName = null)
         {
             if (methodName == null)
@@ -99,6 +123,9 @@ namespace Thismaker.Aba.Client.Mercury
                 new Type[] { typeof(T1), typeof(T2)});
         }
 
+        /// <summary>
+        /// Subscribe a method to the RPC Beam, invoking the method when a payload of the same name is received.
+        /// </summary>
         public void Subscribe<T1, T2, T3>(Action<T1, T2, T3> action, string methodName = null)
         {
             if (methodName == null)
@@ -110,6 +137,9 @@ namespace Thismaker.Aba.Client.Mercury
                 new Type[] { typeof(T1), typeof(T2), typeof(T3) });
         }
 
+        /// <summary>
+        /// Subscribe a method to the RPC Beam, invoking the method when a payload of the same name is received.
+        /// </summary>
         public void Subscribe<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action, string methodName = null)
         {
             if (methodName == null)

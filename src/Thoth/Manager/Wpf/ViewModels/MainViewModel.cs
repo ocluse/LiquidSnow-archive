@@ -25,6 +25,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         private LocalizationData _data;
         private bool? _isDefaultTable, _isDefaultLocale;
         private bool _defTableEnabled, _defLocaleEnabled;
+        private LocalizationIO _locIO;
         #endregion
 
         #region Props
@@ -111,6 +112,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             Items = new ObservableCollection<LocItem>();
             Translations = new ObservableCollection<LocTranslation>();
             Locales = new ObservableCollection<ManagedLocale>();
+            _locIO = new LocalizationIO();
             _data = new LocalizationData
             {
                 Tables = new Dictionary<string, LocalizationTable>(),
@@ -254,7 +256,7 @@ namespace Thismaker.Thoth.Manager.Wpf
 
             try
             {
-                _data = await LocalizationData.LoadAsync(fsData);
+                _data = await _locIO.LoadAsync(fsData);
             }
             catch
             {
@@ -293,7 +295,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             {
 
                 using var fsOpen = File.Open(file.FileName, FileMode.Create);
-                await _data.SaveAsync(fsOpen);
+                await _locIO.SaveAsync(fsOpen, _data);
                 GoroMessageBox.Show("Success","Localization Data has been saved successfully", MessageBoxButton.OK,StatusInfo.Success);
             }
             catch

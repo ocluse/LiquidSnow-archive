@@ -9,6 +9,8 @@
     <Description>This subset of Aba Mercury server works well in hosted environments, such as AspNetCore</Description>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>

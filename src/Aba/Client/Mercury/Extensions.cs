@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Thismaker.Aba.Client.Mercury
+﻿namespace Thismaker.Aba.Client.Mercury
 {
     static class Extensions
     {

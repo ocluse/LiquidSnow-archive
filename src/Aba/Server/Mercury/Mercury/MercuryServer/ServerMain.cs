@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Thismaker.Aba.Common.Mercury;
-using Thismaker.Mercury;
 using MServer = Thismaker.Mercury.Server;
 
 namespace Thismaker.Aba.Server.Mercury
@@ -94,21 +93,21 @@ namespace Thismaker.Aba.Server.Mercury
             {
                 var _tcsAuthenticate = new TaskCompletionSource<string>();
 
-                void OnUserProvidedAuthenticated(string connId, string accessToken)
+                void OnCLientProvidedAuthentication(string connId, string accessToken)
                 {
                     if (connId == connectionId)
                     {
-                        ClientProvidedAuthentication -= OnUserProvidedAuthenticated;
+                        ClientProvidedAuthentication -= OnCLientProvidedAuthentication;
                         _tcsAuthenticate.SetResult(connId);
                     }
                 }
 
-                ClientProvidedAuthentication += OnUserProvidedAuthenticated;
-                await _mServer.SendAsync(connectionId, Globals.AuthSelf);
+                ClientProvidedAuthentication += OnCLientProvidedAuthentication;
+                await _mServer.SendAsync(connectionId, Globals.AuthSelf).ConfigureAwait(false);
 
                 var token = await _tcsAuthenticate.Task;
 
-                var principal = await ValidateAccessToken(token, _defaultScopes);
+                var principal = await ValidateAccessToken(token, _defaultScopes).ConfigureAwait(false);
 
                 if (principal != null)
                 {
@@ -119,7 +118,7 @@ namespace Thismaker.Aba.Server.Mercury
                 else
                 {
                     //User is not authorized, closed their connection:
-                    await _mServer.DisconnectClientAsync(connectionId);
+                    await DisconnectClientAsync(connectionId, "AUTH_FAILED").ConfigureAwait(false);
                     return;
                 }
             }

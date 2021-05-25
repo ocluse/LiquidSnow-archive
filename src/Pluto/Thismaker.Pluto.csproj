@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Rapidly build finance based applications. Allows for record keeping, transaction monitoring etc.</Description>
     <PackageTags>finance financial records transactions money</PackageTags>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
@@ -12,6 +12,7 @@
     <Version>2.0.0.0</Version>
     <Copyright>©2021 Ocluse</Copyright>
     <Company>Ocluse</Company>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>

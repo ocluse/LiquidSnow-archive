@@ -9,6 +9,8 @@
     <Description>This is a type of client that works with Thismker.Mercury for real-time communication atrhoug remote procedure calls from a server-client and vice-versa</Description>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>

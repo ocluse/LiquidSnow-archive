@@ -13,14 +13,12 @@
     <Copyright>©2021 Ocluse</Copyright>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Company>Ocluse</Company>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\assets\images\Thisicon-Prime.png">
+    <None Include="..\..\..\assets\images\Thisicon-Prime.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

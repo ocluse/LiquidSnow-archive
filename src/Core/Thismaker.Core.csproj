@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Very useful library that provide some fundamental utlilities, extensions and models that are useful for speeding up development.</Description>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
@@ -15,6 +15,7 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>

@@ -12,6 +12,8 @@
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <Copyright>©2021 Ocluse</Copyright>
     <Company>Ocluse</Company>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>

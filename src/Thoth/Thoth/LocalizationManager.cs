@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Thismaker.Thoth
@@ -35,15 +34,8 @@ namespace Thismaker.Thoth
             }
         }
 
-        public static async Task LoadData(string path)
+        public static void LoadData(LocalizationData data)
         {
-            using var fsData = File.OpenRead(path);
-            await LoadData(fsData);
-        }
-
-        public static async Task LoadData(Stream stream)
-        {
-            var data = await LocalizationData.LoadAsync(stream);
             Tables = new Dictionary<string, LocalizationTable>(data.Tables);
             DefaultTableKey = data.DefaultTableKey;
             CurrentLocale = data.Locales.Find(x => x.Id == data.DefaultLocaleId);
@@ -142,8 +134,6 @@ namespace Thismaker.Thoth
             }
             return bindingItem;
         }
-
-       
 
         private static async void OnCurrentLocaleChanged()
         {

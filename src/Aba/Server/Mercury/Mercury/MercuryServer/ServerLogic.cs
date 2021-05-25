@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Security.Claims;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Thismaker.Aba.Common.Mercury;
 
@@ -40,22 +37,6 @@ namespace Thismaker.Aba.Server.Mercury
             var clientBase = new MercuryClientBase(connectionId, this);
 
             return clientBase;
-        }
-
-        private async void AuthenticateUser(string connectionId, string accessToken)
-        {
-            var principal = await ValidateAccessToken(accessToken, _defaultScopes).ConfigureAwait(false);
-
-            //Close the client connection:
-            if (principal == null)
-            {
-                await DisconnectClientAsync(connectionId, "AUTH_FAILED").ConfigureAwait(false);
-                return;
-            }
-
-            //Add the user:
-            AddUserConnectionId(connectionId, principal.FindFirst(ClaimTypes.NameIdentifier).Value);
-
         }
 
         private async Task DisconnectClientAsync(string connectionId, string reason)

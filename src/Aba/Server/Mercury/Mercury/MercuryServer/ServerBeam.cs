@@ -79,7 +79,7 @@ namespace Thismaker.Aba.Server.Mercury
             //check if the method is an authentication payload
             if (payload.MethodName == Globals.AuthResponsePayload)
             {
-                AuthenticateUser(connectionId, payload.AccessToken);
+                ClientProvidedAuthentication?.Invoke(connectionId, payload.AccessToken);
                 return;
             }
 

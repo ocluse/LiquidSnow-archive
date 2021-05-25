@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace System.Windows
+﻿namespace System.Windows
 {
     public static class SystemWindows
     {

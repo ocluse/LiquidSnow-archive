@@ -8,6 +8,8 @@
     <Description>Common infrastructure between Aba Mercury client and server</Description>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>

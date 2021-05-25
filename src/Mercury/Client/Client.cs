@@ -271,7 +271,7 @@ namespace Thismaker.Mercury
         /// Call to gracefully disconnect the client from the server. 
         /// </summary>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task DisconnectAsync()
+        public async Task DisconnectAsync(Exception ex=null)
         {
             if (!_connected)
                 throw new InvalidOperationException("Cannot disconnect if already inactive");
@@ -292,16 +292,16 @@ namespace Thismaker.Mercury
             {
                 await SendAsync(Globals.Disconnect).ConfigureAwait(false);
                 await _tcsDisconnect.Task.ConfigureAwait(false);
-                Close(null);
+                Close(ex);
 
             }
             catch (OperationCanceledException)
             {
                 Close(new TimeoutException("Graceful disconnect timed out"));
             }
-            catch(Exception ex)
+            catch(Exception ex2)
             {
-                Close(ex);
+                Close(ex2);
             }
             finally
             {

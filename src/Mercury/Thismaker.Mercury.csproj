@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Simplifies Server-Client communications directly over TCP Sockets</Description>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -13,6 +13,7 @@
     <PackageTags>server-client tcp tcp-sockets</PackageTags>
     <Copyright>©2021 Ocluse</Copyright>
     <Company>Ocluse</Company>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
