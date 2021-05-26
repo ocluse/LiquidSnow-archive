@@ -8,11 +8,11 @@
     <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
-    <Copyright></Copyright>
+    <Copyright>© 2021 Ocluse</Copyright>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>2.0.0.0</Version>
+    <Version>2.0.0.1</Version>
     <Company>Ocluse</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>

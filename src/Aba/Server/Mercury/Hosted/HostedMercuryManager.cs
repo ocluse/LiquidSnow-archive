@@ -17,6 +17,7 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
         private readonly List<HostedMercuryServer> _servers;
         private readonly string _hostAddress;
 
+        private bool _started;
         private Dictionary<string, MercuryUser> _users;
 
         public HostedMercuryManager(HostedManagerOptions options, IServiceProvider provider) 
@@ -29,6 +30,9 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
 
         #region Hosted Services
 
+        /// <summary>
+        /// Starts the manager, creating all necessary servers
+        /// </summary>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             //Create the servers
@@ -61,22 +65,54 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
 
                 var server = (HostedMercuryServer)Activator.CreateInstance(option.ServiceType, parameters.ToArray());
 
+                //running address:
                 server.Address = string.IsNullOrEmpty(option.Address) ?
-                    "localhost" : option.Address;
+                    _options.HostAddress : option.Address;
                 server.Port = option.Port;
                 server.SetManager(this);
                 _servers.Add(server);
 
                 await server.StartAsync(cancellationToken);
             }
+            _started = true;
         }
 
+        /// <summary>
+        /// Starts the manager, creating all the necessary servers
+        /// </summary>
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             foreach(var server in _servers)
             {
                 await server.StopAsync(cancellationToken);
             }
+        }
+
+        #endregion
+
+        #region Hosted GetServer
+
+        /// <summary>
+        /// Returns a server of the provided type, if not found in the list of servers, returns null.
+        /// If the server manager has not yet been started, a <see cref="InvalidOperationException"/> will be thrown.
+        /// </summary>
+        public T GetServer<T>() where T : HostedMercuryServer
+        {
+            if (!_started) throw new InvalidOperationException("Server Manager has not been started yet");
+            var server = GetServer(typeof(T));
+
+            if (server == null) return null;
+            else return (T)server;
+        }
+
+        /// <summary>
+        /// Returns a server of the provided type, if not found in the list of servers returns null
+        /// If the server manager has not yet been started, a <see cref="InvalidOperationException"/> will be thrown.
+        /// </summary>
+        public HostedMercuryServer GetServer(Type type)
+        {
+            if (!_started) throw new InvalidOperationException("Server Manager has not been started yet");
+            return _servers.Find(x => x.GetType() == type);
         }
 
         #endregion
