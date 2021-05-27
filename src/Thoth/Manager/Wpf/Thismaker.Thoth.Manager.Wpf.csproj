@@ -9,7 +9,7 @@
     <Product>Thoth Manager</Product>
     <Description>Used to manage Thoth Localization Data files.</Description>
     <Copyright>©2021 Ocluse</Copyright>
-    <Version>2.0.0.0</Version>
+    <Version>2.0.0.1</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>thoth-icon.png</PackageIcon>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>

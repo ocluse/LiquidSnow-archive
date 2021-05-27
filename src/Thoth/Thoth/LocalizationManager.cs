@@ -54,7 +54,7 @@ namespace Thismaker.Thoth
 
         private static List<BindingItem> _bindingItems;
 
-        public static BindingItem BindProperty(object target, string propertyName, string table, string key)
+        public static BindingItem BindProperty(object target, string propertyName, string table, string key, bool update=true)
         {
             var bindingItem = new BindingItem
             {
@@ -71,6 +71,10 @@ namespace Thismaker.Thoth
 
             }
             _bindingItems.Add(bindingItem);
+
+            //set the value immediate:
+            if (update) bindingItem.SetString();
+
             return bindingItem;
         }
 
@@ -108,18 +112,18 @@ namespace Thismaker.Thoth
             return ChangeBindingKey(item, item.TableKey, newKey, update, unbindTargets);
         }
 
-        public static BindingItem ChangeBindingKey(string bindingId, string newTable, string newKey, bool update = false, bool unbindTargets=true)
+        public static BindingItem ChangeBindingKey(string bindingId, string newTable, string newKey, bool update = true, bool unbindTargets=true)
         {
             var item = _bindingItems.Find(x => x.Id == bindingId);
             return ChangeBindingKey(item, newKey, newTable, update, unbindTargets);
         }
 
-        public static BindingItem ChangeBindingKey(BindingItem bindingItem, string newKey, bool update = false, bool unbindTargets = true)
+        public static BindingItem ChangeBindingKey(BindingItem bindingItem, string newKey, bool update = true, bool unbindTargets = true)
         {
             return ChangeBindingKey(bindingItem, bindingItem.TableKey, newKey, update, unbindTargets);
         }
 
-        public static BindingItem ChangeBindingKey(BindingItem bindingItem, string newTable, string newKey, bool update = false, bool unbindTargets = true)
+        public static BindingItem ChangeBindingKey(BindingItem bindingItem, string newTable, string newKey, bool update = true, bool unbindTargets = true)
         {
             bindingItem.ItemKey = newKey;
             bindingItem.TableKey = newTable;

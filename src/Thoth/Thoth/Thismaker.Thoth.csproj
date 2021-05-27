@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>2.0.0.0</Version>
+    <Version>2.0.0.1</Version>
     <Authors>Thismaker</Authors>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
