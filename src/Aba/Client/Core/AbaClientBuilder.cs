@@ -2,14 +2,14 @@
 using Thismaker.Aba.Client.Core;
 
 [assembly: InternalsVisibleTo("Thismaker.Aba.Client.Configuration")]
-namespace Thismaker.Aba.Client
+namespace Thismaker.Aba.Client.Core
 {
     /// <summary>
     /// Builder to help you quickly create an Aba-based Client application.
     /// Can be used to preconfigure the client and make client singleton.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class AbaClientBuilder<T> where T: ClientBase<T>, new()
+    public class AbaClientBuilder<T> where T: CoreClient<T>, new()
     {
         internal readonly T client;
 

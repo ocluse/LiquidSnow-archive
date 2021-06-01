@@ -11,6 +11,8 @@ namespace Thismaker.Thoth
         public static event Action<string> DefaultTableChanged;
         private static Locale _currentLocale;
         private static string _defaultTableKey;
+        private static List<BindingItem> _bindingItems;
+
 
         public static Dictionary<string, LocalizationTable> Tables { get; private set; }
 
@@ -42,6 +44,34 @@ namespace Thismaker.Thoth
             Locales = new List<Locale>(data.Locales);
         }
 
+        public static void AddSideloadTable(SideloadTable table)
+        {
+            foreach(var locale in Locales)
+            {
+                if (!table.Locales.Exists(x => x.Id == locale.Id)) 
+                    throw new InvalidOperationException($"Sideload table missing locale with Id {locale.Id}");
+            }
+
+            Tables.Add(table.Key, table);
+        }
+
+        public static void RemoveSideloadTable(SideloadTable table)
+        {
+            if (!Tables.ContainsKey(table.Key)) return;
+
+            //Unbind all properties with this key:
+            if (_bindingItems != null)
+            {
+                var removable=_bindingItems.FindAll(x => x.TableKey == table.Key);
+
+                foreach(var item in removable)
+                {
+                    UnbindProperty(item);
+                }
+            }
+            Tables.Remove(table.Key);
+        }
+
         public static string GetLocalizedString(string key)
         {
             return GetLocalizedString(DefaultTableKey, key);
@@ -51,8 +81,6 @@ namespace Thismaker.Thoth
         {
             return Tables[table].Items[key].Translations[CurrentLocale.Id];
         }
-
-        private static List<BindingItem> _bindingItems;
 
         public static BindingItem BindProperty(object target, string propertyName, string table, string key, bool update=true)
         {

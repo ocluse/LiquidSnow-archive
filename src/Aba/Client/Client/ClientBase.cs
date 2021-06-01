@@ -82,7 +82,7 @@ namespace Thismaker.Aba.Client
             HubReconnecting?.Invoke(arg);
             return Task.CompletedTask;
         }
-
+        
         private Task OnHubConnectionReconnected(string arg)
         {
             HubReconnected?.Invoke(arg);
