@@ -1,4 +1,7 @@
-﻿namespace Thismaker.Aba.Client.Core
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Thismaker.Aba.Client.Core
 {
     /// <summary>
     /// The context of the client. Should be impelemeted as e.g WindowsClient, AndroidClient, GeneralClient etc.
@@ -6,13 +9,18 @@
     public interface IContext
     {
         /// <summary>
-        /// Starts the context. Usually called by the derived class
+        /// Starts the context
         /// </summary>
-        void Start();
+        Task StartAsync();
+
+        /// <summary>
+        /// Stops the context
+        /// </summary>
+        Task StopAsync();
 
         /// <summary>
         /// Called by the derived class so that any leftover cleanup can be made in the impelemnting class
         /// </summary>
-        void Shutdown();
+        Task ShutdownAsync();
     }
 }

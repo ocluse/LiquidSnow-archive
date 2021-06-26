@@ -12,7 +12,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>2.0.0.0</Version>
+    <Version>3.0.0-alpha3</Version>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

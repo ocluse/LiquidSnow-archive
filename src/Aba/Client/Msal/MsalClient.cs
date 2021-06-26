@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Thismaker.Aba.Client.Core;
 
 namespace Thismaker.Aba.Client.Msal
 {
@@ -15,7 +16,10 @@ namespace Thismaker.Aba.Client.Msal
         #region Properties
 
         ///<inheritdoc/>
-        public new IMsalContext Context { get; set; }
+        public new IMsalContext Context
+        {
+            get => (IMsalContext)base.Context;
+        }
 
         /// <summary>
         /// The identifier of the client, Provided in the Azure Portal.
@@ -64,7 +68,11 @@ namespace Thismaker.Aba.Client.Msal
         #endregion
 
         #region Base Overrides
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes the HttpClient, HubConnection and the Public client.
+        /// Should be called only once during the lifetime of the application.
+        /// Overriding this method allows you to customize how the app will be initialized
+        /// </summary>
         public override void MakeApp()
         {
             base.MakeApp();
@@ -74,8 +82,20 @@ namespace Thismaker.Aba.Client.Msal
                .WithRedirectUri(RedirectUri)
                .WithLogging(OnMsalLog, LogLevel.Error)
                .Build();
-            ReadAccessToken = AcquireAccessToken;
         }
+
+        public override void SetContext(IContext context)
+        {
+            if(context is IMsalContext)
+            {
+                base.SetContext(context);
+            }
+            else
+            {
+                throw new ArgumentException($"{nameof(Context)} must derive from {nameof(IMsalContext)}");
+            }
+        }
+
         #endregion
 
         #region Abstracts
@@ -100,18 +120,15 @@ namespace Thismaker.Aba.Client.Msal
         }
         #endregion
 
-        #region Private Methods
-
-        private async Task<string> AcquireAccessToken()
-        {
-            return await AcquireAccessToken(null);
-        }
-
-        #endregion
-
         #region Public Methods
 
-        public void SetApiTokenAccessArgs(IAccount account, IEnumerable<string> scopes)
+        /// <summary>
+        /// Should be preferrably called immediately after the the user has logged in.
+        /// This is only useful if the built in token renewal method is used.
+        /// </summary>
+        /// <param name="account">The user account</param>
+        /// <param name="scopes">The scopes requred by the application</param>
+        protected void SetApiTokenAccessArgs(IAccount account, IEnumerable<string> scopes)
         {
             ApiTokenAccessArgs = new TokenAccessArgs
             {
@@ -120,54 +137,32 @@ namespace Thismaker.Aba.Client.Msal
             };
         }
 
-        public async Task<string> AcquireAccessToken(TokenAccessArgs args=null)
+        ///<inheritdoc/>
+        protected override async Task RenewAccessTokenAsync()
         {
-            OnMsalLog(LogLevel.Info, "Access token requested", false);
-            if (args==null||args==ApiTokenAccessArgs)
-            {
-                //Special one, we can return the previous access token:
-                if (DateTimeOffset.UtcNow < AccessToken.ExpiresOn)
-                {
-                    OnMsalLog(LogLevel.Verbose, "Current token valid. Skipping token acquisition", false);
-                    return AccessToken.Value;
-                }
-                else
-                {
-                    args = ApiTokenAccessArgs;
-                    OnMsalLog(LogLevel.Verbose, "Current token expired. Initiating fresh token acquisiton", false);
-                }
-            }
-
             AuthenticationResult result;
             try
             {
-                result = await PublicClient.AcquireTokenSilent(args.Scopes, args.UserAccount).ExecuteAsync();
+                result = await PublicClient.AcquireTokenSilent(ApiTokenAccessArgs.Scopes, ApiTokenAccessArgs.UserAccount).ExecuteAsync();
                 if (string.IsNullOrEmpty(result.AccessToken)) throw new MsalUiRequiredException("404", "Access token was null");
             }
             catch (MsalUiRequiredException)
             {
-                result = await PublicClient.AcquireTokenInteractive(args.Scopes)
+                result = await PublicClient.AcquireTokenInteractive(ApiTokenAccessArgs.Scopes)
                     .WithB2CAuthority(AuthoritySUSI)
-                    .WithAccount(args.UserAccount)
+                    .WithAccount(ApiTokenAccessArgs.UserAccount)
                     .WithParentActivityOrWindow(Context.GetMainWindow())
                     .ExecuteAsync()
                     .ConfigureAwait(false);
             }
-            catch (Exception ex)
+            catch
             {
-                throw new ClientException("Failed to acquire access token for protected resource", ExceptionKind.LoginFailure, ex);
+                throw;
             }
 
-            //Check if the we are talking about the Api Here:
-            if (args == ApiTokenAccessArgs)
-            {
-                AccessToken.ExpiresOn = result.ExpiresOn;
-                AccessToken = Core.AccessToken.Bearer(result.AccessToken);
-            }
-
-            return result.AccessToken;
+            AccessToken.ExpiresOn = result.ExpiresOn;
+            AccessToken = Core.AccessToken.Bearer(result.AccessToken);
         }
-
         #endregion
     }
 }

@@ -97,7 +97,7 @@
                         <goro:StatusIndicator Status="Information"/>
                     </StackPanel>
                     <Button IsEnabled="False" Margin="15 10 0 0" Content="Disabled Button" Width="150" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                    
+                    <DatePicker Style="{DynamicResource DatePickerStyle1}"/>
                     <ProgressBar Value="20" Maximum="100" Margin="10" Height="5"/>
                 </StackPanel>
             </ScrollViewer>

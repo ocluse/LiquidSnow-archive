@@ -60,7 +60,7 @@ namespace Thismaker.Thoth.Manager.Wpf
                 _translation.Locale = translation.Locale;
 
                 TranslationContent = _translation.Value;
-                SelectedLocale = Locales.Find(x => x.ID == _translation.Locale);
+                SelectedLocale = Locales.Find(x => x.ShortName == _translation.Locale);
             }
         }
 
@@ -75,7 +75,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         void OnSave()
         {
             _translation.Value = TranslationContent;
-            _translation.Locale = SelectedLocale.ID;
+            _translation.Locale = SelectedLocale.ShortName;
             DialogResult = true;
         }
 

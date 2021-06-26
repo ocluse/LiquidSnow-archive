@@ -144,7 +144,7 @@ namespace Thismaker.Aba.Client.Transfers
                 Uri uri;
                 if (string.IsNullOrEmpty(transfer.BlobUri))
                 {
-                    uri = await auth.GetSASToken(transfer.BlobName);
+                    uri = await auth.GetSasTokenAsync(transfer.BlobName);
                 }
                 else
                 {
@@ -279,7 +279,7 @@ namespace Thismaker.Aba.Client.Transfers
         /// <returns>True if the blob exists</returns>
         public async Task<bool> Exists(string blobName)
         {
-            var uri = await auth.GetSASToken(blobName);
+            var uri = await auth.GetSasTokenAsync(blobName);
 
             //build the blob:
             var blob = new BlobClient(uri);
@@ -295,7 +295,7 @@ namespace Thismaker.Aba.Client.Transfers
         /// <returns></returns>
         public async Task Delete(string blobName)
         {
-            var uri = await auth.GetSASToken(blobName);
+            var uri = await auth.GetSasTokenAsync(blobName);
 
             //build the blob:
             var blob = new BlobClient(uri);

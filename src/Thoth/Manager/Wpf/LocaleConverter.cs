@@ -13,8 +13,8 @@ namespace Thismaker.Thoth.Manager.Wpf
         {
             if (Model == null) return null;
 
-            var id = (string)value;
-            var name = Model.Locales.FirstOrDefault(x => x.ID == id)?.Name;
+            var shortName = (string)value;
+            var name = Model.Locales.FirstOrDefault(x => x.ShortName == shortName)?.Name;
 
             if (string.IsNullOrEmpty(name)) name = "Unknown Locale";
 

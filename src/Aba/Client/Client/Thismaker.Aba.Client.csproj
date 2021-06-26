@@ -12,7 +12,7 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>2.0.0.2</Version>
+    <Version>3.0.0-alpha3</Version>
     <Company>Ocluse</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>

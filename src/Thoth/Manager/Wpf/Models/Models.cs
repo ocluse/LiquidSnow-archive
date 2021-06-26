@@ -92,14 +92,7 @@ namespace Thismaker.Thoth.Manager.Wpf
 
     public class ManagedLocale : BindableBase
     {
-        private string _id, _name, _shortName;
-
-        public string ID
-        {
-            get => _id;
-            set => SetProperty(ref _id, value);
-        }
-
+        private string _name, _shortName;
         public string Name
         {
             get => _name;
@@ -116,7 +109,6 @@ namespace Thismaker.Thoth.Manager.Wpf
         {
             return new Locale
             {
-                Id = ID,
                 Name = Name,
                 ShortName = ShortName
             };
@@ -133,7 +125,6 @@ namespace Thismaker.Thoth.Manager.Wpf
             {
                 var manLocale = new ManagedLocale
                 {
-                    ID = locale.Id,
                     Name = locale.Name,
                     ShortName = locale.ShortName
                 };

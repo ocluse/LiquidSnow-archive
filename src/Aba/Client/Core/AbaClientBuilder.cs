@@ -1,7 +1,8 @@
-﻿using System.Runtime.CompilerServices;
-using Thismaker.Aba.Client.Core;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Thismaker.Aba.Client.Configuration")]
+[assembly:InternalsVisibleTo("Thismaker.Aba.Client")]
 namespace Thismaker.Aba.Client.Core
 {
     /// <summary>
@@ -12,6 +13,7 @@ namespace Thismaker.Aba.Client.Core
     public class AbaClientBuilder<T> where T: CoreClient<T>, new()
     {
         internal readonly T client;
+        private bool made=false;
 
         public AbaClientBuilder()
         {
@@ -21,11 +23,32 @@ namespace Thismaker.Aba.Client.Core
         /// <summary>
         /// Set the version number of the client
         /// </summary>
-        /// <param name="Version"></param>
         /// <returns></returns>
         public AbaClientBuilder<T> WithVersion(string version)
         {
             client.Version = version;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the api endpoint of the client
+        /// </summary>
+        /// <returns></returns>
+        public AbaClientBuilder<T> WithApiEndpoint(string apiEndpoint)
+        {
+            EnsureNotMadeYet();
+            client.ApiEndpoint = apiEndpoint;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the base address of the client
+        /// </summary>
+        /// <returns></returns>
+        public AbaClientBuilder<T> WithBaseAddress(string address)
+        {
+            EnsureNotMadeYet();
+            client.BaseAddress = address;
             return this;
         }
 
@@ -42,12 +65,34 @@ namespace Thismaker.Aba.Client.Core
         /// <summary>
         /// Provide the context of the client
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The context to apply to the client</param>
         /// <returns></returns>
         public AbaClientBuilder<T> WithContext(IContext context)
         {
-            client.Context = context;
+            client.SetContext(context);
             return this;
+        }
+
+        /// <summary>
+        /// Throws an exception in case the client has already been made
+        /// </summary>
+        public void EnsureNotMadeYet()
+        {
+            if (made)
+            {
+                throw new InvalidOperationException($"Client already made");
+            }
+        }
+
+        /// <summary>
+        /// Throws an exception in case the client has not been made yet
+        /// </summary>
+        public void EnsureAlreadyMade()
+        {
+            if (made)
+            {
+                throw new InvalidOperationException($"Client not made yet");
+            }
         }
 
         /// <summary>
@@ -57,6 +102,7 @@ namespace Thismaker.Aba.Client.Core
         public AbaClientBuilder<T> Make()
         {
             client.MakeApp();
+            made = true;
             return this;
         }
 

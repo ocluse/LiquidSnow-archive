@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Thismaker.Aba.Client.Core
@@ -9,9 +10,7 @@ namespace Thismaker.Aba.Client.Core
     {
 
         #region Properties
-        public virtual IContext Context { get; set; }
-
-        
+        public virtual IContext Context { get; private set; }
 
         /// <summary>
         /// The singleton instance of the client
@@ -28,7 +27,6 @@ namespace Thismaker.Aba.Client.Core
         /// </summary>
         public string BaseAddress { get; set; }
 
-
         /// <summary>
         /// The default address where the Api calls will be made. 
         /// If left null, the endpoint must be included in the requestUri 
@@ -43,11 +41,15 @@ namespace Thismaker.Aba.Client.Core
         public AccessToken AccessToken { get; set; }
 
         /// <summary>
+        /// If true, the client auto renews the access token once it expires by calling
+        /// <see cref="RenewAccessTokenAsync"/> function;
+        /// </summary>
+        public bool AutoRenewAccessToken { get; set; }
+
+        /// <summary>
         /// The client used to access the server api
         /// </summary>
         protected HttpClient HttpClient { get; set; }
-
-        protected virtual Func<Task<string>> ReadAccessToken { get; set; }
 
         #endregion
 
@@ -57,16 +59,20 @@ namespace Thismaker.Aba.Client.Core
         /// allowing for performing basic tasks.
         /// Should be called once <see cref="MakeApp"/> has been called.
         /// </summary>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        public abstract Task Start(IProgress<string> progress);
+        public abstract Task StartAsync();
 
         /// <summary>
-        /// When overidden in a derived class, returns the version of the cloud client.
+        /// Called when the lifetime of the client has ended to cleanup resources
+        /// and persist data if need be.
+        /// </summary>
+        public abstract Task StopAsync();
+
+        /// <summary>
+        /// Called whenever the <see cref="AccessToken"/> has expired and the client is
+        /// allowed to automatically renew.
         /// </summary>
         /// <returns></returns>
-        public abstract Task<string> GetCloudVersion();
-
+        protected abstract Task RenewAccessTokenAsync();
 
         /// <summary>
         /// Called by the HTTP helpers to deserialize a response. Override to customize how deserialization works
@@ -95,9 +101,8 @@ namespace Thismaker.Aba.Client.Core
         }
 
         /// <summary>
-        /// Initializes the HttpClient and the HubConnection. Should be called only onces during the lifetime of the application.
-        /// This method must be called before accessing any of the Hub and HttpClient methods.
-        /// Overriding this method allows you to specify how the HttpClient and HubConnection should be initialized.
+        /// Initializes the HttpClient. Should be called only once during the lifetime 
+        /// of the application
         /// </summary>
         public virtual void MakeApp()
         {
@@ -106,6 +111,18 @@ namespace Thismaker.Aba.Client.Core
 
         #endregion
 
+        #region Public Methods
+
+        /// <summary>
+        /// Sets the underlying context of the client
+        /// </summary>
+        /// <param name="context"></param>
+        public virtual void SetContext(IContext context)
+        {
+            Context = context;
+        }
+
+        #endregion
 
         #region Api Methods
         /// <summary>
@@ -114,19 +131,32 @@ namespace Thismaker.Aba.Client.Core
         /// </summary>
         /// <param name="secured">If true, the http client sends along an Authorization or other authentication headers, otherwise, it removes them</param>
         /// <returns></returns>
-        protected virtual async Task ReadyHttpClientForRequest(bool secured)
+        protected virtual async Task ReadyHttpClientForRequestAsync(bool secured)
         {
             if (secured)
             {
-                var accessToken = ReadAccessToken != null ? await ReadAccessToken.Invoke() : AccessToken.Value;
+                //has acccess token expired?
+                if (AccessToken.IsExpired())
+                {
+                    //are we allowed to autorenew the token:
+                    if (AutoRenewAccessToken)
+                    {
+                        await RenewAccessTokenAsync();
+                    }
+                    else
+                    {
+                        throw new ExpiredTokenException();
+                    }
+                }
+                
                 if (AccessToken.Kind == AccessTokenKind.Custom)
                 {
                     HttpClient.DefaultRequestHeaders.Remove(AccessToken.Key);
-                    HttpClient.DefaultRequestHeaders.Add(AccessToken.Key, accessToken);
+                    HttpClient.DefaultRequestHeaders.Add(AccessToken.Key, AccessToken.Value);
                 }
                 else
                 {
-                    HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AccessToken.Key, accessToken);
+                    HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AccessToken.Key, AccessToken.Value);
                 }
             }
             else
@@ -151,7 +181,7 @@ namespace Thismaker.Aba.Client.Core
         public async Task<HttpResponseMessage> ApiGetAsync(string requestUri, bool secured = true)
         {
             //Prep the HttpClient
-            await ReadyHttpClientForRequest(secured);
+            await ReadyHttpClientForRequestAsync(secured);
 
             try
             {
@@ -166,27 +196,21 @@ namespace Thismaker.Aba.Client.Core
 
         /// <summary>
         /// A simpler way to send a HTTP GET. The result, if successful is deserialized through <see cref="Deserialize{TResult}(string)"/>
-        /// If the response does not indicate success, a <see cref="ClientException"/> with be thrown.
+        /// If the response does not indicate success, a <see cref="HttpRequestException"/> is thrown
         /// </summary>
         /// <typeparam name="TResult">The type to deserialize the content to</typeparam>
         /// <param name="requestUri">The specific resource Uri on the endpoint</param>
         /// <param name="secured">If true, ensures that the method adds the <see cref="AccessToken"/> to the request for a secured resource</param>
         /// <returns>The deserialised content/body of the response received</returns>
-        /// <exception cref="ClientException"/>
+        /// <exception cref="HttpRequestException"/>
         public async Task<TResult> ApiGetSimpleAsync<TResult>(string requestUri, bool secured = true)
         {
             try
             {
                 var response = await ApiGetAsync(requestUri, secured);
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    return Deserialize<TResult>(json);
-                }
-                else
-                {
-                    throw new ClientException(response.StatusCode.ToString(), ExceptionKind.RequestFailed);
-                }
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                return Deserialize<TResult>(json);
             }
             catch
             {
@@ -204,7 +228,7 @@ namespace Thismaker.Aba.Client.Core
         public async Task<HttpResponseMessage> ApiPostAsync(string requestUri, HttpContent content, bool secured = true)
         {
             //Prep the HttpClient
-            await ReadyHttpClientForRequest(secured);
+            await ReadyHttpClientForRequestAsync(secured);
 
             try
             {
@@ -231,7 +255,6 @@ namespace Thismaker.Aba.Client.Core
         /// <param name="deserializeResult">If true, the method first deserializes the Content
         /// (assumes it to be JSON unless <see cref="Deserialize{T}(string)"/> has been overriden)  of the <b>response</b> message</param>
         /// <returns>A <see cref="HttpResponseMessage"/> or generic type depending on the params</returns>
-        /// <exception cref="ClientException">When <paramref name="deserializeResult"/> is true and the request failed</exception>
         /// <exception cref="HttpRequestException"/>
         /// <exception cref="InvalidOperationException"/>
         public async Task<TResult> ApiPostSimpleAsync<TContent, TResult>(string requestUri, TContent content, bool secured = true, bool serializeContent = true, bool deserializeResult = true)
@@ -239,19 +262,17 @@ namespace Thismaker.Aba.Client.Core
             //Request validation:
             if (!serializeContent)
             {
-                var contentType = typeof(TContent);
-                if (!(contentType.IsSubclassOf(typeof(HttpContent)) || contentType == typeof(HttpContent)))
+                if (!content.GetType().IsAssignableFrom(typeof(HttpContent)))
                 {
-                    throw new InvalidOperationException("Content provided must be of type/derive from HttpContent if serializeContent is set to false");
+                    throw new InvalidOperationException($"Content provided must be of type/derive from {nameof(HttpContent)} if serializeContent is set to false");
                 }
             }
 
             if (!deserializeResult)
             {
-                var resultType = typeof(TResult);
-                if (!(resultType.IsSubclassOf(typeof(HttpResponseMessage)) || resultType == typeof(HttpResponseMessage)))
+                if (!typeof(TResult).IsAssignableFrom(typeof(HttpResponseMessage)))
                 {
-                    throw new InvalidOperationException("Generic TResult provided must be of type/derive from HttpResponseMessage if serializeResult is set to false");
+                    throw new InvalidOperationException($"Generic TResult provided must be of type/derive from {nameof(HttpResponseMessage)} if serializeResult is set to false");
                 }
             }
 
@@ -266,22 +287,16 @@ namespace Thismaker.Aba.Client.Core
                     return (TResult)(object)response;
                 }
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    return Deserialize<TResult>(json);
-                }
-                else
-                {
-                    throw new ClientException(response.StatusCode.ToString(), ExceptionKind.RequestFailed);
-                }
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync();
+                return Deserialize<TResult>(json);
             }
-            catch
+            catch(Exception ex)
             {
-                throw;
+                throw new ClientException(ex);
             }
         }
-
 
         /// <summary>
         /// Similar to <see cref="ApiGetAsync(string, bool)"/> but instead sends the request to the provided endpoint.
@@ -289,7 +304,7 @@ namespace Thismaker.Aba.Client.Core
         public async Task<HttpResponseMessage> EndpointGetAsync(string endpoint, string requestUri, bool secured = true)
         {
             //Prep the HttpClient
-            await ReadyHttpClientForRequest(secured);
+            await ReadyHttpClientForRequestAsync(secured);
 
             try
             {
@@ -309,15 +324,9 @@ namespace Thismaker.Aba.Client.Core
             try
             {
                 var response = await EndpointGetAsync(endpoint, requestUri, secured);
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    return Deserialize<TResult>(json);
-                }
-                else
-                {
-                    throw new ClientException(response.StatusCode.ToString(), ExceptionKind.RegisterFailure);
-                }
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                return Deserialize<TResult>(json);
             }
             catch
             {
@@ -331,7 +340,7 @@ namespace Thismaker.Aba.Client.Core
         public async Task<HttpResponseMessage> EndpointPostAsync(string endpoint, string requestUri, HttpContent content, bool secured = true)
         {
             //Prep the HttpClient
-            await ReadyHttpClientForRequest(secured);
+            await ReadyHttpClientForRequestAsync(secured);
 
             try
             {
@@ -351,19 +360,17 @@ namespace Thismaker.Aba.Client.Core
             //Request validation:
             if (!serializeContent)
             {
-                var contentType = typeof(TContent);
-                if (!(contentType.IsSubclassOf(typeof(HttpContent)) || contentType == typeof(HttpContent)))
+                if (!content.GetType().IsAssignableFrom(typeof(HttpContent)))
                 {
-                    throw new InvalidOperationException("Content provided must be of type/derive from HttpContent if serializeContent is set to false");
+                    throw new InvalidOperationException($"Content provided must be of type/derive from {nameof(HttpContent)} if serializeContent is set to false");
                 }
             }
 
             if (!deserializeResult)
             {
-                var resultType = typeof(TResult);
-                if (!(resultType.IsSubclassOf(typeof(HttpResponseMessage)) || resultType == typeof(HttpResponseMessage)))
+                if (!typeof(TResult).IsAssignableFrom(typeof(HttpResponseMessage)))
                 {
-                    throw new InvalidOperationException("Generic TResult provided must be of type/derive from HttpResponseMessage if serializeResult is set to false");
+                    throw new InvalidOperationException($"Generic TResult provided must be of type/derive from {nameof(HttpResponseMessage)} if serializeResult is set to false");
                 }
             }
 
@@ -378,15 +385,9 @@ namespace Thismaker.Aba.Client.Core
                     return (TResult)(object)response;
                 }
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var json = await response.Content.ReadAsStringAsync();
-                    return Deserialize<TResult>(json);
-                }
-                else
-                {
-                    throw new ClientException(response.StatusCode.ToString(), ExceptionKind.RequestFailed);
-                }
+                response.EnsureSuccessStatusCode();
+                var json = await response.Content.ReadAsStringAsync();
+                return Deserialize<TResult>(json);
             }
             catch
             {

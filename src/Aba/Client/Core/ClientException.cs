@@ -2,32 +2,54 @@
 
 namespace Thismaker.Aba.Client.Core
 {
+
+    [Serializable]
     public class ClientException : Exception
     {
-        public ExceptionKind Kind { get; set; }
-
-        public ClientException(string msg, ExceptionKind kind) : base(msg)
-        {
-            Kind = kind;
-        }
-
-        public ClientException(string msg, ExceptionKind kind, Exception innerException):base(msg, innerException) 
-        {
-            Kind = kind;
-        }
+        public ClientException() { }
+        public ClientException(string message) : base(message) { }
+        public ClientException(Exception inner) : base(null, inner) { }
+        public ClientException(string message, Exception inner) : base(message, inner) { }
+        protected ClientException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 
-    public enum ExceptionKind
-    {
-        VersionMismatch,
-        LoginFailure,
-        HubException,
-        NoEntitlements,
-        RegisterFailure,
-        ConnectionException,
-        RequestFailed,
-        AuthException,
-        GenericException,
 
+    [Serializable]
+    public class VersionMismatchException : ClientException
+    {
+        public VersionMismatchException() { }
+        public VersionMismatchException(string message) : base(message) { }
+        public VersionMismatchException(Exception inner) : base(inner) { }
+        public VersionMismatchException(string message, Exception inner) : base(message, inner) { }
+        protected VersionMismatchException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
+
+    [Serializable]
+    public class ConnectionFailedException : ClientException
+    {
+        public ConnectionFailedException() { }
+        public ConnectionFailedException(string message) : base(message) { }
+        public ConnectionFailedException(Exception inner) : base(inner) { }
+        public ConnectionFailedException(string message, Exception inner) : base(message, inner) { }
+        protected ConnectionFailedException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
+
+    [Serializable]
+    public class ExpiredTokenException : ClientException
+    {
+        public ExpiredTokenException() { }
+        public ExpiredTokenException(string message) : base(message) { }
+        public ExpiredTokenException(string message, Exception inner) : base(message, inner) { }
+        protected ExpiredTokenException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }

@@ -6,20 +6,7 @@
         <Setter Property="Background" Value="{DynamicResource AccentDarkDynamic}"/>
     </Style>
 
-    <Style x:Key="{x:Type Menu}" TargetType="{x:Type Menu}">
-        <Setter Property="OverridesDefaultStyle" Value="True" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type Menu}">
-                    <Border BorderThickness="1" Background="{TemplateBinding Background}">
-                        <StackPanel ClipToBounds="True" Orientation="Horizontal" IsItemsHost="True" />
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    
 
     <!--#region Progbar-->
     <Style x:Key="{x:Type ProgressBar}" TargetType="{x:Type ProgressBar}">
@@ -75,18 +62,37 @@
     <!--#endregion-->
     
     <!--#region Context Menu and Menus-->
+    <Style x:Key="{x:Type Menu}" TargetType="{x:Type Menu}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Menu}">
+                    <Border BorderThickness="1" 
+                            Background="{TemplateBinding Background}">
+                        <StackPanel ClipToBounds="True" 
+                                    Orientation="Horizontal" 
+                                    IsItemsHost="True" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style TargetType="{x:Type ContextMenu}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Grid.IsSharedSizeScope" Value="true" />
         <Setter Property="HasDropShadow" Value="True" />
+        <Setter Property="Background" Value="{DynamicResource PanelBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentDisabled}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContextMenu}">
                     <Border x:Name="Border"
-                            Background="{DynamicResource PanelBackground}"
+                            Background="{TemplateBinding Background}"
                             BorderThickness="1"
-                            BorderBrush="{DynamicResource AccentDisabled}">
+                            BorderBrush="{TemplateBinding BorderBrush}">
                         <StackPanel IsItemsHost="True" 
                                     KeyboardNavigation.DirectionalNavigation="Cycle" />
                     </Border>
@@ -149,12 +155,11 @@
     </ControlTemplate>
     
     <!-- TopLevelItem -->
-    <ControlTemplate 
-  x:Key="{x:Static MenuItem.TopLevelItemTemplateKey}" 
-  TargetType="{x:Type MenuItem}">
+    <ControlTemplate x:Key="{x:Static MenuItem.TopLevelItemTemplateKey}" 
+                     TargetType="{x:Type MenuItem}">
         <Border Name="Border" Background="{TemplateBinding Background}" >
             <Grid>
-                <ContentPresenter Margin="6,3,6,3" 
+                <ContentPresenter  Margin="6,3,6,3" 
                                   ContentSource="Header" 
                                   RecognizesAccessKey="True" />
             </Grid>

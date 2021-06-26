@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Thismaker.Aba.Client.Core;
@@ -14,7 +16,6 @@ namespace Thismaker.Aba.Client
     {
 
         #region Properties 
-        
         /// <summary>
         /// The hub endpoint
         /// </summary>
@@ -59,7 +60,7 @@ namespace Thismaker.Aba.Client
                    .WithUrl($"{BaseAddress}/{HubEndpoint}/",
                    options =>
                    {
-                       options.AccessTokenProvider = ReadHubAccessToken;
+                       options.AccessTokenProvider = HubReadAccessTokenAsync;
                    })
                    .Build();
 
@@ -71,6 +72,7 @@ namespace Thismaker.Aba.Client
         #endregion
 
         #region Private Methods
+        
         private Task OnHubConnectionClosed(Exception arg)
         {
             HubClosed?.Invoke(arg);
@@ -89,16 +91,14 @@ namespace Thismaker.Aba.Client
             return Task.CompletedTask;
         }
 
-        protected virtual async Task<string> ReadHubAccessToken()
+        private async Task<string> HubReadAccessTokenAsync()
         {
-            if (ReadAccessToken == null)
+            if (AccessToken.IsExpired())
             {
-                return AccessToken?.Value;
+                await RenewAccessTokenAsync();
             }
-            else
-            {
-                return await ReadAccessToken.Invoke();
-            }
+
+            return AccessToken.Value;
         }
 
         #endregion
@@ -126,15 +126,65 @@ namespace Thismaker.Aba.Client
         #endregion
 
         #region Hub
-        /// <summary>
-        /// When overriden, allows the client to subscribe methods to the Hub
-        /// </summary>
-        public abstract void SubscribeHub();
+
+        private List<string> _subscribedHubMethodNames;
 
         /// <summary>
-        /// When overriden, allows the client to unsubscribe methods from the Hub
+        /// Subscribes methods marked with the <see cref="SubscribeAttribute"/>. Override 
+        /// to customize the behaviour
         /// </summary>
-        public abstract void UnsubscribeHub();
+        public virtual void SubscribeHub()
+        {
+            _subscribedHubMethodNames = new List<string>();
+
+            //get all methods with the subscribe attribute:
+            var methods = GetType()
+                .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+            foreach (var method in methods)
+            {
+                var subAttr = method.GetCustomAttribute<SubscribeAttribute>();
+                if (subAttr == null) continue;
+
+                string name = string.IsNullOrEmpty(subAttr.MethodName) ?
+                    method.Name : subAttr.MethodName;
+
+                var types = new List<Type>();
+                var pInfos = method.GetParameters();
+
+                foreach(var pInfo in pInfos)
+                {
+                    types.Add(pInfo.ParameterType);
+                }
+
+                HubConnection.On(name, types.ToArray(), OnHubCall, method);
+
+                _subscribedHubMethodNames.Add(name);
+            }
+        }
+
+        private Task OnHubCall(object[] parameters, object state)
+        {
+            var method = (MethodInfo)state;
+
+            method.Invoke(this, parameters);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Unsubscribes methods previously subscribed to through
+        /// <see cref="SubscribeHub"/>. Overriding either method changes the behaviour
+        /// </summary>
+        public virtual void UnsubscribeHub()
+        {
+            if (_subscribedHubMethodNames == null) return;
+
+            foreach(var methodName in _subscribedHubMethodNames)
+            {
+                HubConnection.Remove(methodName);
+            }
+        }
 
         /// <summary>
         /// Attempts to connect to the hub. Should be called only once during the lifetime of the application,

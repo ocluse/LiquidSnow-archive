@@ -40,7 +40,7 @@ namespace Thismaker.Thoth
         {
             Tables = new Dictionary<string, LocalizationTable>(data.Tables);
             DefaultTableKey = data.DefaultTableKey;
-            CurrentLocale = data.Locales.Find(x => x.Id == data.DefaultLocaleId);
+            CurrentLocale = data.Locales.Find(x => x.ShortName == data.DefaultLocale);
             Locales = new List<Locale>(data.Locales);
         }
 
@@ -48,8 +48,8 @@ namespace Thismaker.Thoth
         {
             foreach(var locale in Locales)
             {
-                if (!table.Locales.Exists(x => x.Id == locale.Id)) 
-                    throw new InvalidOperationException($"Sideload table missing locale with Id {locale.Id}");
+                if (!table.Locales.Exists(x => x.ShortName == locale.ShortName)) 
+                    throw new InvalidOperationException($"Sideload table missing locale with Id {locale.ShortName}");
             }
 
             Tables.Add(table.Key, table);
@@ -79,7 +79,7 @@ namespace Thismaker.Thoth
 
         public static string GetLocalizedString(string table, string key)
         {
-            return Tables[table].Items[key].Translations[CurrentLocale.Id];
+            return Tables[table].Items[key].Translations[CurrentLocale.ShortName];
         }
 
         public static BindingItem BindProperty(object target, string propertyName, string table, string key, bool update=true)

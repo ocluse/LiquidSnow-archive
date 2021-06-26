@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Thismaker.Thoth.Manager.Wpf"
         xmlns:goro="http://schemas.thismaker.com/liquidsnow/goro"
         xmlns:thoth="clr-namespace:Thismaker.Thoth;assembly=Thismaker.Thoth"
+        Closing="OnClosing"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Thoth Manager" Height="450" Width="800" Style="{DynamicResource StandardWindow}">
@@ -15,14 +16,43 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <WrapPanel Background="{DynamicResource PanelGrayResponsive}">
+        <Menu FontSize="12">
+            <MenuItem Header="File">
+                <MenuItem Header="New" Command="{Binding CreateDataCommand}"/>
+                <MenuItem Header="Open" Command="{Binding OpenDataCommand}"/>
+                <MenuItem Header="Save" Command="{Binding SaveDataCommand}"/>
+                <MenuItem Header="Save As" Command="{Binding SaveDataAsCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Table">
+                <MenuItem Header="Add New Table" Command="{Binding AddTableCommand}"/>
+                <MenuItem Header="Edit Selected Table" Command="{Binding EditTableCommand}"/>
+                <MenuItem Header="Delete Selected Table" Command="{Binding DeleteTableCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Localization Item">
+                <MenuItem Header="Add New Localization Item" Command="{Binding AddItemCommand}"/>
+                <MenuItem Header="Edit Selected Localization Item" Command="{Binding EditItemCommand}"/>
+                <MenuItem Header="Delete Selected Localization Item" Command="{Binding DeleteItemCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Translation">
+                <MenuItem Header="Add New Translation" Command="{Binding AddTranslationCommand}"/>
+                <MenuItem Header="Edit Selected Translation" Command="{Binding EditTranslationCommand}"/>
+                <MenuItem Header="Delete Selected Translation" Command="{Binding DeleteTranslationCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Locale">
+                <MenuItem Header="Add New Locale" Command="{Binding AddLocaleCommand}"/>
+                <MenuItem Header="Edit Selected Locale" Command="{Binding EditLocaleCommand}"/>
+                <MenuItem Header="Delete Selected Locale" Command="{Binding DeleteLocaleCommand}"/>
+            </MenuItem>
+        </Menu>
+        <WrapPanel Grid.Row="1" Background="{DynamicResource PanelGrayResponsive}">
             <goro:ButtonIcon Icon="NewFolder" Command="{Binding CreateDataCommand}" ToolTip="Create a new localization database"/>
             <goro:ButtonIcon Icon="FolderOpen" Command="{Binding OpenDataCommand}" ToolTip="Open existing localization database"/>
             <goro:ButtonIcon Icon="Save" Command="{Binding SaveDataCommand}" ToolTip="Save the localization database"/>
         </WrapPanel>
-        <TabControl Grid.Row="1" Margin="0 10 0 0">
+        <TabControl Grid.Row="2" Margin="0 10 0 0">
             <TabItem Header="Tables">
                 <Grid>
                     <Grid.RowDefinitions>

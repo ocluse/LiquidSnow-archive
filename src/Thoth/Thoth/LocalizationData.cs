@@ -8,9 +8,8 @@ namespace Thismaker.Thoth
 
         public List<Locale> Locales { get; set; }
 
-        public string DefaultLocaleId { get; set; }
+        public string DefaultLocale { get; set; }
 
         public string DefaultTableKey { get; set; }
     }
-
 }
