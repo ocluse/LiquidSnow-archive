@@ -345,13 +345,13 @@
                             RelativeSource={RelativeSource TemplatedParent}}" Margin="{DynamicResource HeaderMargin}"/>
                         <Grid Grid.Row="1">
                             <ToggleButton 
-                            Name="ToggleButton" 
+                                Name="ToggleButton" 
                                 MinHeight="{TemplateBinding MinHeight}"
-                            Template="{DynamicResource ComboBoxToggleButton}" 
-                            Grid.Column="2" 
-                            Focusable="false"
-                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
-                            ClickMode="Press">
+                                Template="{DynamicResource ComboBoxToggleButton}" 
+                                Grid.Column="2" 
+                                Focusable="false"
+                                IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                                ClickMode="Press">
                             </ToggleButton>
                             <ContentPresenter Name="ContentSite" IsHitTestVisible="False"  Content="{TemplateBinding SelectionBoxItem}"
                             ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"

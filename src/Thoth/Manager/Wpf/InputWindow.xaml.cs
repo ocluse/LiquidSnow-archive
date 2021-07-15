@@ -7,7 +7,7 @@ namespace Thismaker.Thoth.Manager.Wpf
     /// </summary>
     public partial class InputWindow : Window
     {
-        public InputWindow(string header, string input=null)
+        public InputWindow(string header, string input = null)
         {
             InitializeComponent();
             ((InputWindowModel)DataContext).Header = header;

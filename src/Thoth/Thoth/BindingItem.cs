@@ -12,33 +12,33 @@ namespace Thismaker.Thoth
 
         public void SetString()
         {
-            var val = LocalizationManager.GetLocalizedString(TableKey, ItemKey);
+            string val = LocalizationManager.GetLocalizedString(TableKey, ItemKey);
             if (BindingTargets == null || BindingTargets.Count == 0)
             {
-                var prop = Target.GetType().GetProperty(PropertyName);
+                System.Reflection.PropertyInfo prop = Target.GetType().GetProperty(PropertyName);
                 prop.SetValue(Target, val);
             }
             else
             {
                 //construct the string:
-                var args = new List<object>();
+                List<object> args = new List<object>();
 
-                foreach (var item in BindingTargets)
+                foreach (BindingTarget item in BindingTargets)
                 {
                     args.Add(Target.GetPropValue(item.PropertyName));
                 }
 
-                var constructed = string.Format(val, args.ToArray());
+                string constructed = string.Format(val, args.ToArray());
 
-                var prop = Target.GetType().GetProperty(PropertyName);
+                System.Reflection.PropertyInfo prop = Target.GetType().GetProperty(PropertyName);
                 prop.SetValue(Target, constructed);
             }
         }
 
         public BindingItem BindObservableTarget(INotifyPropertyChanged target, string propertyName, bool listen = true)
         {
-            var inst = BindTarget(target, propertyName);
-            var tar = BindingTargets.Find(x => x.Target == target);
+            BindingItem inst = BindTarget(target, propertyName);
+            BindingTarget tar = BindingTargets.Find(x => x.Target == target);
             tar.ListenStatusChanged += TargetListenStatusChanged;
             tar.Listen = listen;
             tar.IsObservable = true;
@@ -78,8 +78,12 @@ namespace Thismaker.Thoth
 
         public void UnbindAllTargets()
         {
-            if (BindingTargets == null) return;
-            foreach (var tar in BindingTargets)
+            if (BindingTargets == null)
+            {
+                return;
+            }
+
+            foreach (BindingTarget tar in BindingTargets)
             {
                 if (tar.IsObservable)
                 {
@@ -92,9 +96,13 @@ namespace Thismaker.Thoth
 
         public void UnbindTarget(object target, string propertyName)
         {
-            var bindingTarget = BindingTargets.Find(x => x.Target == target && x.PropertyName == propertyName);
+            BindingTarget bindingTarget = BindingTargets.Find(x => x.Target == target && x.PropertyName == propertyName);
 
-            if (bindingTarget == null) throw new NullReferenceException("Target not found");
+            if (bindingTarget == null)
+            {
+                throw new NullReferenceException("Target not found");
+            }
+
             UnbindTarget(bindingTarget);
         }
 
@@ -106,7 +114,7 @@ namespace Thismaker.Thoth
                 bindingTarget.ListenStatusChanged -= TargetListenStatusChanged;
             }
 
-            BindingTargets.Remove(bindingTarget);
+            _ = BindingTargets.Remove(bindingTarget);
         }
 
         public BindingItem BindTarget(object target, string propertyName)
@@ -116,7 +124,7 @@ namespace Thismaker.Thoth
                 BindingTargets = new List<BindingTarget>();
             }
 
-            var item = new BindingTarget
+            BindingTarget item = new BindingTarget
             {
                 PropertyName = propertyName,
                 Target = target,

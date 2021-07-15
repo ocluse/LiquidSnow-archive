@@ -10,7 +10,7 @@ namespace Thismaker.Aba.Client.Core
     /// Can be used to preconfigure the client and make client singleton.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class AbaClientBuilder<T> where T: CoreClient<T>, new()
+    public class AbaClientBuilder<T> where T: CoreClientBase<T>, new()
     {
         internal readonly T client;
         private bool made=false;

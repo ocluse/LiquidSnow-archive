@@ -18,7 +18,7 @@ namespace Thismaker.Thoth
 
         public static Locale CurrentLocale
         {
-            get { return _currentLocale; }
+            get => _currentLocale;
             set
             {
                 _currentLocale = value;
@@ -28,7 +28,7 @@ namespace Thismaker.Thoth
 
         public static string DefaultTableKey
         {
-            get { return _defaultTableKey; }
+            get => _defaultTableKey;
             set
             {
                 _defaultTableKey = value;
@@ -46,10 +46,12 @@ namespace Thismaker.Thoth
 
         public static void AddSideloadTable(SideloadTable table)
         {
-            foreach(var locale in Locales)
+            foreach (Locale locale in Locales)
             {
-                if (!table.Locales.Exists(x => x.ShortName == locale.ShortName)) 
+                if (!table.Locales.Exists(x => x.ShortName == locale.ShortName))
+                {
                     throw new InvalidOperationException($"Sideload table missing locale with Id {locale.ShortName}");
+                }
             }
 
             Tables.Add(table.Key, table);
@@ -57,19 +59,22 @@ namespace Thismaker.Thoth
 
         public static void RemoveSideloadTable(SideloadTable table)
         {
-            if (!Tables.ContainsKey(table.Key)) return;
+            if (!Tables.ContainsKey(table.Key))
+            {
+                return;
+            }
 
             //Unbind all properties with this key:
             if (_bindingItems != null)
             {
-                var removable=_bindingItems.FindAll(x => x.TableKey == table.Key);
+                List<BindingItem> removable = _bindingItems.FindAll(x => x.TableKey == table.Key);
 
-                foreach(var item in removable)
+                foreach (BindingItem item in removable)
                 {
                     UnbindProperty(item);
                 }
             }
-            Tables.Remove(table.Key);
+            _ = Tables.Remove(table.Key);
         }
 
         public static string GetLocalizedString(string key)
@@ -82,9 +87,9 @@ namespace Thismaker.Thoth
             return Tables[table].Items[key].Translations[CurrentLocale.ShortName];
         }
 
-        public static BindingItem BindProperty(object target, string propertyName, string table, string key, bool update=true)
+        public static BindingItem BindProperty(object target, string propertyName, string table, string key, bool update = true)
         {
-            var bindingItem = new BindingItem
+            BindingItem bindingItem = new BindingItem
             {
                 Target = target,
                 ItemKey = key,
@@ -101,48 +106,63 @@ namespace Thismaker.Thoth
             _bindingItems.Add(bindingItem);
 
             //set the value immediate:
-            if (update) bindingItem.SetString();
+            if (update)
+            {
+                bindingItem.SetString();
+            }
 
             return bindingItem;
         }
 
         public static void UnbindProperty(object target, string propertyName, string table, string key)
         {
-            var item = _bindingItems.Find(x => x.Target == target && 
-            x.PropertyName == propertyName && 
-            x.TableKey == table && 
+            BindingItem item = _bindingItems.Find(x => x.Target == target &&
+            x.PropertyName == propertyName &&
+            x.TableKey == table &&
             x.ItemKey == key);
 
-            if (item == null) throw new NullReferenceException("Target not found");
+            if (item == null)
+            {
+                throw new NullReferenceException("Target not found");
+            }
+
             UnbindProperty(item);
         }
 
         public static void UnbindProperty(BindingItem item)
         {
-            if (!_bindingItems.Contains(item)) throw new ArgumentException("The provided binding item was not found in the current localization manager");
+            if (!_bindingItems.Contains(item))
+            {
+                throw new ArgumentException("The provided binding item was not found in the current localization manager");
+            }
+
             item.UnbindAllTargets();
-            _bindingItems.Remove(item);
+            _ = _bindingItems.Remove(item);
         }
 
         public static void UnbindAllProperties()
         {
-            if (_bindingItems == null) return;
-            foreach(var item in _bindingItems)
+            if (_bindingItems == null)
+            {
+                return;
+            }
+
+            foreach (BindingItem item in _bindingItems)
             {
                 item.UnbindAllTargets();
             }
             _bindingItems.Clear();
         }
 
-        public static BindingItem ChangeBindingKey(string bindingId, string newKey, bool update=true, bool unbindTargets=true)
+        public static BindingItem ChangeBindingKey(string bindingId, string newKey, bool update = true, bool unbindTargets = true)
         {
-            var item = _bindingItems.Find(x => x.Id == bindingId);
+            BindingItem item = _bindingItems.Find(x => x.Id == bindingId);
             return ChangeBindingKey(item, item.TableKey, newKey, update, unbindTargets);
         }
 
-        public static BindingItem ChangeBindingKey(string bindingId, string newTable, string newKey, bool update = true, bool unbindTargets=true)
+        public static BindingItem ChangeBindingKey(string bindingId, string newTable, string newKey, bool update = true, bool unbindTargets = true)
         {
-            var item = _bindingItems.Find(x => x.Id == bindingId);
+            BindingItem item = _bindingItems.Find(x => x.Id == bindingId);
             return ChangeBindingKey(item, newKey, newTable, update, unbindTargets);
         }
 
@@ -177,13 +197,13 @@ namespace Thismaker.Thoth
             LocaleChanged?.Invoke(CurrentLocale.ShortName);
         }
 
-       private static Task SetBoundProperties()
-       {
-            foreach (var item in _bindingItems)
+        private static Task SetBoundProperties()
+        {
+            foreach (BindingItem item in _bindingItems)
             {
                 item.SetString();
             }
             return Task.CompletedTask;
-       }
+        }
     }
 }

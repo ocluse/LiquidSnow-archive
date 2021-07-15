@@ -9,7 +9,7 @@ namespace Thismaker.Aba.Client.Core
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static AbaClientBuilder<T> WithConfiguration<T>(this AbaClientBuilder<T> aba, IConfiguration config, string configKey = "AbaClient", bool make = true) where T:CoreClient<T>, new()
+        public static AbaClientBuilder<T> WithConfiguration<T>(this AbaClientBuilder<T> aba, IConfiguration config, string configKey = "AbaClient", bool make = true) where T:CoreClientBase<T>, new()
         {
             aba.client.Configure(config, configKey, make);
             return aba;
@@ -18,7 +18,7 @@ namespace Thismaker.Aba.Client.Core
         /// <summary>
         /// Configures the app using the provided Configuration, calling <see cref="ClientBase{T}.MakeApp"/> once done
         /// </summary>
-        public static void Configure<T>(this CoreClient<T> client, IConfiguration config, string configKey="AbaClient", bool make=true) where T : CoreClient<T>
+        public static void Configure<T>(this CoreClientBase<T> client, IConfiguration config, string configKey="AbaClient", bool make=true) where T : CoreClientBase<T>
         {
             config.Bind(configKey, client);
             if (make)

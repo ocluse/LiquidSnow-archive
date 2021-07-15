@@ -1,6 +1,5 @@
-Aba.Client.Core
-Aba.Client
-Aba.Client.Configuration
-Aba.Client.Mercury
-Aba.Client.Msal
-Aba.Client.Transfers
+Aba.Client.Core--
+Aba.Client--
+Aba.Client.Mercury--
+Aba.Client.Msal--
+Aba.Client.Transfers--

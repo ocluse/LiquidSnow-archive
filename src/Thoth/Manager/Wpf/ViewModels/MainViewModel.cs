@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using Thismaker.Core;
@@ -29,7 +30,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         private readonly LocalizationIO _locIO;
 
         private string _filePath;
-        private bool _edited=false;
+        private bool _edited = false;
         #endregion
 
         #region Props
@@ -133,10 +134,10 @@ namespace Thismaker.Thoth.Manager.Wpf
 
         private void OnPropChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var name = e.PropertyName;
+            string name = e.PropertyName;
             if (name == nameof(SelectedTable))
             {
-                if(SelectedTable != null)
+                if (SelectedTable != null)
                 {
                     Items = SelectedTable.Items;
                     IsDefaultTableEnabled = true;
@@ -151,7 +152,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             }
             if (name == nameof(SelectedItem))
             {
-                if(SelectedItem != null)
+                if (SelectedItem != null)
                 {
                     Translations = SelectedItem.Translations;
                 }
@@ -183,14 +184,14 @@ namespace Thismaker.Thoth.Manager.Wpf
                 {
                     _data.DefaultTableKey = SelectedTable.TableKey;
                 }
-                else if(SelectedTable.TableKey==_data.DefaultTableKey)
+                else if (SelectedTable.TableKey == _data.DefaultTableKey)
                 {
                     _data.DefaultTableKey = null;
                 }
             }
             if (name == nameof(IsDefaultLocale) && SelectedLocale != null)
             {
-                if ( IsDefaultLocale.HasValue && IsDefaultLocale.Value)
+                if (IsDefaultLocale.HasValue && IsDefaultLocale.Value)
                 {
                     _data.DefaultLocale = SelectedLocale.ShortName;
                 }
@@ -206,12 +207,18 @@ namespace Thismaker.Thoth.Manager.Wpf
 
         private bool CanChangeContext()
         {
-            if (!_edited) return true;
+            if (!_edited)
+            {
+                return true;
+            }
 
             //Ask the user if they wish to save changes:
-            var result = GoroMessageBox.Show("Changes Pending", "Do you want to save the changes you've made?", MessageBoxButton.YesNoCancel);
+            bool? result = GoroMessageBox.Show("Changes Pending", "Do you want to save the changes you've made?", MessageBoxButton.YesNoCancel);
 
-            if (result == null) return false;
+            if (result == null)
+            {
+                return false;
+            }
 
             //Save changes:
             if (result.Value)
@@ -247,6 +254,8 @@ namespace Thismaker.Thoth.Manager.Wpf
             AddTableCommand = new RelayCommand(OnAddTable);
             EditTableCommand = new RelayCommand(OnEditTable, CanEditTable);
             DeleteTableCommand = new RelayCommand(OnDeleteTable, CanEditTable);
+            ExportTableCommand = new RelayCommand(OnExportTable, CanEditTable);
+            ImportTableCommand = new RelayCommand(OnImportTable);
 
             AddItemCommand = new RelayCommand(OnAddItem, CanAddItem);
             EditItemCommand = new RelayCommand(OnEditItem, CanEditItem);
@@ -264,7 +273,10 @@ namespace Thismaker.Thoth.Manager.Wpf
         public RelayCommand CreateDataCommand { get; private set; }
         private void OnCreateData()
         {
-            if (!CanChangeContext()) return;
+            if (!CanChangeContext())
+            {
+                return;
+            }
 
             //Basically clear everything:
             Tables.Clear();
@@ -275,15 +287,21 @@ namespace Thismaker.Thoth.Manager.Wpf
         public RelayCommand OpenDataCommand { get; private set; }
         private async void OnOpenData()
         {
-            if (!CanChangeContext()) return;
+            if (!CanChangeContext())
+            {
+                return;
+            }
 
-            var file = new OpenFileDialog();
-            var result = file.ShowDialog();
-            if (!(result.HasValue && result.Value)) return;
+            OpenFileDialog file = new();
+            bool? result = file.ShowDialog();
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
 
             _filePath = file.FileName;
 
-            using var fsData = file.OpenFile();
+            using Stream fsData = file.OpenFile();
 
             try
             {
@@ -291,7 +309,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             }
             catch
             {
-                GoroMessageBox.Show("Error", "Could not load the selected file. Ensure it is a valid localization data file and try again", MessageBoxButton.OK, StatusInfo.Error);
+                _ = GoroMessageBox.Show("Error", "Could not load the selected file. Ensure it is a valid localization data file and try again", MessageBoxButton.OK, StatusInfo.Error);
                 return;
             }
 
@@ -313,9 +331,12 @@ namespace Thismaker.Thoth.Manager.Wpf
         {
             if (string.IsNullOrEmpty(_filePath))
             {
-                var file = new SaveFileDialog();
-                var result = file.ShowDialog();
-                if (!(result.HasValue && result.Value)) return;
+                SaveFileDialog file = new();
+                bool? result = file.ShowDialog();
+                if (!(result.HasValue && result.Value))
+                {
+                    return;
+                }
 
                 _filePath = file.FileName;
             }
@@ -329,13 +350,13 @@ namespace Thismaker.Thoth.Manager.Wpf
             }
             try
             {
-                using var fsOpen = File.Open(_filePath, FileMode.Create);
+                using FileStream fsOpen = File.Open(_filePath, FileMode.Create);
                 await _locIO.SaveAsync(fsOpen, _data);
                 _edited = false;
             }
             catch
             {
-                GoroMessageBox.Show("Error", "Could not write localization data to the selected file. Ensure Thoth has adequate permissions to access it and that no other process is utilizing it and try again!", MessageBoxButton.OK, StatusInfo.Error);
+                _ = GoroMessageBox.Show("Error", "Could not write localization data to the selected file. Ensure Thoth has adequate permissions to access it and that no other process is utilizing it and try again!", MessageBoxButton.OK, StatusInfo.Error);
             }
         }
         private void SaveData()
@@ -347,7 +368,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             }
             catch
             {
-                GoroMessageBox.Show("Error", "Something went wrong when saving the localization data. Ensure that all keys are unique and try again!", MessageBoxButton.OK, StatusInfo.Error);
+                _ = GoroMessageBox.Show("Error", "Something went wrong when saving the localization data. Ensure that all keys are unique and try again!", MessageBoxButton.OK, StatusInfo.Error);
                 throw;
             }
         }
@@ -355,9 +376,12 @@ namespace Thismaker.Thoth.Manager.Wpf
         public RelayCommand SaveDataAsCommand { get; private set; }
         private void OnSaveDataAs()
         {
-            var file = new SaveFileDialog();
-            var result = file.ShowDialog();
-            if (!(result.HasValue && result.Value)) return;
+            SaveFileDialog file = new();
+            bool? result = file.ShowDialog();
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
 
             _filePath = file.FileName;
 
@@ -367,12 +391,16 @@ namespace Thismaker.Thoth.Manager.Wpf
         public RelayCommand AddTableCommand { get; private set; }
         private void OnAddTable()
         {
-            var dlg = new InputWindow("Provide the table key");
-            var result = dlg.ShowDialog();
-            if (!(result.HasValue && result.Value)) return;
-            var tableKey = dlg.Input;
+            InputWindow dlg = new("Provide the table key");
+            bool? result = dlg.ShowDialog();
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
 
-            var table = new LocTable
+            string tableKey = dlg.Input;
+
+            LocTable table = new()
             {
                 TableKey = tableKey,
                 Items = new ObservableCollection<LocItem>()
@@ -382,7 +410,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             SelectedTable = table;
             _edited = true;
         }
-   
+
         public RelayCommand EditTableCommand { get; private set; }
         private bool CanEditTable()
         {
@@ -390,10 +418,14 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnEditTable()
         {
-            var dlg = new InputWindow("Provide a new table key", SelectedTable.TableKey);
-            var result = dlg.ShowDialog();
-            if (!(result.HasValue && result.Value)) return;
-            var tableKey = dlg.Input;
+            InputWindow dlg = new("Provide a new table key", SelectedTable.TableKey);
+            bool? result = dlg.ShowDialog();
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
+
+            string tableKey = dlg.Input;
 
             SelectedTable.TableKey = tableKey;
             _edited = true;
@@ -402,10 +434,87 @@ namespace Thismaker.Thoth.Manager.Wpf
         public RelayCommand DeleteTableCommand { get; private set; }
         private void OnDeleteTable()
         {
-            var result = GoroMessageBox.Show("Warning", "Are you sure you want to delete this table?", MessageBoxButton.YesNo, StatusInfo.Warning);
-            if (!(result.HasValue && result.Value)) return;
-            Tables.Remove(SelectedTable);
+            bool? result = GoroMessageBox.Show("Warning", "Are you sure you want to delete this table?", MessageBoxButton.YesNo, StatusInfo.Warning);
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
+
+            _ = Tables.Remove(SelectedTable);
             _edited = true;
+        }
+
+        public RelayCommand ExportTableCommand { get; private set; }
+
+        private void OnExportTable()
+        {
+            try
+            {
+                SaveFileDialog file = new();
+                bool? result = file.ShowDialog();
+                if (!(result.HasValue && result.Value))
+                {
+                    return;
+                }
+
+                string path = file.FileName;
+
+
+                LocalizationTable locTable = SelectedTable.ToTable();
+
+                List<Locale> locales = new();
+
+                foreach (ManagedLocale m in Locales)
+                {
+                    locales.Add(m.ToLocale());
+                }
+
+                SideloadTable table = new()
+                {
+                    Items = locTable.Items,
+                    Key = SelectedTable.TableKey,
+                    Locales = locales
+                };
+
+                string json = JsonSerializer.Serialize(table);
+
+                File.WriteAllText(path, json);
+            }
+            catch
+            {
+                _ = GoroMessageBox.Show("Failed", "Table could not be successfully exported. Ensure the data is okay and try again", MessageBoxButton.OK, StatusInfo.Error);
+            }
+            
+        }
+
+        public RelayCommand ImportTableCommand { get; private set; }
+
+        private void OnImportTable()
+        {
+            try
+            {
+                OpenFileDialog file = new();
+                bool? result = file.ShowDialog();
+                if (!(result.HasValue && result.Value))
+                {
+                    return;
+                }
+
+                string json = File.ReadAllText(file.FileName);
+
+                SideloadTable table = JsonSerializer.Deserialize<SideloadTable>(json);
+
+                LocTable m = table.ToMTable(table.Key);
+
+                Tables.Add(m);
+
+                _edited = true;
+            }
+            catch
+            {
+                _ = GoroMessageBox.Show("Failed", "That importation failed to happen. Check your data and try again", MessageBoxButton.OK, StatusInfo.Error);
+            }
+           
         }
 
         public RelayCommand AddItemCommand { get; private set; }
@@ -415,12 +524,16 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnAddItem()
         {
-            var dlg = new InputWindow("Provide the item's key");
-            var result = dlg.ShowDialog();
-            if (!(result.HasValue && result.Value)) return;
-            var itemKey = dlg.Input;
+            InputWindow dlg = new("Provide the item's key");
+            bool? result = dlg.ShowDialog();
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
 
-            var item = new LocItem
+            string itemKey = dlg.Input;
+
+            LocItem item = new()
             {
                 Translations = new ObservableCollection<LocTranslation>(),
                 Key = itemKey
@@ -438,10 +551,14 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnEditItem()
         {
-            var dlg = new InputWindow("Provide a new item key", SelectedItem.Key);
-            var result = dlg.ShowDialog();
-            if (!(result.HasValue && result.Value)) return;
-            var itemKey = dlg.Input;
+            InputWindow dlg = new("Provide a new item key", SelectedItem.Key);
+            bool? result = dlg.ShowDialog();
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
+
+            string itemKey = dlg.Input;
             SelectedItem.Key = itemKey;
             _edited = true;
         }
@@ -449,12 +566,16 @@ namespace Thismaker.Thoth.Manager.Wpf
         public RelayCommand DeleteItemCommand { get; private set; }
         private void OnDeleteItem()
         {
-            var result = GoroMessageBox.Show("Warning", "Are you sure you want to delete this item?", MessageBoxButton.YesNo, StatusInfo.Warning);
-            if (!(result.HasValue && result.Value)) return;
-            SelectedTable.Items.Remove(SelectedItem);
+            bool? result = GoroMessageBox.Show("Warning", "Are you sure you want to delete this item?", MessageBoxButton.YesNo, StatusInfo.Warning);
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
+
+            _ = SelectedTable.Items.Remove(SelectedItem);
             _edited = true;
         }
-        
+
         public RelayCommand AddTranslationCommand { get; private set; }
         private bool CanAddTrans()
         {
@@ -462,11 +583,14 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnAddTrans()
         {
-            var editor = new TranslationEditor(Locales);
-            var result = editor.ShowDialog();
-            if (!(result.HasValue && result.Value)) return;
+            TranslationEditor editor = new(Locales);
+            bool? result = editor.ShowDialog();
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
 
-            var trans = editor.Translation;
+            LocTranslation trans = editor.Translation;
             SelectedItem.Translations.Add(trans);
             SelectedTranslation = trans;
             _edited = true;
@@ -479,11 +603,14 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnEditTrans()
         {
-            var editor = new TranslationEditor(Locales, SelectedTranslation);
-            var result = editor.ShowDialog();
-            if (!(result.HasValue && result.Value)) return;
+            TranslationEditor editor = new(Locales, SelectedTranslation);
+            bool? result = editor.ShowDialog();
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
 
-            var trans = editor.Translation;
+            LocTranslation trans = editor.Translation;
 
             SelectedTranslation.Locale = trans.Locale;
             SelectedTranslation.Value = trans.Value;
@@ -493,9 +620,13 @@ namespace Thismaker.Thoth.Manager.Wpf
         public RelayCommand DeleteTranslationCommand { get; private set; }
         private void OnDeleteTrans()
         {
-            var result = GoroMessageBox.Show("Warning", "Are you sure you want to delete this translation?", MessageBoxButton.YesNo, StatusInfo.Warning);
-            if (!(result.HasValue && result.Value)) return;
-            SelectedItem.Translations.Remove(SelectedTranslation);
+            bool? result = GoroMessageBox.Show("Warning", "Are you sure you want to delete this translation?", MessageBoxButton.YesNo, StatusInfo.Warning);
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
+
+            _ = SelectedItem.Translations.Remove(SelectedTranslation);
             _edited = true;
         }
 
@@ -506,7 +637,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnAddLocale()
         {
-            var managedLocale = new ManagedLocale
+            ManagedLocale managedLocale = new()
             {
                 Name = LocaleName,
                 ShortName = LocaleShortName
@@ -539,18 +670,22 @@ namespace Thismaker.Thoth.Manager.Wpf
         }
         private void OnDeleteLocale()
         {
-            var result = GoroMessageBox.Show("Warning", "Are you sure you want to delete this locale definition?", MessageBoxButton.YesNo, StatusInfo.Warning);
-            if (!(result.HasValue && result.Value)) return;
-            Locales.Remove(SelectedLocale);
+            bool? result = GoroMessageBox.Show("Warning", "Are you sure you want to delete this locale definition?", MessageBoxButton.YesNo, StatusInfo.Warning);
+            if (!(result.HasValue && result.Value))
+            {
+                return;
+            }
+
+            _ = Locales.Remove(SelectedLocale);
             _edited = true;
         }
 
         private bool LocaleNotEmpty()
         {
-            return (!string.IsNullOrEmpty(LocaleName) 
-                && !string.IsNullOrEmpty(LocaleShortName));
+            return !string.IsNullOrEmpty(LocaleName)
+                && !string.IsNullOrEmpty(LocaleShortName);
         }
-        
+
         #endregion
     }
 }

@@ -1,6 +1,9 @@
 ﻿using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Thismaker.Aba.Client.Core;
 
@@ -14,6 +17,10 @@ namespace Thismaker.Aba.Client.Msal
     public abstract class MsalClient<T>:ClientBase<T> where T:MsalClient<T>
     {
         #region Properties
+
+        public string IdToken { get; protected set; }
+
+        public string RefreshToken { get; protected set; }
 
         ///<inheritdoc/>
         public new IMsalContext Context
@@ -65,6 +72,8 @@ namespace Thismaker.Aba.Client.Msal
 
         public TokenAccessArgs ApiTokenAccessArgs { get; protected set; }
 
+        protected event Action<AuthenticationResult> TokenRenewed;
+
         #endregion
 
         #region Base Overrides
@@ -98,19 +107,7 @@ namespace Thismaker.Aba.Client.Msal
 
         #endregion
 
-        #region Abstracts
-        /// <summary>
-        /// When overriden in a derived class, starts the relevant login process
-        /// </summary>
-        /// <returns></returns>
-        public abstract Task Login();
-
-        /// <summary>
-        /// When overriden in a derived class, starts the relevant logout process
-        /// </summary>
-        /// <returns></returns>
-        public abstract Task Logout();
-
+        #region Virtuals
         /// <summary>
         /// Override to capture any Msal logs
         /// </summary>
@@ -137,6 +134,23 @@ namespace Thismaker.Aba.Client.Msal
             };
         }
 
+        protected JsonDocument ParseIdToken()
+        {
+            // Parse the idToken to get user info
+            string idPart = IdToken.Split('.')[1];
+            idPart = Base64UrlDecode(idPart);
+            return JsonDocument.Parse(idPart);
+        }
+
+        private string Base64UrlDecode(string s)
+        {
+            s = s.Replace('-', '+').Replace('_', '/');
+            s = s.PadRight(s.Length + (4 - s.Length % 4) % 4, '=');
+            byte[] byteArray = Convert.FromBase64String(s);
+            string decoded = Encoding.UTF8.GetString(byteArray, 0, byteArray.Count());
+            return decoded;
+        }
+
         ///<inheritdoc/>
         protected override async Task RenewAccessTokenAsync()
         {
@@ -159,9 +173,11 @@ namespace Thismaker.Aba.Client.Msal
             {
                 throw;
             }
+            AccessToken = AccessToken.Bearer(result.AccessToken, result.ExpiresOn);
 
-            AccessToken.ExpiresOn = result.ExpiresOn;
-            AccessToken = Core.AccessToken.Bearer(result.AccessToken);
+            IdToken = result.IdToken;
+
+            TokenRenewed?.Invoke(result);
         }
         #endregion
     }

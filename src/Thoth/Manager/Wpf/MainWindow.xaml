@@ -30,6 +30,8 @@
                 <MenuItem Header="Add New Table" Command="{Binding AddTableCommand}"/>
                 <MenuItem Header="Edit Selected Table" Command="{Binding EditTableCommand}"/>
                 <MenuItem Header="Delete Selected Table" Command="{Binding DeleteTableCommand}"/>
+                <MenuItem Header="Export as SideloadTable" Command="{Binding ExportTableCommand}"/>
+                <MenuItem Header="Import SideloadTable" Command="{Binding ImportTableCommand}"/>
             </MenuItem>
             <MenuItem Header="Localization Item">
                 <MenuItem Header="Add New Localization Item" Command="{Binding AddItemCommand}"/>

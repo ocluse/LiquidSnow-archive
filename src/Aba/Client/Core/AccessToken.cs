@@ -5,63 +5,32 @@ namespace Thismaker.Aba.Client.Core
 {
     public class AccessToken
     {
-        private string value, key;
-        private AccessTokenKind kind;
-        private DateTimeOffset? exipresOn;
-        private double expiryCushion = 5;
-        private bool isAuthorizationHeader;
 
         /// <summary>
-        /// The actual value of the access-token, usually a random base64-encoded string
+        /// The actual value of the access-token, usually a base64-encoded string
         /// </summary>
-        public string Value
-        {
-            get { return value; }
-            set { this.value = value; }
-        }
-
-        public bool IsAuthorizationHeader
-        {
-            get => isAuthorizationHeader;
-            set => isAuthorizationHeader = value;
-        }
+        public string Value { get; set; }
 
         /// <summary>
-        /// The key used to identify the <see cref="AccessToken"/> in the header for the HTTP requests
+        /// The key added to the request headers, e.g Authorization
         /// </summary>
-        public string Key
-        {
-            get { return key; }
-            set { key = value; }
-        }
+        public string HeaderName { get; set; }
 
         /// <summary>
-        /// The kind of the <see cref="AccessToken"/>, usually Bearer, Basic or Custom for custom auth schemes
+        /// The scheme of the access token, e.g Bearer
         /// </summary>
-        public AccessTokenKind Kind
-        {
-            get { return kind; }
-            set { kind = value; }
-        }
+        public string Scheme { get; set; }
 
         /// <summary>
-        /// The expiry time of the token. May be applicable to Bearer and custom tokens
+        /// The expiry time of the token, after which it should be renewed
         /// </summary>
-        public DateTimeOffset? ExpiresOn
-        {
-            get { return exipresOn; }
-            set { exipresOn = value; }
-        }
+        public DateTimeOffset? ExpiresOn { get; set; }
 
         /// <summary>
         /// The cushion time, in minutes that is added to the actual token expiry when checking whether the token is expired.
         /// The default value is 5 minutes
         /// </summary>
-        public double ExpiryCushion
-        {
-            get => expiryCushion;
-            set => expiryCushion = value;
-        }
+        public double ExpiryCushion { get; set; } = 5;
 
         /// <summary>
         /// Returns true if the access token has an expiry date that has been elapsed.
@@ -77,13 +46,14 @@ namespace Thismaker.Aba.Client.Core
         /// <summary>
         /// Creates a Bearer access token
         /// </summary>
-        public static AccessToken Bearer(string value)
+        public static AccessToken Bearer(string value, DateTimeOffset? expiry = null)
         {
             var result = new AccessToken
             {
-                Key = "Bearer",
-                Kind = AccessTokenKind.Bearer,
-                Value = value
+                HeaderName = "Authorization",
+                Scheme = "Bearer",
+                Value = value,
+                ExpiresOn = expiry
             };
             return result;
         }
@@ -91,37 +61,17 @@ namespace Thismaker.Aba.Client.Core
         /// <summary>
         /// Creates a basic access token
         /// </summary>
-        public static AccessToken Basic(string value)
+        public static AccessToken Basic(string value, DateTimeOffset? expiry = null)
         {
             var result = new AccessToken
             {
-                Key = "Basic",
-                Kind = AccessTokenKind.Bearer,
-                Value = value
+                HeaderName = "Authorization",
+                Scheme = "Basic",
+                Value = value,
+                ExpiresOn = expiry
             };
 
             return result;
         }
-
-        /// <summary>
-        /// Creates a custom access token
-        /// </summary>
-        public static AccessToken Custom(string key, string value)
-        {
-            var result = new AccessToken
-            {
-                Key = key,
-                Kind = AccessTokenKind.Custom,
-                Value = value
-            };
-            return result;
-        }
-    }
-
-    public enum AccessTokenKind
-    {
-        Bearer,
-        Basic,
-        Custom,
     }
 }

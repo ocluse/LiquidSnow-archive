@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Net.Http;
 
 namespace Thismaker.Aba.Client.Core
 {
@@ -51,5 +53,16 @@ namespace Thismaker.Aba.Client.Core
         protected ExpiredTokenException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
+    [Serializable]
+    public class SimpleRequestException : HttpRequestException
+    {
+        public HttpStatusCode StatusCode => ResponseMessage.StatusCode;
+        public HttpResponseMessage ResponseMessage { get; set; }
+        public SimpleRequestException(HttpResponseMessage responseMessage)
+        {
+            ResponseMessage = responseMessage;
+        }
     }
 }

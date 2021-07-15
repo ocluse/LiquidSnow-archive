@@ -15,7 +15,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             ThemeManager.Theme = ThemeMode.Dark;
             ThemeManager.Accent = ColorUtility.CreateBrush("#3A47AA").Color;
 
-            var window = new MainWindow();
+            MainWindow window = new();
             MainWindow = window;
             window.Show();
         }

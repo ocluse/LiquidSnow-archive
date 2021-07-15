@@ -8,7 +8,7 @@ namespace Thismaker.Thoth.Manager.Wpf
     /// </summary>
     public partial class TranslationEditor : Window
     {
-        public TranslationEditor(IEnumerable<ManagedLocale> locales, LocTranslation locTranslation=null)
+        public TranslationEditor(IEnumerable<ManagedLocale> locales, LocTranslation locTranslation = null)
         {
             InitializeComponent();
 

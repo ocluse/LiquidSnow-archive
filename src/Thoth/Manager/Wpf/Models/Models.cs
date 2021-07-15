@@ -9,7 +9,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         private string _tableKey;
 
         private ObservableCollection<LocItem> _items;
-        
+
         public string TableKey
         {
             get => _tableKey;
@@ -24,12 +24,12 @@ namespace Thismaker.Thoth.Manager.Wpf
 
         public LocalizationTable ToTable()
         {
-            var table = new LocalizationTable
+            LocalizationTable table = new()
             {
                 Items = new Dictionary<string, LocalizationItem>()
             };
 
-            foreach(var item in Items)
+            foreach (LocItem item in Items)
             {
                 table.Items.Add(item.Key, item.ToItem());
             }
@@ -58,12 +58,12 @@ namespace Thismaker.Thoth.Manager.Wpf
 
         public LocalizationItem ToItem()
         {
-            var item = new LocalizationItem
+            LocalizationItem item = new()
             {
                 Translations = new Dictionary<string, string>()
             };
 
-            foreach(var trans in Translations)
+            foreach (LocTranslation trans in Translations)
             {
                 item.Translations.Add(trans.Locale, trans.Value);
             }
@@ -119,11 +119,11 @@ namespace Thismaker.Thoth.Manager.Wpf
     {
         public static IEnumerable<ManagedLocale> GetManagedLocales(this LocalizationData data)
         {
-            var result = new List<ManagedLocale>();
+            List<ManagedLocale> result = new();
 
-            foreach(var locale in data.Locales)
+            foreach (Locale locale in data.Locales)
             {
-                var manLocale = new ManagedLocale
+                ManagedLocale manLocale = new()
                 {
                     Name = locale.Name,
                     ShortName = locale.ShortName
@@ -137,27 +137,27 @@ namespace Thismaker.Thoth.Manager.Wpf
 
         public static IEnumerable<LocTable> GetLocTables(this LocalizationData data)
         {
-            var result = new List<LocTable>();
+            List<LocTable> result = new();
 
-            foreach(var table in data.Tables)
+            foreach (KeyValuePair<string, LocalizationTable> table in data.Tables)
             {
-                var locTable = new LocTable
+                LocTable locTable = new()
                 {
                     Items = new ObservableCollection<LocItem>(),
                     TableKey = table.Key,
                 };
 
-                foreach(var item in table.Value.Items)
+                foreach (KeyValuePair<string, LocalizationItem> item in table.Value.Items)
                 {
-                    var locItem = new LocItem
+                    LocItem locItem = new()
                     {
                         Key = item.Key,
                         Translations = new ObservableCollection<LocTranslation>()
                     };
 
-                    foreach(var trans in item.Value.Translations)
+                    foreach (KeyValuePair<string, string> trans in item.Value.Translations)
                     {
-                        var locTrans = new LocTranslation
+                        LocTranslation locTrans = new()
                         {
                             Locale = trans.Key,
                             Value = trans.Value,
@@ -177,9 +177,9 @@ namespace Thismaker.Thoth.Manager.Wpf
         public static void SetLocTables(this LocalizationData data, IEnumerable<LocTable> tables)
         {
             data.Tables = new Dictionary<string, LocalizationTable>();
-            foreach(var locTable in tables)
+            foreach (LocTable locTable in tables)
             {
-                var table = locTable.ToTable();
+                LocalizationTable table = locTable.ToTable();
                 data.Tables.Add(locTable.TableKey, table);
             }
         }
@@ -187,7 +187,7 @@ namespace Thismaker.Thoth.Manager.Wpf
         public static void SetManagedLocales(this LocalizationData data, IEnumerable<ManagedLocale> locales)
         {
             data.Locales = new List<Locale>();
-            foreach(var manLocale in locales)
+            foreach (ManagedLocale manLocale in locales)
             {
                 data.Locales.Add(manLocale.ToLocale());
             }

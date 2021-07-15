@@ -11,12 +11,18 @@ namespace Thismaker.Thoth.Manager.Wpf
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (Model == null) return null;
+            if (Model == null)
+            {
+                return null;
+            }
 
-            var shortName = (string)value;
-            var name = Model.Locales.FirstOrDefault(x => x.ShortName == shortName)?.Name;
+            string shortName = (string)value;
+            string name = Model.Locales.FirstOrDefault(x => x.ShortName == shortName)?.Name;
 
-            if (string.IsNullOrEmpty(name)) name = "Unknown Locale";
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "Unknown Locale";
+            }
 
             return name;
         }

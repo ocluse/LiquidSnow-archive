@@ -12,7 +12,7 @@ namespace Thismaker.Aba.Client
     /// The <see cref="ClientBase{T}"/> is an abstract class with the very basic fundamentals of what
     /// all apps are supposed to contain
     /// </summary>
-    public abstract partial class ClientBase<TClient> : CoreClient<TClient>where TClient:ClientBase<TClient>
+    public abstract partial class ClientBase<TClient> : CoreClientBase<TClient> where TClient : ClientBase<TClient>
     {
 
         #region Properties 
@@ -121,7 +121,7 @@ namespace Thismaker.Aba.Client
         /// <param name="args">The object to serialize</param>
         protected override string Serialize<T>(T args)
         {
-            return JsonSerializer.Serialize(args);
+            return JsonSerializer.Serialize(args, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
         #endregion
 
@@ -139,7 +139,7 @@ namespace Thismaker.Aba.Client
 
             //get all methods with the subscribe attribute:
             var methods = GetType()
-                .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                .GetMethods();
 
             foreach (var method in methods)
             {
@@ -187,21 +187,19 @@ namespace Thismaker.Aba.Client
         }
 
         /// <summary>
-        /// Attempts to connect to the hub. Should be called only once during the lifetime of the application,
-        /// unless the client was disconnected and they wish to reconnect.
-        /// Calling this method when the hub was already online throws an exception.
+        /// Attempts to connect to the hub
         /// </summary>
-        /// <returns></returns>
-        public async Task ConnectHub()
+        public async Task ConnectHubAsync()
         {
-            try
-            {
-                await HubConnection.StartAsync();
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+            await HubConnection.StartAsync().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Attempts to disconnect the hub by stopping it gracefully.
+        /// </summary>
+        public async Task DisconnectHubAsync()
+        {
+            await HubConnection.StopAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -209,7 +207,7 @@ namespace Thismaker.Aba.Client
         /// </summary>
         public async Task HubSend(string methodName)
         {
-            await HubConnection.SendAsync(methodName);
+            await HubConnection.SendAsync(methodName).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -217,7 +215,7 @@ namespace Thismaker.Aba.Client
         /// </summary>
         public async Task HubSend(string methodName, object arg1)
         {
-            await HubConnection.SendAsync(methodName, arg1);
+            await HubConnection.SendAsync(methodName, arg1).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -225,7 +223,7 @@ namespace Thismaker.Aba.Client
         /// </summary>
         public async Task HubSend(string methodName, object arg1, object arg2)
         {
-            await HubConnection.SendAsync(methodName, arg1, arg2);
+            await HubConnection.SendAsync(methodName, arg1, arg2).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -233,7 +231,7 @@ namespace Thismaker.Aba.Client
         /// </summary>
         public async Task HubSend(string methodName, object arg1, object arg2, object arg3)
         {
-            await HubConnection.SendAsync(methodName, arg1, arg2, arg3);
+            await HubConnection.SendAsync(methodName, arg1, arg2, arg3).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -241,7 +239,7 @@ namespace Thismaker.Aba.Client
         /// </summary>
         public async Task HubSend(string methodName, object arg1, object arg2, object arg3, object arg4)
         {
-            await HubConnection.SendAsync(methodName, arg1, arg2, arg3, arg4);
+            await HubConnection.SendAsync(methodName, arg1, arg2, arg3, arg4).ConfigureAwait(false);
         }
 
         /// <summary>

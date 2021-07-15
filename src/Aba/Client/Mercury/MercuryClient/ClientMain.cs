@@ -7,7 +7,7 @@ using MClient = Thismaker.Mercury.Client;
 
 namespace Thismaker.Aba.Client.Mercury
 {
-    public abstract partial class MercuryClient<TClient>:CoreClient<TClient> where TClient:MercuryClient<TClient>
+    public abstract partial class MercuryClient<TClient>:CoreClientBase<TClient> where TClient:MercuryClient<TClient>
     {
         private MClient _mClient;
 
