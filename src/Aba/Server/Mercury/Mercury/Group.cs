@@ -64,7 +64,7 @@ namespace Thismaker.Aba.Server.Mercury
 
         public async Task BeamAsync(string methodName, object[] args, Type[] types)
         {
-            foreach (var client in _clients)
+            foreach (string client in _clients)
             {
                 await _server.BeamClientAsync(client, methodName, args, types);
             }
@@ -72,12 +72,12 @@ namespace Thismaker.Aba.Server.Mercury
 
         internal void RemoveFromGroup(string connectionId)
         {
-            _clients.Remove(connectionId);
+            _ = _clients.Remove(connectionId);
         }
 
         internal void AddConnectionId(string connectionId)
         {
-            _clients.Add(connectionId);
+            _ = _clients.Add(connectionId);
         }
 
         #endregion
@@ -119,9 +119,13 @@ namespace Thismaker.Aba.Server.Mercury
 
         public async Task BeamExceptAsync(string excludeId, string methodName, object[] args, Type[] types)
         {
-            foreach (var client in _clients)
+            foreach (string client in _clients)
             {
-                if (excludeId == client) continue;
+                if (excludeId == client)
+                {
+                    continue;
+                }
+
                 await _server.BeamClientAsync(client, methodName, args, types);
             }
         }

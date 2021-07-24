@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>2.0.0.0</Version>
+    <Version>3.0.0-alpha1</Version>
     <Authors>Thismaker</Authors>
     <Description>Enables you to quickly secure your files and folders by providing the CryptoFile and CryptoContainer classes for dealing with files and folders respectively.</Description>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.IO.Packaging" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>

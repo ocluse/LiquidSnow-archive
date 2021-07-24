@@ -10,7 +10,12 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
 {
     public abstract class HostedMercuryServer : MercuryServer, IHostedService
     {
-        HostedMercuryManager _manager;
+        private HostedMercuryManager _manager;
+
+        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
         #region HostedServiceImplements
         public Task StartAsync(CancellationToken cancellationToken)
@@ -48,22 +53,22 @@ namespace Thismaker.Aba.Server.Mercury.Hosted
 
         protected override T Deserialize<T>(string json)
         {
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonSerializer.Deserialize<T>(json, _jsonOptions);
         }
 
         protected override object Deserialize(string json, Type type)
         {
-            return JsonSerializer.Deserialize(json, type);
+            return JsonSerializer.Deserialize(json, type, _jsonOptions);
         }
 
         protected override string Serialize(object obj, Type type)
         {
-            return JsonSerializer.Serialize(obj, type);
+            return JsonSerializer.Serialize(obj, type, _jsonOptions);
         }
 
         protected override string Serialize<T>(T obj)
         {
-            return JsonSerializer.Serialize<T>(obj);
+            return JsonSerializer.Serialize(obj, _jsonOptions);
         }
 
         protected override async Task<ClaimsPrincipal> ValidateAccessToken(string accessToken, List<string> scopes)

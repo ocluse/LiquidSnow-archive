@@ -13,18 +13,32 @@ namespace Thismaker.Aba.Server.Mercury
 
         public virtual MercuryUser User(string userId)
         {
-            if (_users == null) return null;
-            if (_users.ContainsKey(userId)) return null;
+            if (_users == null)
+            {
+                return null;
+            }
+
+            if (_users.ContainsKey(userId))
+            {
+                return null;
+            }
+
             return _users[userId];
         }
 
         public virtual MercuryUser UserWithConnectionId(string connectionId)
         {
-            if (_users == null) return null;
-
-            foreach (var user in _users)
+            if (_users == null)
             {
-                if (user.Value.HasConnectionId(connectionId)) return user.Value;
+                return null;
+            }
+
+            foreach (KeyValuePair<string, MercuryUser> user in _users)
+            {
+                if (user.Value.HasConnectionId(connectionId))
+                {
+                    return user.Value;
+                }
             }
 
             return null;
@@ -32,9 +46,12 @@ namespace Thismaker.Aba.Server.Mercury
 
         public IBeamer Client(string connectionId)
         {
-            if (!_mServer.HasClient(connectionId)) return null;
+            if (!_mServer.HasClient(connectionId))
+            {
+                return null;
+            }
 
-            var clientBase = new MercuryClientBase(connectionId, this);
+            MercuryClientBase clientBase = new MercuryClientBase(connectionId, this);
 
             return clientBase;
         }
@@ -42,7 +59,7 @@ namespace Thismaker.Aba.Server.Mercury
         private async Task DisconnectClientAsync(string connectionId, string reason)
         {
             //create the special payload:
-            var payload = new RPCPayload
+            RPCPayload payload = new RPCPayload
             {
                 Parameters = new List<string> { reason },
                 MethodName = Globals.CloseConnection
@@ -57,16 +74,12 @@ namespace Thismaker.Aba.Server.Mercury
         {
             MercuryUser user;
 
-            if (_users == null) _users = new Dictionary<string, MercuryUser>();
+            if (_users == null)
+            {
+                _users = new Dictionary<string, MercuryUser>();
+            }
 
-            if (_users.ContainsKey(userId))
-            {
-                user = _users[userId];
-            }
-            else
-            {
-                user = new MercuryUser(userId, this);
-            }
+            user = _users.ContainsKey(userId) ? _users[userId] : new MercuryUser(userId, this);
 
             user.AddConnectionId(connectionId);
         }
@@ -77,7 +90,11 @@ namespace Thismaker.Aba.Server.Mercury
 
         public Group Group(string groupName)
         {
-            if (_groups == null) return null;
+            if (_groups == null)
+            {
+                return null;
+            }
+
             if (_groups.ContainsKey(groupName))
             {
                 return _groups[groupName];
@@ -90,10 +107,12 @@ namespace Thismaker.Aba.Server.Mercury
             if (_mServer.HasClient(connectionId))
             {
                 Group group;
-                if (_groups == null) _groups = new Dictionary<string, Group>();
+                if (_groups == null)
+                {
+                    _groups = new Dictionary<string, Group>();
+                }
 
-                if (_groups.ContainsKey(groupName)) group = _groups[groupName];
-                else group = new Group(this, groupName);
+                group = _groups.ContainsKey(groupName) ? _groups[groupName] : new Group(this, groupName);
 
                 group.AddConnectionId(connectionId);
             }
@@ -101,8 +120,16 @@ namespace Thismaker.Aba.Server.Mercury
 
         public void RemoveFromGroup(string connectionId, string groupName)
         {
-            if (_groups == null) return;
-            if (!_groups.ContainsKey(groupName)) return;
+            if (_groups == null)
+            {
+                return;
+            }
+
+            if (!_groups.ContainsKey(groupName))
+            {
+                return;
+            }
+
             _groups[groupName].RemoveFromGroup(connectionId);
         }
 

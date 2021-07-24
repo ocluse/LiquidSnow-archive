@@ -11,7 +11,7 @@ namespace Thismaker.Aba.Server.Mercury
 
         internal MercuryClientBase(string connectionId, MercuryServer server)
         {
-            _connectionId = connectionId; 
+            _connectionId = connectionId;
             _server = server;
         }
 

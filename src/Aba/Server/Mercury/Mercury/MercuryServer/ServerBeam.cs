@@ -8,9 +8,9 @@ using Thismaker.Aba.Common.Mercury;
 
 namespace Thismaker.Aba.Server.Mercury
 {
-    public partial class MercuryServer: IBeamer
+    public partial class MercuryServer : IBeamer
     {
-        class CacheItem
+        private class CacheItem
         {
             public bool Authorize { get; set; }
             public bool InjectPrincipal { get; set; }
@@ -27,25 +27,28 @@ namespace Thismaker.Aba.Server.Mercury
         {
             _methodCache = new Dictionary<string, CacheItem>();
 
-            var methods = GetType().GetMethods();
+            MethodInfo[] methods = GetType().GetMethods(BindingFlags.Instance);
 
-            foreach (var method in methods)
+            foreach (MethodInfo method in methods)
             {
-                var beamable = method.GetCustomAttribute<BeamableAttribute>();
-                if (beamable == null) continue;
+                BeamableAttribute beamable = method.GetCustomAttribute<BeamableAttribute>();
+                if (beamable == null)
+                {
+                    continue;
+                }
 
                 string name = string.IsNullOrEmpty(beamable.MethodName) ?
                     method.Name : beamable.MethodName;
 
-                var types = new List<Type>();
-                var pInfos = method.GetParameters();
+                List<Type> types = new List<Type>();
+                ParameterInfo[] pInfos = method.GetParameters();
 
-                foreach (var pInfo in pInfos)
+                foreach (ParameterInfo pInfo in pInfos)
                 {
                     types.Add(pInfo.ParameterType);
                 }
 
-                var cache = new CacheItem
+                CacheItem cache = new CacheItem
                 {
                     MethodInfo = method,
                     Types = types,
@@ -88,21 +91,27 @@ namespace Thismaker.Aba.Server.Mercury
                 ConstructMethodCache();
             }
 
-            if (!_methodCache.ContainsKey(payload.MethodName)) return;
+            if (!_methodCache.ContainsKey(payload.MethodName))
+            {
+                return;
+            }
 
             //if we require auth send
-            var item = _methodCache[payload.MethodName];
+            CacheItem item = _methodCache[payload.MethodName];
 
-            var parameters = new List<object>();
+            List<object> parameters = new List<object>();
 
             //first, validate the access token:
             if (item.Authorize)
             {
-                var principal = await ValidateAccessToken(payload.AccessToken, item.Scopes).ConfigureAwait(false);
+                ClaimsPrincipal principal = await ValidateAccessToken(payload.AccessToken, item.Scopes).ConfigureAwait(false);
 
-                if (principal == null) return;
+                if (principal == null)
+                {
+                    return;
+                }
 
-                var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                string userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 //If we require authentication, ensure that is done first:
                 if (_requiresAuth && User(userId) == null)
@@ -120,7 +129,7 @@ namespace Thismaker.Aba.Server.Mercury
                 //Inject the principal if so required
                 if (item.InjectPrincipal)
                 {
-                    var mPrincipal = new MercuryPrincipal(connectionId, this, principal);
+                    MercuryPrincipal mPrincipal = new MercuryPrincipal(connectionId, this, principal);
                     parameters.Add(mPrincipal);
                 }
             }
@@ -133,9 +142,7 @@ namespace Thismaker.Aba.Server.Mercury
                 }
             }
 
-            if (parameters.Count == 0) item.MethodInfo.Invoke(this, null);
-
-            else item.MethodInfo.Invoke(this, parameters.ToArray());
+            _ = parameters.Count == 0 ? item.MethodInfo.Invoke(this, null) : item.MethodInfo.Invoke(this, parameters.ToArray());
         }
 
         #endregion
@@ -149,8 +156,8 @@ namespace Thismaker.Aba.Server.Mercury
 
         public async Task BeamAsync<T1>(string methodName, T1 arg)
         {
-            await BeamAsync(methodName, 
-                new object[] { arg }, 
+            await BeamAsync(methodName,
+                new object[] { arg },
                 new Type[] { typeof(T1) });
         }
 
@@ -158,7 +165,7 @@ namespace Thismaker.Aba.Server.Mercury
         {
             await BeamAsync(methodName,
                 new object[] { arg1, arg2 },
-                new Type[] { typeof(T1), typeof(T2)});
+                new Type[] { typeof(T1), typeof(T2) });
         }
 
         public async Task BeamAsync<T1, T2, T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
@@ -177,7 +184,7 @@ namespace Thismaker.Aba.Server.Mercury
 
         public async Task BeamAsync(string methodName, object[] args, Type[] types)
         {
-            var payload = new RPCPayload
+            RPCPayload payload = new RPCPayload
             {
                 Parameters = new List<string>(),
                 MethodName = methodName
@@ -188,16 +195,19 @@ namespace Thismaker.Aba.Server.Mercury
                 payload.Parameters.Add(Serialize(args[i], types[i]));
             }
 
-            var data = Serialize(payload).GetBytes<UTF8Encoding>();
+            byte[] data = Serialize(payload).GetBytes<UTF8Encoding>();
 
             await _mServer.SendAllAsync(data).ConfigureAwait(false);
         }
 
         internal async Task BeamClientAsync(string connectionId, string methodName, object[] args, Type[] types)
         {
-            if (!_mServer.HasClient(connectionId)) return;
+            if (!_mServer.HasClient(connectionId))
+            {
+                return;
+            }
 
-            var payload = new RPCPayload
+            RPCPayload payload = new RPCPayload
             {
                 Parameters = new List<string>(),
                 MethodName = methodName

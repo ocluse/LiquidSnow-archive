@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Thismaker.Horus.Symmetrics;
 
 namespace Thismaker.Horus.IO
@@ -16,7 +16,7 @@ namespace Thismaker.Horus.IO
     {
         #region Private Fields
         private byte[] _key;
-        
+
         private readonly Stream _stream;
         #endregion
 
@@ -84,7 +84,7 @@ namespace Thismaker.Horus.IO
         public void SetKey(byte[] key)
         {
             Array.Clear(_key, 0, _key.Length);
-            Array.Copy(key,0, _key,0, key.Length);
+            Array.Copy(key, 0, _key, 0, key.Length);
         }
 
         /// <summary>
@@ -95,28 +95,26 @@ namespace Thismaker.Horus.IO
         public async Task<T> DeserializeAsync<T>()
         {
             //Create serializer and stream
-            var serializer = new XmlSerializer(typeof(T));
-            using var msData = new MemoryStream();
+            using MemoryStream msData = new MemoryStream();
 
             //Decrypt the data to the stream
             await ReadAsync(msData);
             msData.Position = 0;
 
             //Deserialize
-            return (T)serializer.Deserialize(msData);
+            return await JsonSerializer.DeserializeAsync<T>(msData);
         }
 
         /// <summary>
-        /// Uses XML serialization to save the contents of the provided <paramref name="o"/>
+        /// Uses JSON serialization to save the contents of the provided <paramref name="o"/>
         /// to the <see cref="CryptoFile"/>'s underlying stream.
         /// </summary>
         /// <param name="o">The object to serialize</param>
         /// <returns></returns>
-        public async Task SerializeAsync(object o)
+        public async Task SerializeAsync<T>(T o)
         {
-            var serializer = new XmlSerializer(o.GetType());
-            using var msData = new MemoryStream();
-            serializer.Serialize(msData, o);
+            using MemoryStream msData = new MemoryStream();
+            await JsonSerializer.SerializeAsync(msData, o).ConfigureAwait(false);
             msData.Position = 0;
             _stream.Position = 0;
             _stream.SetLength(0);
@@ -154,29 +152,29 @@ namespace Thismaker.Horus.IO
         /// <returns></returns>
         public async Task WriteBytesAsync(byte[] buffer, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
-            using var msData = new MemoryStream(buffer);
+            using MemoryStream msData = new MemoryStream(buffer);
             await WriteAsync(msData, progress, cancellationToken);
 
         }
 
         public async Task<byte[]> ReadBytesAsync(IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
-            using var ms = new MemoryStream();
+            using MemoryStream ms = new MemoryStream();
             await ReadAsync(ms, progress, cancellationToken);
             return ms.ToArray();
         }
 
-        public async Task WriteTextAsync(string contents, IProgress<float> progress=null, CancellationToken cancellationToken = default)
+        public async Task WriteTextAsync(string contents, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
             await WriteBytesAsync(contents.GetBytes<UTF8Encoding>(), progress, cancellationToken);
         }
 
-        public async Task<string> ReadTextAsync(IProgress<float> progress=null, CancellationToken cancellationToken = default)
+        public async Task<string> ReadTextAsync(IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
-            var data = await ReadBytesAsync(progress, cancellationToken);
+            byte[] data = await ReadBytesAsync(progress, cancellationToken);
             return data.GetString<UTF8Encoding>();
         }
-        
+
         /// <summary>
         /// Releases all resources used by the file, closing the underlying stream
         /// </summary>

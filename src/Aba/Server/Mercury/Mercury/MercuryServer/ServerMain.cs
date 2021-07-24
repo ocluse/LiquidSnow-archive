@@ -45,9 +45,9 @@ namespace Thismaker.Aba.Server.Mercury
         #region Initialization
         protected MercuryServer()
         {
-            var requireAuthAtt = GetType().GetCustomAttribute<RequireTokenValidationAttribute>();
+            RequireTokenValidationAttribute requireAuthAtt = GetType().GetCustomAttribute<RequireTokenValidationAttribute>();
             _requiresAuth = requireAuthAtt != null;
-            
+
             if (_requiresAuth)
             {
                 _defaultScopes = requireAuthAtt.Scopes;
@@ -88,10 +88,10 @@ namespace Thismaker.Aba.Server.Mercury
         private async void OnConnectedInternal(string connectionId)
         {
             MercuryUser user;
-            
+
             if (_requiresAuth)
             {
-                var _tcsAuthenticate = new TaskCompletionSource<string>();
+                TaskCompletionSource<string> _tcsAuthenticate = new TaskCompletionSource<string>();
 
                 void OnCLientProvidedAuthentication(string connId, string accessToken)
                 {
@@ -105,13 +105,13 @@ namespace Thismaker.Aba.Server.Mercury
                 ClientProvidedAuthentication += OnCLientProvidedAuthentication;
                 await _mServer.SendAsync(connectionId, Globals.AuthSelf).ConfigureAwait(false);
 
-                var token = await _tcsAuthenticate.Task;
+                string token = await _tcsAuthenticate.Task;
 
-                var principal = await ValidateAccessToken(token, _defaultScopes).ConfigureAwait(false);
+                ClaimsPrincipal principal = await ValidateAccessToken(token, _defaultScopes).ConfigureAwait(false);
 
                 if (principal != null)
                 {
-                    var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    string userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     AddUserConnectionId(connectionId, userId);
                     user = User(userId);
                 }
@@ -130,7 +130,7 @@ namespace Thismaker.Aba.Server.Mercury
 
 
             await OnConnectedAsync(user, connectionId).ConfigureAwait(false);
-            
+
         }
 
         private async void OnDisconnectedInternal(string connectionId, Exception ex)
@@ -143,7 +143,7 @@ namespace Thismaker.Aba.Server.Mercury
         #endregion
 
         #region Abstracts
-        
+
         /// <summary>
         /// This method is used to serialize the <see cref="RPCPayload"/> for transportation.
         /// Override to customize payload serialization
@@ -198,8 +198,8 @@ namespace Thismaker.Aba.Server.Mercury
         private void OnReceived(string connectionId, byte[] data)
         {
             //Check if it's ping:
-            var json = data.GetString<UTF8Encoding>();
-            var payload = Deserialize<RPCPayload>(json);
+            string json = data.GetString<UTF8Encoding>();
+            RPCPayload payload = Deserialize<RPCPayload>(json);
             PayloadReceivedAsync(connectionId, payload);
         }
 

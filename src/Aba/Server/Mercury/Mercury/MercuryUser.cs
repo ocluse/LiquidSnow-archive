@@ -29,8 +29,12 @@ namespace Thismaker.Aba.Server.Mercury
 
         public void AddConnectionId(string connId)
         {
-            if (_connectionIds.Contains(connId)) return;
-            _connectionIds.Add(connId);
+            if (_connectionIds.Contains(connId))
+            {
+                return;
+            }
+
+            _ = _connectionIds.Add(connId);
         }
 
         public bool HasConnectionId(string connId)
@@ -40,7 +44,7 @@ namespace Thismaker.Aba.Server.Mercury
 
         public bool RemoveConnectionId(string connId)
         {
-            _connectionIds.Remove(connId);
+            _ = _connectionIds.Remove(connId);
             return _connectionIds.Count > 0;
         }
 
@@ -84,7 +88,7 @@ namespace Thismaker.Aba.Server.Mercury
 
         public async Task BeamAsync(string methodName, object[] args, Type[] types)
         {
-            foreach (var connectionId in _connectionIds)
+            foreach (string connectionId in _connectionIds)
             {
                 await _server.BeamClientAsync(connectionId, methodName, args, types);
             }
