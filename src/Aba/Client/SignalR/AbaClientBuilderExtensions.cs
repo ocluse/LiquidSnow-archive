@@ -1,4 +1,4 @@
-﻿using Thismaker.Aba.Client.Core;
+﻿using Thismaker.Aba.Client.SignalR;
 
 namespace Thismaker.Aba.Client
 {
@@ -8,7 +8,7 @@ namespace Thismaker.Aba.Client
         /// Sets the HubEndpoint of a client
         /// </summary>
         /// <returns></returns>
-        public static AbaClientBuilder<T> WithHubEndpoint<T>(this AbaClientBuilder<T> aba, string hubEndpoint)where T : ClientBase<T>, new()
+        public static AbaClientBuilder<T> WithHubEndpoint<T>(this AbaClientBuilder<T> aba, string hubEndpoint) where T : SignalRClientBase<T>, new()
         {
             aba.EnsureNotMadeYet();
             aba.client.HubEndpoint = hubEndpoint;
@@ -16,10 +16,10 @@ namespace Thismaker.Aba.Client
         }
 
         /// <summary>
-        /// Calls <see cref="ClientBase{TClient}.SubscribeHub"/>
+        /// Calls <see cref="SignalRClientBase{TClient}.SubscribeHub"/>
         /// </summary>
         /// <returns></returns>
-        public static AbaClientBuilder<T> SubscribeHub<T>(this AbaClientBuilder<T> aba) where T : ClientBase<T>, new()
+        public static AbaClientBuilder<T> SubscribeHub<T>(this AbaClientBuilder<T> aba) where T : SignalRClientBase<T>, new()
         {
             aba.EnsureAlreadyMade();
             aba.client.SubscribeHub();

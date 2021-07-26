@@ -29,9 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Server.Mercur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Server.Mercury.Hosted", "src\Aba\Server\Mercury\Hosted\Thismaker.Aba.Server.Mercury.Hosted.csproj", "{27821C9D-9EC7-4E50-8404-042ECA4D7A00}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Core", "src\Aba\Client\Core\Thismaker.Aba.Client.Core.csproj", "{4EBCA0B3-6D2E-4FB4-BE6B-316AD6B8C473}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client", "src\Aba\Client\Client\Thismaker.Aba.Client.csproj", "{4EBCA0B3-6D2E-4FB4-BE6B-316AD6B8C473}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client", "src\Aba\Client\Client\Thismaker.Aba.Client.csproj", "{73CAC99C-CBB4-4527-B6C0-56B5EE3B3464}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.SignalR", "src\Aba\Client\SignalR\Thismaker.Aba.Client.SignalR.csproj", "{73CAC99C-CBB4-4527-B6C0-56B5EE3B3464}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thismaker.Aba.Client.Mercury", "src\Aba\Client\Mercury\Thismaker.Aba.Client.Mercury.csproj", "{C94BFAF1-0797-42EC-B01C-A815F429DD10}"
 EndProject

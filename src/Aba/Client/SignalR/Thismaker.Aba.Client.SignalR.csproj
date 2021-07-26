@@ -1,25 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>8.0</LangVersion>
     <Authors>Thismaker</Authors>
-    <Description>Extends the functionality of AbaClients so that they work as Msal clients. Useful if your client app is using AzureAd or AzureAdB2C to authenticate calls to a webApi.</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>For apps that rely on SignalRCore and WebApi, this allows you to build the client side of Server-Client based applications rapidly.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
-    <PackageTags>client-application client-app signalr webapi web-api azure-ad azure-adb2c</PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
+    <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
+    <Copyright>© 2021 Ocluse</Copyright>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Version>3.0.0</Version>
     <Company>Ocluse</Company>
-    <Copyright>©2021 Ocluse</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.29.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.8" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Thismaker.Core.csproj" />
+    <ProjectReference Include="..\Client\Thismaker.Aba.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,9 +34,4 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SignalR\Thismaker.Aba.Client.SignalR.csproj" />
-  </ItemGroup>
-
 </Project>

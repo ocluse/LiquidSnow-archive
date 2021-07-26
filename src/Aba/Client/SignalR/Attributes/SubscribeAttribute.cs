@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Thismaker.Aba.Client
+namespace Thismaker.Aba.Client.SignalR
 {
     /// <summary>
-    /// Added to a method so that it is marked for subscription during the <see cref="ClientBase{TClient}.SubscribeHub"/>
+    /// Added to a method so that it is marked for subscription during the <see cref="SignalRClientBase{TClient}.SubscribeHub"/>
     /// This attribute is not inherited and must be provided again in an overriding method
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, Inherited =false, AllowMultiple =false)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
     public class SubscribeAttribute : Attribute
     {
         /// <summary>
@@ -16,7 +15,7 @@ namespace Thismaker.Aba.Client
         /// </summary>
         public string MethodName
         {
-            get;set;
+            get; set;
         }
 
         public SubscribeAttribute()

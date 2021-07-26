@@ -7,7 +7,7 @@ using Thismaker.Aba.Common.Mercury;
 
 namespace Thismaker.Aba.Client.Mercury
 {
-    public abstract partial class MercuryClient<TClient> : IBeamer
+    public abstract partial class MercuryClientBase<TClient> : IBeamer
     {
         private readonly Dictionary<string, InvocationHandler> _subs
             = new Dictionary<string, InvocationHandler>();
@@ -30,15 +30,15 @@ namespace Thismaker.Aba.Client.Mercury
 
             if (!_subs.ContainsKey(payload.MethodName)) return;
 
-            var handler = _subs[payload.MethodName];
+            InvocationHandler handler = _subs[payload.MethodName];
 
-            if (handler.Types == null||handler.Types.Count==0)
+            if (handler.Types == null || handler.Types.Count == 0)
             {
                 handler.Invoke(null);
             }
             else
             {
-                var parameters = new List<object>();
+                List<object> parameters = new List<object>();
                 for (int i = 0; i < payload.Parameters.Count; i++)
                 {
                     parameters.Add(Deserialize(payload.Parameters[i], handler.Types[i]));
@@ -68,13 +68,13 @@ namespace Thismaker.Aba.Client.Mercury
                 handler = new InvocationHandler()
                 {
                     Binds = new List<InvocationBind>(),
-                    Types = types==null ? null : new List<Type>(types)
+                    Types = types == null ? null : new List<Type>(types)
                 };
 
                 _subs.Add(methodName, handler);
             }
 
-            var bind = new InvocationBind
+            InvocationBind bind = new InvocationBind
             {
                 Info = method,
                 Target = target
@@ -86,7 +86,7 @@ namespace Thismaker.Aba.Client.Mercury
         /// <summary>
         /// Subscribe a method to the RPC Beam, invoking the method when a payload of the same name is received.
         /// </summary>
-        public void Subscribe(Action action, string methodName=null)
+        public void Subscribe(Action action, string methodName = null)
         {
             if (methodName == null)
             {
@@ -99,14 +99,14 @@ namespace Thismaker.Aba.Client.Mercury
         /// <summary>
         /// Subscribe a method to the RPC Beam, invoking the method when a payload of the same name is received.
         /// </summary>
-        public void Subscribe<T1>(Action<T1> action, string methodName=null)
+        public void Subscribe<T1>(Action<T1> action, string methodName = null)
         {
             if (methodName == null)
             {
                 methodName = action.Method.Name;
             }
 
-            Subscribe(methodName, action.Target, action.Method, new Type[] { typeof(T1)});
+            Subscribe(methodName, action.Target, action.Method, new Type[] { typeof(T1) });
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Thismaker.Aba.Client.Mercury
             }
 
             Subscribe(methodName, action.Target, action.Method,
-                new Type[] { typeof(T1), typeof(T2)});
+                new Type[] { typeof(T1), typeof(T2) });
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Thismaker.Aba.Client.Mercury
             public void Invoke(object[] parameters)
             {
 
-                foreach(var bind in Binds)
+                foreach (InvocationBind bind in Binds)
                 {
                     bind.Info.Invoke(bind.Target, parameters);
                 }
@@ -179,13 +179,13 @@ namespace Thismaker.Aba.Client.Mercury
 
         private async Task SendPayloadAsync(RPCPayload payload)
         {
-            var bytes = Serialize(payload).GetBytes<UTF8Encoding>();
+            byte[] bytes = Serialize(payload).GetBytes<UTF8Encoding>();
             await _mClient.SendAsync(bytes).ConfigureAwait(false);
         }
 
         public async Task BeamAsync(string methodName, object[] args, Type[] types)
         {
-            var payload = new RPCPayload
+            RPCPayload payload = new RPCPayload
             {
                 MethodName = methodName,
                 Parameters = new List<string>()
@@ -208,26 +208,26 @@ namespace Thismaker.Aba.Client.Mercury
 
         public async Task BeamAsync<T1>(string methodName, T1 arg)
         {
-            await BeamAsync(methodName, new object[] { arg }, 
+            await BeamAsync(methodName, new object[] { arg },
                 new Type[] { typeof(T1) });
         }
 
         public async Task BeamAsync<T1, T2>(string methodName, T1 arg1, T2 arg2)
         {
-            await BeamAsync(methodName, new object[] { arg1, arg2 }, 
+            await BeamAsync(methodName, new object[] { arg1, arg2 },
                 new Type[] { typeof(T1), typeof(T2) });
         }
 
         public async Task BeamAsync<T1, T2, T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
         {
-            await BeamAsync(methodName, new object[] { arg1, arg2, arg3 }, 
+            await BeamAsync(methodName, new object[] { arg1, arg2, arg3 },
                 new Type[] { typeof(T1), typeof(T2), typeof(T3) });
         }
 
         public async Task BeamAsync<T1, T2, T3, T4>(string methodName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            await BeamAsync(methodName, new object[] { arg1, arg2, arg3, arg4 }, 
-                new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4)});
+            await BeamAsync(methodName, new object[] { arg1, arg2, arg3, arg4 },
+                new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) });
         }
 
         #endregion

@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace Thismaker.Aba.Client.Core
+namespace Thismaker.Aba.Client
 {
     public class AccessToken
     {
@@ -40,7 +40,7 @@ namespace Thismaker.Aba.Client.Core
         /// <returns></returns>
         public bool IsExpired()
         {
-            return (ExpiresOn.HasValue && DateTime.UtcNow > ExpiresOn.Value.AddMinutes(-ExpiryCushion).UtcDateTime);
+            return ExpiresOn.HasValue && DateTime.UtcNow > ExpiresOn.Value.AddMinutes(-ExpiryCushion).UtcDateTime;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Thismaker.Aba.Client.Core
         /// </summary>
         public static AccessToken Bearer(string value, DateTimeOffset? expiry = null)
         {
-            var result = new AccessToken
+            AccessToken result = new AccessToken
             {
                 HeaderName = "Authorization",
                 Scheme = "Bearer",
@@ -63,7 +63,7 @@ namespace Thismaker.Aba.Client.Core
         /// </summary>
         public static AccessToken Basic(string value, DateTimeOffset? expiry = null)
         {
-            var result = new AccessToken
+            AccessToken result = new AccessToken
             {
                 HeaderName = "Authorization",
                 Scheme = "Basic",

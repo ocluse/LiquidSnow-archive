@@ -1,32 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <Authors>Thismaker</Authors>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>For apps that rely on SignalRCore and WebApi, this allows you to build the client side of Server-Client based applications rapidly.</Description>
-    <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
-    <Copyright>© 2021 Ocluse</Copyright>
-    <PackageReleaseNotes></PackageReleaseNotes>
-    <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>3.0.0-alpha7</Version>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <Version>3.0.0</Version>
     <Company>Ocluse</Company>
+    <Copyright>©2021 Ocluse</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Allows you to rapidly build a client application that depend on a HTTP WebApi for updates etc.</Description>
+    <AssemblyVersion>3.0.0.1</AssemblyVersion>
+    <FileVersion>3.0.0.1</FileVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.8" />
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\Thismaker.Core.csproj" />
-    <ProjectReference Include="..\Core\Thismaker.Aba.Client.Core.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\..\..\assets\images\Thisicon-Prime.png">
@@ -34,4 +22,5 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
+
 </Project>

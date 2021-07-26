@@ -1,10 +1,9 @@
 ﻿using Microsoft.Identity.Client;
-using Thismaker.Aba.Client.Core;
 
 namespace Thismaker.Aba.Client.Msal
 {
     /// <summary>
-    /// A <see cref="IContext"/> that should be used specifically for <see cref="MsalClient{T}"/>
+    /// A <see cref="IContext"/> that should be used specifically for <see cref="MsalClientBase{T}"/>
     /// </summary>
     public interface IMsalContext : IContext
     {

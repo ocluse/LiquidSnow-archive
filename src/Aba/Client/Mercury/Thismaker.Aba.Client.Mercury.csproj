@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
-    <Version>3.0.0-alpha4</Version>
+    <Version>3.0.0</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <Description>This is a type of client that works with Thismker.Mercury for real-time communication atrhoug remote procedure calls from a server-client and vice-versa</Description>
@@ -16,7 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mercury\Thismaker.Mercury.csproj" />
     <ProjectReference Include="..\..\Common\Mercury\Thismaker.Aba.Common.Mercury.csproj" />
-    <ProjectReference Include="..\Core\Thismaker.Aba.Client.Core.csproj" />
+    <ProjectReference Include="..\Client\Thismaker.Aba.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

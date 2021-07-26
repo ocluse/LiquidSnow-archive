@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Http;
 
-namespace Thismaker.Aba.Client.Core
+namespace Thismaker.Aba.Client
 {
 
     [Serializable]

@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Thismaker.Aba.Client.Core
+namespace Thismaker.Aba.Client
 {
     /// <summary>
     /// The context of the client. Should be impelemeted as e.g WindowsClient, AndroidClient, GeneralClient etc.

@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Thismaker.Aba.Client.Core;
 using Thismaker.Aba.Common.Mercury;
 using MClient = Thismaker.Mercury.Client;
 
 namespace Thismaker.Aba.Client.Mercury
 {
-    public abstract partial class MercuryClient<TClient>:CoreClientBase<TClient> where TClient:MercuryClient<TClient>
+    public abstract partial class MercuryClientBase<TClient> : ClientBase<TClient> where TClient : MercuryClientBase<TClient>
     {
         private MClient _mClient;
 
@@ -33,7 +34,7 @@ namespace Thismaker.Aba.Client.Mercury
             base.MakeApp();
         }
 
-        public async Task Connect()
+        public async Task ConnectAsync()
         {
             await _mClient.ConnectAsync(false);
 
@@ -50,7 +51,7 @@ namespace Thismaker.Aba.Client.Mercury
             {
                 if (obj.Compare(Globals.AuthSelf))
                 {
-                    var authLoad = new RPCPayload
+                    RPCPayload authLoad = new RPCPayload
                     {
                         MethodName = Globals.AuthResponsePayload,
                         AccessToken = AccessToken.Value,
@@ -63,9 +64,9 @@ namespace Thismaker.Aba.Client.Mercury
             }
 
             //convert to string:
-            var json = obj.GetString<UTF8Encoding>();
-            var payload = Deserialize<RPCPayload>(json);
-            
+            string json = obj.GetString<UTF8Encoding>();
+            RPCPayload payload = Deserialize<RPCPayload>(json);
+
             PayloadReceived(payload);
         }
 
@@ -74,7 +75,7 @@ namespace Thismaker.Aba.Client.Mercury
             return BaseAddress.StartsWith("https:") ?
                 BaseAddress.Substring(8) :
                 BaseAddress.StartsWith("http:") ?
-                BaseAddress.Substring(7):
+                BaseAddress.Substring(7) :
                 BaseAddress;
         }
 

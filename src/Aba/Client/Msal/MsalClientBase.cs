@@ -5,16 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Thismaker.Aba.Client.Core;
+using Thismaker.Aba.Client.SignalR;
 
 namespace Thismaker.Aba.Client.Msal
 {
     /// <summary>
     /// A base class that inherits from <see cref="ClientBase"/>.
     /// Useful when using AzureADB2C in it's default state. Note that for this client,
-    /// <see cref="ClientBase.AccessToken"/> is predetemined and cannot be changed
+    /// <see cref="SignalRClientBase.AccessToken"/> is predetemined and cannot be changed
     /// </summary>
-    public abstract class MsalClient<T>:ClientBase<T> where T:MsalClient<T>
+    public abstract class MsalClientBase<T> : SignalRClientBase<T> where T : MsalClientBase<T>
     {
         #region Properties
 
@@ -23,10 +23,7 @@ namespace Thismaker.Aba.Client.Msal
         public string RefreshToken { get; protected set; }
 
         ///<inheritdoc/>
-        public new IMsalContext Context
-        {
-            get => (IMsalContext)base.Context;
-        }
+        public new IMsalContext Context => (IMsalContext)base.Context;
 
         /// <summary>
         /// The identifier of the client, Provided in the Azure Portal.
@@ -95,7 +92,7 @@ namespace Thismaker.Aba.Client.Msal
 
         public override void SetContext(IContext context)
         {
-            if(context is IMsalContext)
+            if (context is IMsalContext)
             {
                 base.SetContext(context);
             }
@@ -145,7 +142,7 @@ namespace Thismaker.Aba.Client.Msal
         private string Base64UrlDecode(string s)
         {
             s = s.Replace('-', '+').Replace('_', '/');
-            s = s.PadRight(s.Length + (4 - s.Length % 4) % 4, '=');
+            s = s.PadRight(s.Length + ((4 - (s.Length % 4)) % 4), '=');
             byte[] byteArray = Convert.FromBase64String(s);
             string decoded = Encoding.UTF8.GetString(byteArray, 0, byteArray.Count());
             return decoded;
@@ -158,7 +155,10 @@ namespace Thismaker.Aba.Client.Msal
             try
             {
                 result = await PublicClient.AcquireTokenSilent(ApiTokenAccessArgs.Scopes, ApiTokenAccessArgs.UserAccount).ExecuteAsync();
-                if (string.IsNullOrEmpty(result.AccessToken)) throw new MsalUiRequiredException("404", "Access token was null");
+                if (string.IsNullOrEmpty(result.AccessToken))
+                {
+                    throw new MsalUiRequiredException("404", "Access token was null");
+                }
             }
             catch (MsalUiRequiredException)
             {

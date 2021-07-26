@@ -1,387 +1,352 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text.Json;
+﻿using System;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
-using Thismaker.Aba.Client.Core;
 
 namespace Thismaker.Aba.Client
 {
-    /// <summary>
-    /// The <see cref="ClientBase{T}"/> is an abstract class with the very basic fundamentals of what
-    /// all apps are supposed to contain
-    /// </summary>
-    public abstract partial class ClientBase<TClient> : CoreClientBase<TClient> where TClient : ClientBase<TClient>
+    public abstract partial class ClientBase<TClient> where TClient : ClientBase<TClient>
     {
 
-        #region Properties 
-        /// <summary>
-        /// The hub endpoint
-        /// </summary>
-        public string HubEndpoint { get; set; }
+        #region Properties
+        public virtual IContext Context { get; private set; }
 
         /// <summary>
-        /// The connection to the server's hub
+        /// The singleton instance of the client
         /// </summary>
-        protected HubConnection HubConnection { get; set; }
-        #endregion
-
-        #region Events
-        /// <summary>
-        /// Fired when the underlying <see cref="HubConnection"/> is reconnecting
-        /// </summary>
-        public event Action<Exception> HubReconnecting;
+        public static TClient Instance { get; private set; }
 
         /// <summary>
-        /// Fired when the underlying <see cref="HubConnection"/> is reconnected
+        /// The version number of the current <b>local</b> client.
         /// </summary>
-        public event Action<string> HubReconnected;
+        public string Version { get; set; }
 
         /// <summary>
-        /// Fired when the underlying <see cref="HubConnection"/> is closed.
-        /// Exception will be null in case no error occurred when closing the hub
+        /// Represents the base url address to the server api endpoint e.g www.liquidsnow.com
         /// </summary>
-        public event Action<Exception> HubClosed;
-        #endregion
+        public string BaseAddress { get; set; }
 
-        #region Initialization
         /// <summary>
-        /// Initializes the HttpClient and the HubConnection. Should be called only onces during the lifetime of the application.
-        /// This method must be called before accessing any of the Hub and HttpClient methods.
-        /// Overriding this method allows you to specify how the HttpClient and HubConnection should be initialized.
+        /// The default endpoint preppended to every request made using the Api HTTP Verbs.
+        /// If left as null, the endpoint must be included in the request uri
         /// </summary>
-        public override void MakeApp()
-        {
-            base.MakeApp();
+        public string ApiEndpoint { get; set; }
 
-            HubConnection = new HubConnectionBuilder()
-                   .WithAutomaticReconnect()
-                   .WithUrl($"{BaseAddress}/{HubEndpoint}/",
-                   options =>
-                   {
-                       options.AccessTokenProvider = HubReadAccessTokenAsync;
-                   })
-                   .Build();
+        /// <summary>
+        /// The access token that allows the client to access a protected resource
+        /// </summary>
+        public AccessToken AccessToken { get; set; }
 
-            HubConnection.Reconnected += OnHubConnectionReconnected;
-            HubConnection.Reconnecting += OnHubConnectionReconnecting;
-            HubConnection.Closed += OnHubConnectionClosed;
-        }
+        /// <summary>
+        /// If true, the client auto renews the access token once it expires by calling
+        /// <see cref="RenewAccessTokenAsync"/> method;
+        /// </summary>
+        public bool AutoRenewAccessToken { get; set; }
+
+        /// <summary>
+        /// The client used to make Http Requests
+        /// </summary>
+        protected HttpClient HttpClient { get; set; }
 
         #endregion
 
-        #region Private Methods
-        
-        private Task OnHubConnectionClosed(Exception arg)
-        {
-            HubClosed?.Invoke(arg);
-            return Task.CompletedTask;
-        }
+        #region Abstract Methods
+        /// <summary>
+        /// When overriden in a derived class, starts the ClientApp, 
+        /// allowing for performing basic tasks.
+        /// Should be called once <see cref="MakeApp"/> has been called.
+        /// </summary>
+        public abstract Task StartAsync();
 
-        private Task OnHubConnectionReconnecting(Exception arg)
-        {
-            HubReconnecting?.Invoke(arg);
-            return Task.CompletedTask;
-        }
-        
-        private Task OnHubConnectionReconnected(string arg)
-        {
-            HubReconnected?.Invoke(arg);
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// Called when the lifetime of the client has ended to cleanup resources
+        /// and persist data if need be.
+        /// </summary>
+        public abstract Task StopAsync();
 
-        private async Task<string> HubReadAccessTokenAsync()
-        {
-            if (AccessToken.IsExpired())
-            {
-                await RenewAccessTokenAsync();
-            }
+        /// <summary>
+        /// Called whenever the <see cref="AccessToken"/> has expired and the client is
+        /// allowed to automatically renew the token
+        /// </summary>
+        protected abstract Task RenewAccessTokenAsync();
 
-            return AccessToken.Value;
-        }
-
-        #endregion
-
-        #region Helpers Implementations
         /// <summary>
         /// Called by the HTTP helpers to deserialize a response. Override to customize how deserialization works
         /// </summary>
         /// <typeparam name="T">The type of required result</typeparam>
         /// <param name="args">The string to deserialize</param>
-        protected override T Deserialize<T>(string args)
-        {
-            return JsonSerializer.Deserialize<T>(args, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        }
+        protected abstract T Deserialize<T>(string args);
 
         /// <summary>
-        /// Called by the HTTP helpers, particularly the POST helper to serialize an object to be added to the body of the request
+        /// Called by the HTTP helpers to serialize Http string content
         /// </summary>
         /// <typeparam name="T">The type of object being serialized</typeparam>
         /// <param name="args">The object to serialize</param>
-        protected override string Serialize<T>(T args)
-        {
-            return JsonSerializer.Serialize(args, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        }
+        protected abstract string Serialize<T>(T args);
         #endregion
 
-        #region Hub
-
-        private List<string> _subscribedHubMethodNames;
+        #region Initialization
 
         /// <summary>
-        /// Subscribes methods marked with the <see cref="SubscribeAttribute"/>. Override 
-        /// to customize the behaviour
+        /// Makes the app the singleton that can be easily accessed by <see cref="ClientBase{T}.Instance"/>
+        /// This is useful where only one Client App is needed accross the entire application
         /// </summary>
-        public virtual void SubscribeHub()
+        public void MakeSingleton()
         {
-            _subscribedHubMethodNames = new List<string>();
+            Instance = (TClient)this;
+        }
 
-            //get all methods with the subscribe attribute:
-            var methods = GetType()
-                .GetMethods();
+        /// <summary>
+        /// Initializes the HttpClient. Should be called only once during the lifetime 
+        /// of the client app. Overrride to customize how the client is made
+        /// </summary>
+        public virtual void MakeApp()
+        {
+            HttpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
+        }
 
-            foreach (var method in methods)
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Sets the underlying context of the client
+        /// </summary>
+        /// <param name="context"></param>
+        public virtual void SetContext(IContext context)
+        {
+            Context = context;
+        }
+
+        #endregion
+
+        #region Http Methods
+
+        protected virtual async Task PrepareRequestAsync(HttpRequestMessage requestMessage, bool isProtected)
+        {
+            if (isProtected)
             {
-                var subAttr = method.GetCustomAttribute<SubscribeAttribute>();
-                if (subAttr == null) continue;
-
-                string name = string.IsNullOrEmpty(subAttr.MethodName) ?
-                    method.Name : subAttr.MethodName;
-
-                var types = new List<Type>();
-                var pInfos = method.GetParameters();
-
-                foreach(var pInfo in pInfos)
+                if (AccessToken.IsExpired())
                 {
-                    types.Add(pInfo.ParameterType);
+                    if (AutoRenewAccessToken)
+                    {
+                        await RenewAccessTokenAsync();
+                    }
+                    else
+                    {
+                        throw new ExpiredTokenException();
+                    }
                 }
 
-                HubConnection.On(name, types.ToArray(), OnHubCall, method);
-
-                _subscribedHubMethodNames.Add(name);
-            }
-        }
-
-        private Task OnHubCall(object[] parameters, object state)
-        {
-            var method = (MethodInfo)state;
-
-            method.Invoke(this, parameters);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Unsubscribes methods previously subscribed to through
-        /// <see cref="SubscribeHub"/>. Overriding either method changes the behaviour
-        /// </summary>
-        public virtual void UnsubscribeHub()
-        {
-            if (_subscribedHubMethodNames == null) return;
-
-            foreach(var methodName in _subscribedHubMethodNames)
-            {
-                HubConnection.Remove(methodName);
-            }
-        }
-
-        /// <summary>
-        /// Attempts to connect to the hub
-        /// </summary>
-        public async Task ConnectHubAsync()
-        {
-            await HubConnection.StartAsync().ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Attempts to disconnect the hub by stopping it gracefully.
-        /// </summary>
-        public async Task DisconnectHubAsync()
-        {
-            await HubConnection.StopAsync().ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Send an RPC to the connected hub.
-        /// </summary>
-        public async Task HubSend(string methodName)
-        {
-            await HubConnection.SendAsync(methodName).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Send an RPC to the connected hub.
-        /// </summary>
-        public async Task HubSend(string methodName, object arg1)
-        {
-            await HubConnection.SendAsync(methodName, arg1).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Send an RPC to the connected hub.
-        /// </summary>
-        public async Task HubSend(string methodName, object arg1, object arg2)
-        {
-            await HubConnection.SendAsync(methodName, arg1, arg2).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Send an RPC to the connected hub.
-        /// </summary>
-        public async Task HubSend(string methodName, object arg1, object arg2, object arg3)
-        {
-            await HubConnection.SendAsync(methodName, arg1, arg2, arg3).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Send an RPC to the connected hub. If you wish to send more than four arguments, consider using <see cref="HubConnection"/> directly
-        /// </summary>
-        public async Task HubSend(string methodName, object arg1, object arg2, object arg3, object arg4)
-        {
-            await HubConnection.SendAsync(methodName, arg1, arg2, arg3, arg4).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Unsubscribes a method from the hub
-        /// </summary>
-        public void UnbindHub(Action action)
-        {
-            var name = action.Method.Name;
-            HubConnection.Remove(name);
-        }
-
-        /// <summary>
-        /// Unsubscribes a method from the hub
-        /// </summary>
-        public void UnbindHub<T1>(Action<T1> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        /// <summary>
-        /// Unsubscribes a method from the hub
-        /// </summary>
-        public void UnbindHub<T1,T2>(Action<T1,T2> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        /// <summary>
-        /// Unsubscribes a method from the hub
-        /// </summary>
-        public void UnbindHub<T1,T2,T3>(Action<T1,T2,T3> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        /// <summary>
-        /// Unsubscribes a method from the hub
-        /// </summary>
-        public void UnbindHub<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        /// <summary>
-        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
-        /// </summary>
-        public void BindHub(Action action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        /// <summary>
-        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
-        /// </summary>
-        public void BindHub<T1>(Action<T1> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        /// <summary>
-        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
-        /// </summary>
-        public void BindHub<T1,T2>(Action<T1,T2> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        /// <summary>
-        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
-        /// </summary>
-        public void BindHub<T1,T2,T3>(Action<T1,T2,T3> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        /// <summary>
-        /// Adds a method to be called when the Hub recieves an RPC of the same name as the method
-        /// </summary>
-        public void BindHub<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-
-        /// <summary>
-        /// Sends a request to the hub and holds the calling thread until a response is received.
-        /// To use this method, ensure that the SignalR hub server must sends response after recieving this call through all paths.
-        /// </summary>
-        /// <typeparam name="TResult">The result expected from the hub. This method is only useful from single results</typeparam>
-        /// <param name="requestName">The name of the method to be called on the Server Hub</param>
-        /// <param name="responseName">The name of the method expected to be called by the server for response. If null, then the<paramref name="requestName"/> is used instead</param>
-        /// <param name="content">The content to send to the method, , if null, no content is sent</param>
-        /// <param name="timeOut">If provided, the method throws a <see cref="TaskCanceledException"/> if the time  in miliseconds elapses without receiving a response</param>
-        public async Task<TResult> CallHubAsync<TResult>(string requestName, string responseName=null, object content=null, double? timeOut=null)
-        {
-            if (string.IsNullOrEmpty(responseName))
-            {
-                responseName = requestName;
-            }
-            var tcs = new TaskCompletionSource<TResult>();
-
-            if (timeOut.HasValue)
-            {
-                var timer = new System.Timers.Timer(timeOut.Value)
+                if (AccessToken.HeaderName == "Authorization")
                 {
-                    Enabled = true
-                };
-
-                void TimerElapsed(object sender, EventArgs e)
-                {
-                    HubConnection.Remove(responseName);
-                    timer.Elapsed -= TimerElapsed;
-                    tcs.SetCanceled();
+                    requestMessage.Headers.Authorization
+                        = AccessToken.Value == null ?
+                        new AuthenticationHeaderValue(AccessToken.Scheme) :
+                        new AuthenticationHeaderValue(AccessToken.Scheme, AccessToken.Value);
                 }
-                timer.Elapsed += TimerElapsed;
+                else
+                {
+                    requestMessage.Headers.Add(AccessToken.HeaderName, AccessToken.Value);
+                }
+            }
+        }
+
+        public async Task<HttpResponseMessage> HttpSendAsync(HttpRequestMessage requestMessage, bool isProtected, HttpCompletionOption option = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await PrepareRequestAsync(requestMessage, isProtected);
+                return await HttpClient.SendAsync(requestMessage, option, cancellationToken);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<HttpResponseMessage> ApiGetAsync(string requestUri, bool isProtected = true)
+        {
+            return await EndpointGetAsync(ApiEndpoint, requestUri, isProtected);
+        }
+
+        public async Task<HttpResponseMessage> ApiPostAsync(string requestUri, HttpContent content, bool isProtected = true)
+        {
+            return await EndpointPostAsync(ApiEndpoint, requestUri, content, isProtected);
+        }
+
+        public async Task<HttpResponseMessage> ApiPutAsync(string requestUri, HttpContent content, bool isProtected = true)
+        {
+            return await EndpointPutAsync(ApiEndpoint, requestUri, content, isProtected);
+        }
+
+        public async Task<HttpResponseMessage> ApiDeleteAsync(string requestUri, bool isProtected = true)
+        {
+            return await EndpointDeleteAsync(ApiEndpoint, requestUri, isProtected);
+        }
+
+        public async Task<HttpResponseMessage> EndpointGetAsync(string endpoint, string requestUri, bool isProtected = true)
+        {
+            return await ExecuteVerbAsync(HttpVerb.Get, endpoint, requestUri, null, isProtected);
+        }
+
+        public async Task<HttpResponseMessage> EndpointPostAsync(string endpoint, string requestUri, HttpContent content, bool isProtected = true)
+        {
+            return await ExecuteVerbAsync(HttpVerb.Post, endpoint, requestUri, content, isProtected);
+        }
+
+        public async Task<HttpResponseMessage> EndpointPutAsync(string endpoint, string requestUri, HttpContent content, bool isProtected = true)
+        {
+            return await ExecuteVerbAsync(HttpVerb.Put, endpoint, requestUri, content, isProtected);
+        }
+
+        public async Task<HttpResponseMessage> EndpointDeleteAsync(string endpoint, string requestUri, bool isProtected = true)
+        {
+            return await ExecuteVerbAsync(HttpVerb.Delete, endpoint, requestUri, null, isProtected);
+        }
+
+        private enum HttpVerb
+        {
+            Get, Post, Put, Delete
+        }
+
+        private async Task<HttpResponseMessage> ExecuteVerbAsync(HttpVerb verb, string endpoint, string requestUri, HttpContent content, bool isProtected = true)
+        {
+            HttpMethod method = verb switch
+            {
+                HttpVerb.Get => HttpMethod.Get,
+                HttpVerb.Post => HttpMethod.Post,
+                HttpVerb.Put => HttpMethod.Put,
+                HttpVerb.Delete => HttpMethod.Delete,
+                _ => throw new NotImplementedException("Unknown/unimplemented verb")
+            };
+
+            Uri uri = new Uri($"{endpoint}/{requestUri}", UriKind.Relative);
+
+            HttpRequestMessage requestMessage = new HttpRequestMessage()
+            {
+                RequestUri = uri,
+                Method = method,
+                Content = content
+            };
+
+            return await HttpSendAsync(requestMessage, isProtected);
+        }
+
+        #region Simple Methods
+
+        public async Task<TResult> ApiGetSimpleAsync<TResult>(string requestUri, bool isProtected = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await EndpointGetSimpleAsync<TResult>(ApiEndpoint, requestUri, isProtected, requiredStatusCode);
+        }
+
+        public async Task<TResult> ApiPostSimpleAsync<TContent, TResult>(string requestUri, TContent content, bool isProtected = true, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await EndpointPostSimpleAsync<TContent, TResult>(ApiEndpoint, requestUri, content, isProtected, serializeContent, deserializeResult, requiredStatusCode);
+        }
+
+        public async Task<TResult> ApiPutSimpleAsync<TContent, TResult>(string requestUri, TContent content, bool isProtected = true, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await EndpointPutSimpleAsync<TContent, TResult>(ApiEndpoint, requestUri, content, isProtected, serializeContent, deserializeResult, requiredStatusCode);
+        }
+
+        public async Task<TResult> ApiDeleteSimpleAsync<TResult>(string requestUri, bool isProtected = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await EndpointDeleteSimpleAsync<TResult>(ApiEndpoint, requestUri, isProtected, requiredStatusCode);
+        }
+
+        public async Task<TResult> EndpointGetSimpleAsync<TResult>(string endpoint, string requestUri, bool isProtected = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await ExecuteVerbSimpleAsync<bool, TResult>(HttpVerb.Get, endpoint, requestUri, false, isProtected, requiredStatusCode: requiredStatusCode);
+        }
+
+        public async Task<TResult> EndpointPostSimpleAsync<TContent, TResult>(string endpoint, string requestUri, TContent content, bool isProtected = true, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await ExecuteVerbSimpleAsync<TContent, TResult>(HttpVerb.Post, endpoint, requestUri, content, isProtected, serializeContent, deserializeResult, requiredStatusCode);
+        }
+
+        public async Task<TResult> EndpointPutSimpleAsync<TContent, TResult>(string endpoint, string requestUri, TContent content, bool isProtected = true, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await ExecuteVerbSimpleAsync<TContent, TResult>(HttpVerb.Put, endpoint, requestUri, content, isProtected, serializeContent, deserializeResult, requiredStatusCode);
+        }
+
+        public async Task<TResult> EndpointDeleteSimpleAsync<TResult>(string endpoint, string requestUri, bool isProtected = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await ExecuteVerbSimpleAsync<bool, TResult>(HttpVerb.Delete, endpoint, requestUri, false, isProtected, requiredStatusCode: requiredStatusCode);
+        }
+
+        private bool RequiresContent(HttpVerb verb)
+        {
+            return verb == HttpVerb.Put || verb == HttpVerb.Post;
+        }
+
+        private async Task<TResult> ExecuteVerbSimpleAsync<TContent, TResult>(HttpVerb verb, string endpoint, string requestUri, TContent content, bool isProtected, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            bool requiresContent = RequiresContent(verb);
+
+            HttpContent finalContent = null;
+
+            if (requiresContent)
+            {
+                // Content validation:
+                if (!serializeContent)
+                {
+                    if (!content.GetType().IsAssignableFrom(typeof(HttpContent)))
+                    {
+                        throw new ArgumentException($"{nameof(content)} provided must be of type/derive from {nameof(HttpContent)} if {nameof(serializeContent)} is set to false", nameof(serializeContent));
+                    }
+                }
+
+                //Result validation
+                if (!deserializeResult)
+                {
+                    if (!typeof(HttpResponseMessage).IsAssignableFrom(typeof(TResult)))
+                    {
+                        throw new ArgumentException($"Generic {nameof(TResult)} provided must be of type or base of {nameof(HttpResponseMessage)} if {nameof(deserializeResult)} is set to false", nameof(serializeContent));
+                    }
+                }
+
+                finalContent = serializeContent ?
+                    GetStringContent(content) : (HttpContent)(object)content;
             }
 
-            void OnHubResponse(TResult result)
+
+            HttpResponseMessage response = await ExecuteVerbAsync(verb, endpoint, requestUri, finalContent, isProtected);
+
+
+            if (!deserializeResult)
             {
-                HubConnection.Remove(responseName);
-                tcs.SetResult(result);
+                return (TResult)(object)response;
             }
-            HubConnection.On<TResult>(responseName, OnHubResponse);
-            if (content == null)
+
+            if ((requiredStatusCode.HasValue && response.StatusCode != requiredStatusCode) ||
+                (!requiredStatusCode.HasValue && !response.IsSuccessStatusCode))
             {
-                await HubSend(requestName);
+                throw new SimpleRequestException(response);
             }
-            else
-            {
-                await HubSend(requestName, content);
-            }
-            return await tcs.Task;
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            return Deserialize<TResult>(responseContent);
         }
+
+        #endregion
+
+        #region Helpers
+
+
+        /// <summary>
+        /// Called by the HTTP POST helper to create a string content out of a provided object. Override to customize the behaviour.
+        /// By default, the string content is encoded using UTF8 encoding with a mediatype of "application/json"
+        /// </summary>
+        protected virtual StringContent GetStringContent<T>(T o)
+        {
+            return new StringContent(Serialize(o), System.Text.Encoding.UTF8, "application/json");
+        }
+
+        #endregion
+
         #endregion
     }
 }
