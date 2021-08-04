@@ -62,8 +62,6 @@ namespace Thismaker.Aretha
                     cancelled = true;
                     tcsSummon.TrySetCanceled();
                     throw new TaskCanceledException();
-                    
-                    
                 }
                 else if (args[0] == "exit" && args.Length == 1)
                 {
@@ -128,21 +126,21 @@ namespace Thismaker.Aretha
                 if (DeltaTime.Elapsed < 100 && er != 1) return;
 
                 DeltaTime.Capture();
-                int percent = (int)(er * 100.0f);
+                int percent = (int)(er * 100.0);
 
                 if (percent - previousProgress < 1) return;
 
                 previousProgress = percent;
 
-                
+
                 string progBar = "Execution Progress: ";
                 for (int i = 0; i <= 100; i += 10)
                 {
                     if (i <= percent) progBar += "|";
                     else progBar += ".";
                 }
-                Console.Write("\r");
-                progBar += $" {percent}%";
+
+                progBar += $" {percent}%\r";
 
                 Console.Write(progBar);
 
