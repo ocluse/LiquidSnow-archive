@@ -18,7 +18,7 @@ namespace Thismaker.Aba.Server.Authentication
         public string JwtKey { get; set; }
         public string JwtIssuer { get; set; }
 
-        public string GenerateToken(string userId, List<Claim> claims, int expireMinutes = 20)
+        public string GenerateToken(string userId, List<Claim> claims, int expireMinutes, string audience = null)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -34,7 +34,8 @@ namespace Thismaker.Aba.Server.Authentication
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Issuer=JwtIssuer, 
+                Issuer=JwtIssuer,
+                Audience=audience,
                 IssuedAt=now, 
                 Expires = expireMinutes == 0 ? null : now.AddMinutes(Convert.ToInt32(expireMinutes)),
                 SigningCredentials = credentials

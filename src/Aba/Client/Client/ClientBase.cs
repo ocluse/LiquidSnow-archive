@@ -223,7 +223,9 @@ namespace Thismaker.Aba.Client
                 _ => throw new NotImplementedException("Unknown/unimplemented verb")
             };
 
-            Uri uri = new Uri($"{endpoint}/{requestUri}", UriKind.Relative);
+            Uri uri = string.IsNullOrEmpty(endpoint)
+                ? new Uri(requestUri, UriKind.Relative)
+                : new Uri($"{endpoint}/{requestUri}", UriKind.Relative);
 
             HttpRequestMessage requestMessage = new HttpRequestMessage()
             {
