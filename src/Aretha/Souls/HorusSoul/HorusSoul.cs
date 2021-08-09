@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Thismaker.Aretha
 {
@@ -25,9 +27,11 @@ namespace Thismaker.Aretha
         public async void WaitForCommand(string[] args=null)
         {
             List<string> cmdlets;
+            
+            string cmd;
             if (args == null || args.Length == 0)
             {
-                var cmd = Ask();
+                cmd = Ask();
                 if (cmd == null) return;
 
                 cmdlets = new List<string>(cmd.Split(' '));
@@ -35,6 +39,18 @@ namespace Thismaker.Aretha
             else
             {
                 cmdlets = new List<string>(args);
+                StringBuilder sb = new();
+
+                for (int i = 0; i < cmdlets.Count; i++){
+                    sb.Append(cmdlets[i]);
+
+                    if (i != cmdlets.Count - 1)
+                    {
+                        sb.Append(' ');
+                    }
+                }
+
+                cmd = sb.ToString();
             }
 
             while (true)
@@ -67,6 +83,11 @@ namespace Thismaker.Aretha
                             default:
                                 throw new InvalidOperationException("Unknown operation");
                         }
+                    }
+                    if (cmdlets[0] == "hash")
+                    {
+                        var input = Ask(isCase: true);
+                        Speak(Horus.Horus.GetHashString(input));
                     }
 
                     cmdlets = new List<string>(Ask().Split(' '));
