@@ -20,7 +20,7 @@
 </p>
 
 
-The LiquidSnow is a collection of .NET assemblies that you can use to make your .NET development work easy. It covers mutitudes of bases, from fundamental concepts to those that I just added for fun. While most of the API is generally frozen, there may still be breaking changes in the future, so keep this in mind. If you have any issues, don't hesitate to ask for assistance in the issues tab. Also, check the Wiki for documentation on how to use the Framework.
+The LiquidSnow is a collection of .NET assemblies that you can use to make your .NET development work easy. It covers mutitudes of bases, from fundamental concepts to those that I just added for fun. While most of the API is generally stable, there may still be breaking changes in the future, so keep this in mind. If you have any issues, don't hesitate to ask for assistance in the issues tab. Also, check the Wiki for documentation on how to use the Framework.
 
 LiquidSnow Assemblies:
  * [Aretha](#aretha)
