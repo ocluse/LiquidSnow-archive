@@ -10,7 +10,7 @@ using System.Text;
 namespace Thismaker.Horus.IO
 {
     
-    internal class CryptoContainer : IDisposable, ICryptoContainer
+    internal class CryptoContainer : ICryptoContainer
     {
         #region Private Fields
 
@@ -46,7 +46,7 @@ namespace Thismaker.Horus.IO
 
         #region Stream IO
         
-        public async Task AddAsync(string name, Stream input, bool overwrite = false, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public async Task AddAsync(string name, Stream input, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             Uri uri = PackUriHelper.CreatePartUri(new Uri(name, UriKind.Relative));
 
@@ -55,11 +55,11 @@ namespace Thismaker.Horus.IO
                 : _package.CreatePart(uri, "");
 
             Stream output = part.GetStream();
-            using CryptoFile ef = new CryptoFile(output, Key);
+            using ICryptoFile ef = IOBuilder.CreateFile(Key, output);
             await ef.WriteAsync(input, progress, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task GetAsync(string name, Stream output, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public async Task GetAsync(string name, Stream output, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             Uri uri = PackUriHelper.CreatePartUri(new Uri(name, UriKind.Relative));
 
@@ -69,7 +69,7 @@ namespace Thismaker.Horus.IO
             }
 
             Stream input = _package.GetPart(uri).GetStream();
-            using CryptoFile ef = new CryptoFile(input, Key);
+            using ICryptoFile ef = IOBuilder.CreateFile(Key, input);
             await ef.ReadAsync(output, progress, cancellationToken).ConfigureAwait(false);
         }
         #endregion
@@ -84,7 +84,7 @@ namespace Thismaker.Horus.IO
                 : _package.CreatePart(uri, "");
 
             Stream output = part.GetStream();
-            using CryptoFile ef = new CryptoFile(output, Key);
+            using ICryptoFile ef = IOBuilder.CreateFile(Key, output);
             await ef.SerializeAsync(o).ConfigureAwait(false);
         }
 
@@ -98,20 +98,20 @@ namespace Thismaker.Horus.IO
             }
 
             Stream input = _package.GetPart(uri).GetStream();
-            using CryptoFile ef = new CryptoFile(input, Key);
+            using ICryptoFile ef = IOBuilder.CreateFile(Key, input);
             return await ef.DeserializeAsync<T>().ConfigureAwait(false);
         }
         #endregion
 
         #region Byte IO
 
-        public async Task AddBytesAsync(string name, byte[] data, bool overwrite = false, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public async Task AddBytesAsync(string name, byte[] data, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             using MemoryStream msData = new MemoryStream(data);
             await AddAsync(name, msData, overwrite, progress, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<byte[]> GetBytesAsync(string name, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public async Task<byte[]> GetBytesAsync(string name, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             using MemoryStream msData = new MemoryStream();
             await GetAsync(name, msData, progress, cancellationToken).ConfigureAwait(false);
@@ -120,12 +120,12 @@ namespace Thismaker.Horus.IO
         #endregion
 
         #region String IO
-        public async Task AddTextAsync(string name, string contents, bool overwrite = false, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public async Task AddTextAsync(string name, string contents, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             await AddBytesAsync(name, contents.GetBytes<UTF8Encoding>(), overwrite, progress, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<string> GetTextAsync(string name, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public async Task<string> GetTextAsync(string name, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             byte[] bytes = await GetBytesAsync(name, progress, cancellationToken).ConfigureAwait(false);
             return bytes.GetString<UTF8Encoding>();
@@ -133,7 +133,7 @@ namespace Thismaker.Horus.IO
         #endregion
 
         #region Misc Methods
-        public async Task ExtractContainerAsync(string outputDirecotry, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public async Task ExtractContainerAsync(string outputDirecotry, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             if (!Directory.Exists(outputDirecotry))
             {
@@ -144,10 +144,10 @@ namespace Thismaker.Horus.IO
             int index = 0;
             int count = parts.Count();
 
-            Progress<float> innerProgress = new Progress<float> { };
+            Progress<double> innerProgress = new Progress<double> { };
             innerProgress.ProgressChanged += (o, e) =>
             {
-                float percent = (index + e) / count;
+                double percent = (index + e) / count;
                 progress.Report(percent);
             };
 

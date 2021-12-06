@@ -48,6 +48,13 @@ namespace Thismaker.Horus.Symmetrics
 
             ICryptoTransform trans = forward ? alg.CreateEncryptor() : alg.CreateDecryptor();
             using CryptoStream csInput = new CryptoStream(input, trans, CryptoStreamMode.Read);
+
+            //TODO: As soon as the projects targets a higher .NET Version, get rid of this dirty hack
+            var prop = csInput
+                .GetType()
+                .GetField("_leaveOpen", System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance);
+
             while (true)
             {
                 byte[] buffer = new byte[8];
@@ -74,7 +81,17 @@ namespace Thismaker.Horus.Symmetrics
 
             long workedOn = 0;
             ICryptoTransform trans = forward ? alg.CreateEncryptor() : alg.CreateDecryptor();
+
             using CryptoStream csInput = new CryptoStream(input, trans, CryptoStreamMode.Read);
+
+            //TODO: As soon as the projects targets a higher .NET Version, get rid of this dirty hack
+            var prop = csInput
+                .GetType()
+                .GetField("_leaveOpen", System.Reflection.BindingFlags.NonPublic 
+                | System.Reflection.BindingFlags.Instance);
+
+            prop.SetValue(csInput, true);
+
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested)

@@ -8,7 +8,7 @@ namespace Thismaker.Horus.IO
     /// <summary>
     /// Contains utility methods for creating instances of <see cref="ICryptoFile"/> and <see cref="ICryptoContainer"/>
     /// </summary>
-    public class HorusIOBuilder
+    public class IOBuilder
     {
         /// <summary>
         /// Create an instance of a <see cref="ICryptoFile"/> with the underlying <see cref="Stream"/> being a new <see cref="MemoryStream"/>
@@ -36,7 +36,23 @@ namespace Thismaker.Horus.IO
         /// </remarks>
         public static ICryptoFile CreateFile(string key, Stream stream)
         {
-            return new CryptoFile(stream, key);
+            return new CryptoFile(key, stream);
+        }
+
+        /// <summary>
+        /// Creates an instance of a <see cref="ICryptoFile"/> 
+        /// </summary>
+        /// <param name="key">The key used to encrypt/decrypt the contents of the file</param>
+        /// <param name="path">The path of the file</param>
+        /// <returns>
+        /// An <see cref="ICryptoFile"/> that writes to and reads from the provided file <paramref name="path"/>
+        /// </returns>
+        /// <remarks>
+        /// If no file exists at the specified path, a new one will be created, otherwise, the existing file will be opened
+        /// </remarks>
+        public static ICryptoFile CreateFile(string key, string path)
+        {
+            return new CryptoFile(key, path);
         }
 
         /// <summary>

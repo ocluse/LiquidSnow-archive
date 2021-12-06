@@ -12,7 +12,7 @@ namespace Thismaker.Horus.Symmetrics.Tests
         [TestMethod()]
         public async Task SymmetricTest()
         {
-            var alg = PredefinedSymmetric.AesFixed;
+            ISymmetric alg = SymmetricBuilder.CreateAesFixed();
             using var msInput = new MemoryStream(Plaintext.GetBytes<UTF8Encoding>());
             using var msOutput = new MemoryStream();
 

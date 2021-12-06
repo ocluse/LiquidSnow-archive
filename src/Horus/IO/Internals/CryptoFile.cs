@@ -6,19 +6,12 @@ using System.Threading.Tasks;
 
 namespace Thismaker.Horus.IO
 {
-    internal class CryptoFile : ICryptoFile, IDisposable 
+    internal class CryptoFile : ICryptoFile
     {
         #region Private Fields
         private byte[] _key;
 
         private readonly Stream _stream;
-
-        public long Position
-        {
-            get => _stream.Position;
-            set => _stream.Position = value;
-        }
-        public bool AlwaysOverwrite { get; set; } = true;
         #endregion
 
         #region Constructors
@@ -56,27 +49,19 @@ namespace Thismaker.Horus.IO
 
         public async Task<T> DeserializeAsync<T>()
         {
-            //Create serializer and stream
             using MemoryStream msData = new MemoryStream();
 
-            //Decrypt the data to the stream
             await ReadAsync(msData);
             msData.Position = 0;
 
-            //Deserialize
-            return await HorusIOSettings.Serializer.DeserializeAsync<T>(msData);
+            return await IOSettings.Serializer.DeserializeAsync<T>(msData);
         }
 
         public async Task SerializeAsync<T>(T o)
         {
             using MemoryStream msData = new MemoryStream();
-            await HorusIOSettings.Serializer.SerializeAsync(o, msData).ConfigureAwait(false);
             
-            if (AlwaysOverwrite)
-            {
-                _stream.Position = 0;
-                _stream.SetLength(0);
-            }
+            await IOSettings.Serializer.SerializeAsync(o, msData).ConfigureAwait(false);
 
             msData.Position = 0;
 
@@ -85,17 +70,16 @@ namespace Thismaker.Horus.IO
 
         public async Task WriteAsync(Stream stream, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
-            if (AlwaysOverwrite)
-            {
-                _stream.Position = 0;
-            }
-            await HorusIOSettings.Algorithm.EncryptAsync(input: stream, output: _stream, _key, progress, cancellationToken);
+            _stream.Position = 0;
+            _stream.SetLength(0);
+            
+            await IOSettings.Algorithm.EncryptAsync(input: stream, output: _stream, _key, progress, cancellationToken);
         }
 
         public async Task ReadAsync(Stream stream, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             _stream.Position = 0;
-            await HorusIOSettings.Algorithm.DecryptAsync(input: _stream, output: stream, _key, progress, cancellationToken);
+            await IOSettings.Algorithm.DecryptAsync(input: _stream, output: stream, _key, progress, cancellationToken);
         }
 
         public async Task WriteBytesAsync(byte[] buffer, IProgress<double> progress = null, CancellationToken cancellationToken = default)

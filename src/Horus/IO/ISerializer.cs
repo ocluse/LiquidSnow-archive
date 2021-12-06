@@ -28,8 +28,7 @@ namespace Thismaker.Horus.IO
     {
         public async Task SerializeAsync<T>(T data, Stream destinationStream)
         {
-            using MemoryStream msData=new MemoryStream();
-            await JsonSerializer.SerializeAsync(msData, data);
+            await JsonSerializer.SerializeAsync(destinationStream, data);
         }
 
         public async Task<T> DeserializeAsync<T>(Stream sourceStream)

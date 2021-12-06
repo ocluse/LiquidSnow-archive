@@ -6,7 +6,7 @@ namespace Thismaker.Horus.IO
     /// <summary>
     /// A static class for specifying the cryptographic and serialization settings to be used by the <see cref="ICryptoFile"/> and <see cref="ICryptoContainer"/> instances
     /// </summary>
-    public static class HorusIOSettings
+    public static class IOSettings
     {
         private static ISerializer _serializer;
         

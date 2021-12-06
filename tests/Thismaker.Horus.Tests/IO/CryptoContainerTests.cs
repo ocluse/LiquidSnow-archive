@@ -17,22 +17,16 @@ namespace Thismaker.Horus.IO.Tests
         public async Task CryptoContainerTest()
         {
             using var fsContainer = File.Create(containerPath);
-            using var container = new CryptoContainer(fsContainer, key);
+            using ICryptoContainer container=IOBuilder.CreateContainer(key, fsContainer);
             await container.AddTextAsync(fileName, plainText, true);
 
-            var student = new Student
-            {
-                DateOfBirth = DateTime.Today,
-                Class = 3,
-                Name = "Ivy Rose"
-            };
+            Student student = Student.Create();
 
             var readBack = await container.GetTextAsync(fileName);
             await container.AddAsync("student", student, true);
             var readStudent = await container.GetAsync<Student>("student");
             Assert.AreEqual(plainText, readBack);
-
-            Assert.AreEqual(student, readStudent);
+            Assert.IsTrue(Student.AreEqual(student, readStudent));
         }
     }
 
@@ -42,15 +36,19 @@ namespace Thismaker.Horus.IO.Tests
         public DateTime DateOfBirth { get; set; }
         public int Class { get; set; }
 
-        public override bool Equals(object obj)
+        public static Student Create()
         {
-            if (obj == null) return false;
-            if (obj.GetType() == typeof(Student))
+            return new Student
             {
-                var test = (Student)obj;
-                return Name == test.Name && DateOfBirth == test.DateOfBirth && Class == test.Class;
-            }
-            return false;
+                DateOfBirth = DateTime.Today,
+                Class = 3,
+                Name = "Ivy Rose"
+            };
+        }
+
+        public static bool AreEqual(Student a, Student test)
+        {
+            return a.Name == test.Name && a.DateOfBirth == test.DateOfBirth && a.Class == test.Class;
         }
     }
 }

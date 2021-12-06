@@ -8,33 +8,15 @@ namespace Thismaker.Horus.IO
     /// <summary>
     /// Contains functionality for encrypting and decrypting a file
     /// </summary>
-    public interface ICryptoFile
+    public interface ICryptoFile : IDisposable
     {
-        /// <summary>
-        /// Gets or sets the position of the underlying <see cref="Stream"/>
-        /// </summary>
-        long Position { get; set; }
 
         /// <summary>
-        /// Gets or sets a value determining whether, if true, 
-        /// all write operations reset the <see cref="Stream.Position"/> of the underlying <see cref="Stream"/> to 0
-        /// resulting in overwriting of existing data. If false, write operations continue from the current position.
-        /// </summary>
-        /// <remarks>
-        /// By default. This value is true for <see cref="ICryptoFile"/> instances created using <see cref="HorusIOBuilder"/>
-        /// </remarks>
-        bool AlwaysOverwrite { get; set; }
-
-        /// <summary>
-        /// Decrypts and deserializes the contents of the file using the <see cref="HorusIOSettings.Serializer"/>
+        /// Decrypts and deserializes the contents of the file using the <see cref="IOSettings.Serializer"/>
         /// </summary>
         /// <returns>The resultant object from the decryption and deserialization operation</returns>
         Task<T> DeserializeAsync<T>();
-        
-        /// <summary>
-        /// Closes the file and disposes the underlying stream
-        /// </summary>
-        void Dispose();
+
         
         /// <summary>
         /// Decrypts the contents of the file and writes them to the provided <paramref name="stream"/>
@@ -80,12 +62,13 @@ namespace Thismaker.Horus.IO
         void SetKey(string key);
 
         /// <summary>
-        /// Reads from and encrypts data from <paramref name="stream"/>, writing the encrypted data to the file
+        /// Encrypts and writes data to the file
         /// </summary>
-        /// <param name="stream">The stream to read from and encrypted to be written into the file</param>
+        /// <param name="stream">The stream to read from, the data read encrypted and written into the file</param>
         /// <param name="progress">The subscriber notified of the progress of the operation</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests</param>
         /// <remarks>
+        /// Reads from and encrypts data from <paramref name="stream"/>, writing the encrypted data to the file.
         /// The data in <paramref name="stream"/> will not be encrypted, instead, it is only read.
         /// The encrypted data is written to the underying stream of the <see cref="ICryptoFile"/>
         /// </remarks>
