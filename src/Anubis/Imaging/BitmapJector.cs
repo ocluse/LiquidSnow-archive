@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
+using SkiaSharp;
 using System.Collections;
 using System.Threading.Tasks;
 using System.IO;
@@ -26,37 +25,38 @@ namespace Thismaker.Anubis.Imaging
         public override Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
             //Prepare the images:
-            var inputImage = (Bitmap)Image.FromStream(source);
-            
-            var width = inputImage.Width;
-            var height = inputImage.Height;
-            
-            var ls_data = new List<byte>();
+            SKBitmap inputImage = SKBitmap.Decode(source);
+
+            int width = inputImage.Width;
+            int height = inputImage.Height;
+
+            List<byte> ls_data = new List<byte>();
 
             //Read the data to be injected
             ls_data.AddRange(data.ReadAllBytes());
             //add the EOF:
             if (!string.IsNullOrEmpty(EOF))
             {
-                ls_data.AddRange(Sign);
+                ls_data.AddRange(EOFBytes);
             }
 
             //create the message:
-            var message = new BitArray(ls_data.ToArray());
+            BitArray message = new BitArray(ls_data.ToArray());
 
-            var count = message.Count;
+            int count = message.Count;
 
             if (EnsureSuccess)
             {
-                var maxWritable = (UseAlpha ? 4 : 3) * LsbDepth * width * height;
+                int maxWritable = (UseAlpha ? 4 : 3) * LsbDepth * width * height;
                 if (count > maxWritable)
                     throw new InvalidOperationException("There is not enough room in the picture to write the data");
             }
 
             //create the output image:
-            var outputImage = inputImage.Clone(new Rectangle(0, 0, inputImage.Width, inputImage.Height), inputImage.PixelFormat);
+            SKBitmap outputImage = inputImage.Copy();
+            //var outputImage = inputImage.Clone(new Rectangle(0, 0, inputImage.Width, inputImage.Height), inputImage.PixelFormat);
 
-            var pos = 0;
+            int pos = 0;
 
             for (int y = 0; y < height; y++)
             {
@@ -76,15 +76,15 @@ namespace Thismaker.Anubis.Imaging
                         break;
                     }
 
-                    var pixel = inputImage.GetPixel(x, y);
+                    SKColor pixel = inputImage.GetPixel(x, y);
 
-                    int[] vals = new int[] { pixel.A, pixel.R, pixel.G, pixel.B };
+                    int[] vals = new int[] { pixel.Alpha, pixel.Red, pixel.Green, pixel.Blue };
 
                     for (int v = 0; v < vals.Length; v++)
                     {
                         if (!UseAlpha && v == 0) continue;
 
-                        var bitArray = new BitArray(new[] { vals[v] });
+                        BitArray bitArray = new BitArray(new[] { vals[v] });
                         for (int i = 0; i < LsbDepth; i++)
                         {
                             if (pos == count)
@@ -101,37 +101,40 @@ namespace Thismaker.Anubis.Imaging
                         if (stop) break;
                     }
 
-                    pixel = Color.FromArgb(vals[0], vals[1], vals[2], vals[3]);
+                    pixel=new SKColor((byte)vals[1], (byte)vals[2], (byte)vals[3], (byte)vals[0]);
+
+                    //pixel = Color.FromArgb(vals[0], vals[1], vals[2], vals[3]);
 
                     outputImage.SetPixel(x, y, pixel);
 
                     //Report on progress:
                     if (progress != null)
                     {
-                        var percent = pos / (float)count;
+                        float percent = pos / (float)count;
                         progress.Report(percent);
                     }
                 }
 
                 if (stop) break;
             }
-
-            outputImage.Save(destination, ImageFormat.Png);
+            outputImage.Encode(destination, SKEncodedImageFormat.Png, 100);
+            //outputImage.Save(destination, ImageFormat.Png);
             return Task.CompletedTask;
         }
         
         public override Task EjectAsync(Stream source, Stream destination, IProgress<float> progress=null, CancellationToken cancellationToken=default)
         {
             //Prepare the image
-            var inputImage = (Bitmap)Image.FromStream(source);
+            //var inputImage = (Bitmap)Image.FromStream(source);
+            SKBitmap inputImage =SKBitmap.Decode(source);
 
-            var height = inputImage.Height;
-            var width = inputImage.Width;
+            int height = inputImage.Height;
+            int width = inputImage.Width;
 
             //Prepare the writing stage
             int count = (width * height) * LsbDepth * (UseAlpha ? 4 : 3);
-            var message = new BitArray(count, false);
-            var pos = 0;
+            BitArray message = new BitArray(count, false);
+            int pos = 0;
 
             for (int y = 0; y < height; y++)
             {
@@ -143,14 +146,14 @@ namespace Thismaker.Anubis.Imaging
                         cancellationToken.ThrowIfCancellationRequested();
                     }
 
-                    var pixel = inputImage.GetPixel(x, y);
+                    SKColor pixel = inputImage.GetPixel(x, y);
 
-                    int[] vals = UseAlpha ? new int[] { pixel.A, pixel.R, pixel.G, pixel.B }
-                    : new int[] { pixel.R, pixel.G, pixel.B }; ;
+                    byte[] vals = UseAlpha ? new byte[] { pixel.Alpha, pixel.Red, pixel.Green, pixel.Blue }
+                    : new byte[] { pixel.Red, pixel.Green, pixel.Blue }; ;
 
-                    foreach (var val in vals)
+                    foreach (byte val in vals)
                     {
-                        var bitArray = new BitArray(new[] { val });
+                        BitArray bitArray = new BitArray(new[] { val });
                         for (int i = 0; i < LsbDepth; i++)
                         {
                             message[pos] = bitArray[i];
@@ -167,7 +170,7 @@ namespace Thismaker.Anubis.Imaging
             }
 
             //Write the result
-            var bytes = message.ToBytes();
+            byte[] bytes = message.ToBytes();
             List<byte> result;
 
             //Return the file cause there is no need to find the EOF
@@ -178,11 +181,11 @@ namespace Thismaker.Anubis.Imaging
             else
             {
                 result = new List<byte>();
-                var success = false;
+                bool success = false;
 
                 for (int i = 0; i < bytes.Length; i++)
                 {
-                    if (bytes[i] == Sign[0])
+                    if (bytes[i] == EOFBytes[0])
                     {
                         //check sequence
                         if (IsSignature(bytes, i))
@@ -202,7 +205,6 @@ namespace Thismaker.Anubis.Imaging
             destination.Write(result.ToArray(), 0, result.Count);
             destination.Flush();
             return Task.CompletedTask;
-
         }
 
     }

@@ -4,6 +4,7 @@
     <LangVersion>8.0</LangVersion>
     <Authors>Thismaker</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <Description>For apps that rely on SignalRCore and WebApi, this allows you to build the client side of Server-Client based applications rapidly.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>

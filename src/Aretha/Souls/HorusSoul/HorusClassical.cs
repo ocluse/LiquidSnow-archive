@@ -132,7 +132,7 @@ namespace Thismaker.Aretha
             _alg = algName switch
             {
                 "playfair" => new Playfair(),
-                "ceasar" => new Ceasar(),
+                "caesar" => new Caesar(),
                 "vigenere" => new Vigenere(),
                 _ => throw
                 new InvalidOperationException("The classical algorithm provided is unknown")

@@ -46,7 +46,7 @@ namespace Thismaker.Mercury
         /// sends ping messages at the provided interval</param>
         public ClientConnection(TcpClient client, Server server)
         {
-            ConnectionId = Horus.Horus.GenerateID();
+            ConnectionId = Horus.Horus.GenerateId();
             _tcpClient = client;
             _server = server;
 

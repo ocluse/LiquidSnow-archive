@@ -5,13 +5,15 @@
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageOutputPath>..\..\..\build</PackageOutputPath>
     <Description>Horus greatly simplifies cryptography and encryption, allowing you to work with symmetric algorithms by taking care of the difficult part of setting them to work properly</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>encryption security symmetric-algorithm aes encrypted</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>2.0.0.0</Version>
+    <Version>3.0.0-preview1.0</Version>
     <Copyright>©2021 Ocluse</Copyright>
     <Company>Ocluse</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -22,10 +24,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Symmetrics\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -93,7 +93,7 @@ namespace Thismaker.Thoth
             {
                 Target = target,
                 ItemKey = key,
-                Id = Horus.Horus.GenerateID(),
+                Id = Horus.Horus.GenerateId(),
                 PropertyName = propertyName,
                 TableKey = table
             };

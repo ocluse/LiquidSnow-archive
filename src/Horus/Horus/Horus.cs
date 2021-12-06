@@ -6,29 +6,32 @@ using System.Text;
 
 namespace Thismaker.Horus
 {
+    /// <summary>
+    /// Contains utility methods for generating IDs, random numbers and calculating hashes
+    /// </summary>
     public class Horus
     {
         #region Generation
         /// <summary>
         /// Generates an arguably unique string of characters to be used for unique identification. 
-        /// The uniqueness strength boils down to the <see cref="IDKind"/> used, depending on the scenario.
+        /// The uniqueness strength boils down to the <see cref="IdKind"/> used.
         /// Some IDs may not be suitable for certain scenarios
         /// </summary>
-        /// <param name="kind">The kind of ID to be generated, determines the strength as well as the look</param>
-        /// <param name="length">The length of the string to be generated, only applicable when the kind is set to Standard or Random</param>
-        public static string GenerateID(IDKind kind = IDKind.GUID, int length = 12)
+        /// <param name="kind">The kind of ID to be generated</param>
+        /// <param name="length">The length of the string to be generated, only applicable for <see cref="IdKind.Standard"/> up to 36 characters and <see cref="IdKind.Random"/> for unlimited characters</param>
+        public static string GenerateId(IdKind kind = IdKind.Guid, int length = 12)
         {
             return kind switch
             {
-                IDKind.DateTime => GenerateDTID(),
-                IDKind.GUID => GenerateGUID(),
-                IDKind.Hash => GenerateSHAID(),
-                IDKind.Random => Random(length, true),
-                _ => GenerateSTDID(length),
+                IdKind.DateTime => GenerateDateTimeId(),
+                IdKind.Guid => GenerateGuid(),
+                IdKind.Hash => GenerateHashedId(),
+                IdKind.Random => Random(length, true),
+                _ => GenerateStandardId(length),
             };
         }
 
-        private static string GenerateDTID()
+        private static string GenerateDateTimeId()
         {
             long ticks = DateTime.Now.Ticks;
             byte[] bytes = BitConverter.GetBytes(ticks);
@@ -39,9 +42,9 @@ namespace Thismaker.Horus
             return id.ToUpper();
         }
 
-        private static string GenerateSTDID(int count)
+        private static string GenerateStandardId(int count)
         {
-            var builder = new StringBuilder();
+            StringBuilder builder = new StringBuilder();
             Enumerable
                 .Range(65, 26)
                 .Select(e => ((char)e).ToString())
@@ -53,41 +56,48 @@ namespace Thismaker.Horus
             return builder.ToString();
         }
 
-        private static string GenerateGUID()
+        private static string GenerateGuid()
         {
-            var guid = Guid.NewGuid();
+            Guid guid = Guid.NewGuid();
             return guid.ToString();
         }
 
-        private static string GenerateSHAID()
+        private static string GenerateHashedId()
         {
-            var start = GenerateID();
-            return GetHashString(start);
+            string start = GenerateId();
+            return GetHash(start);
         }
         #endregion
 
         #region Randomnization
         private static readonly Random _random = new Random();
 
+        /// <summary>
+        /// Generates a random integer
+        /// </summary>
+        /// <param name="min">The minimum inclusive value</param>
+        /// <param name="max">The maximum exclusive value</param>
+        /// <returns>A randomly generated integer</returns>
         public static int Random(int min, int max)
         {
             return _random.Next(min, max);
         }
 
         /// <summary>
-        /// Returns a random string of the specified <paramref name="size"/>
+        /// Generates a random string of the specified <paramref name="length"/>
         /// </summary>
-        /// <param name="size">The number of characters to include in the string</param>
+        /// <param name="length">The number of characters to include in the string</param>
         /// <param name="lowerCase">If true, returns lowercase characters, otherwise uppercase</param>
-        public static string Random(int size = 8, bool lowerCase = false)
+        /// <returns>A randomly generated string</returns>
+        public static string Random(int length = 8, bool lowerCase = false)
         {
-            var builder = new StringBuilder(size);
+            StringBuilder builder = new StringBuilder(length);
 
             char offset = lowerCase ? 'a' : 'A';
             const int lettersOffset = 26;
-            for (var i = 0; i < size; i++)
+            for (int i = 0; i < length; i++)
             {
-                var @char = (char)_random.Next(offset, offset + lettersOffset);
+                char @char = (char)_random.Next(offset, offset + lettersOffset);
                 builder.Append(@char);
             }
             return lowerCase ? builder.ToString().ToLower() : builder.ToString();
@@ -99,50 +109,51 @@ namespace Thismaker.Horus
         #region Hash
 
         /// <summary>
-        /// Quickly computes the hash of a file
+        /// Computes the SHA256 hash value of file
         /// </summary>
-        /// <param name="path">Path to the file whose hash is to be calculated</param>
-        /// <returns></returns>
+        /// <param name="path">The path of the file whose hash value is to be computed</param>
+        /// <returns>A string representing the hash value of the file</returns>
         public static string ComputeFileHash(string path)
         {
-            using var alSHA = SHA256.Create();
-            using var stream = File.OpenRead(path);
-            var bytes = alSHA.ComputeHash(stream);
-            string result = "";
-            foreach (var b in bytes) result += b.ToString("X2");
-            return result;
+            using SHA256 alg = SHA256.Create();
+            using FileStream stream = File.OpenRead(path);
+            byte[] bytes = alg.ComputeHash(stream);
+
+            return GetHexString(bytes);
         }
 
         /// <summary>
-        /// Returns the hash of an array of data
+        /// Computes the hash of an array of bytes
         /// </summary>
-        /// <param name="inputData"></param>
-        /// <returns></returns>
-        public static byte[] GetHash(byte[] inputData)
+        /// <param name="data">The data to be hashed</param>
+        /// <returns>The resulting byte array from the operation</returns>
+        public static byte[] GetHash(byte[] data)
         {
-            using var alSHA = SHA256.Create();
-            return alSHA.ComputeHash(inputData);
+            using SHA256 alg = SHA256.Create();
+            
+            return alg.ComputeHash(data);
         }
 
         /// <summary>
-        /// Returns the hash of a string. No idea why you'd want that,
-        /// but hey I made it so....
+        /// Computes the hash of a string
         /// </summary>
-        /// <param name="inputString"></param>
-        /// <returns></returns>
-        public static byte[] GetHash(string inputString)
+        /// <param name="input">The string to be hashed</param>
+        /// <returns>A string representing the hash of the <paramref name="input"/></returns>
+        public static string GetHash(string input)
         {
-            return GetHash(Encoding.UTF8.GetBytes(inputString));
+            byte[] bytes = GetHash(input.GetBytes<UTF8Encoding>());
+            
+            return GetHexString(bytes);
         }
 
-        /// <summary>
-        /// Hashes a string.
-        /// </summary>
-        public static string GetHashString(string inputString)
+        private static string GetHexString(byte[] bytes)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (byte b in GetHash(inputString))
+
+            foreach (byte b in bytes)
+            {
                 sb.Append(b.ToString("X2"));
+            }
 
             return sb.ToString();
         }
@@ -150,29 +161,32 @@ namespace Thismaker.Horus
         #endregion
     }
 
-    public enum IDKind
+    /// <summary>
+    /// The type of ID to be generated by <see cref="Horus.GenerateId(IdKind, int)"/>
+    /// </summary>
+    public enum IdKind
     {
         /// <summary>
-        /// Generates the strongest ID, should be used for most default scenarios
+        /// Generates an ID based on <see cref="System.Guid"/>
         /// </summary>
-        GUID,
+        Guid,
         /// <summary>
         /// Generates a GUID that is transformed into an alphanumeric squence.
         /// </summary>
         Standard,
 
         /// <summary>
-        /// ID Generated by this method is simply the GUID but passed through a Hash function for 256 characters
+        /// ID Generated by this method is simply the <see cref="Guid"/> but passed through a Hash function for 256 characters
         /// </summary>
         Hash,
 
         /// <summary>
-        /// Generates an ID based on the System.DateTime, conflicts may occur depending on the time, but are rare.
+        /// Generates an ID based on the <see cref="System.DateTime"/>, conflicts may occur depending on the time, but are rare.
         /// </summary>
         DateTime,
 
         /// <summary>
-        /// Generates an ID based on the System.Random
+        /// Generates an ID based on <see cref="System.Random"/>
         /// </summary>
         Random
     }

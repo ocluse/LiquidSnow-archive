@@ -3,107 +3,76 @@ using System.Text;
 
 namespace Thismaker.Horus.Symmetrics
 {
-    public class SymmetricBuilder
+    /// <summary>
+    /// Used to create instances of <see cref="ISymmetric"/>
+    /// </summary>
+    public static class SymmetricBuilder
     {
-        private int _keySize=256;
-        private int _blockSize = 128;
-        private string _salt;
-        private int _iterations = 1000;
-        private EncryptionAlgorithm _algorithm = EncryptionAlgorithm.AES;
+        #region Constants
+        private const int _keySize=256;
+        private const int _blockSize = 128;
+        private const int _iterations = 1000;
+        #endregion
 
+        #region Public Methods
+        
         /// <summary>
-        /// Provides the algorithm to be used. Otherwise it will be <see cref="EncryptionAlgorithm.AES"/>
+        /// Creates a <see cref="ISymmetric"/> of the algorithm and salt
         /// </summary>
-        /// <param name="algorithm">The algorthm</param>
-        public SymmetricBuilder WithAlgorithm(EncryptionAlgorithm algorithm)
+        /// <param name="algorithm">The algorithm used for the cryptographic operations</param>
+        /// <param name="salt">The salt used in derivation of Key and IV during the cryptographic operation</param>
+        /// <returns>An <see cref="ISymmetric"/> instance initialized with the specified algorithm and salt that can be used for cryptographic operations</returns>
+        public static ISymmetric Create(EncryptionAlgorithm algorithm, string salt)
         {
-            _algorithm = algorithm;
-            return this;
-        }
-
-        /// <summary>
-        /// If provided, will set the size of the key to be usd. Otherwise 256.
-        /// </summary>
-        /// <param name="size"></param>
-        public SymmetricBuilder WithKeySize(int size)
-        {
-            _keySize = size;
-            return this;
-        }
-
-        /// <summary>
-        /// If provided, will set the blocks, otherwise 128.
-        /// </summary>
-        /// <param name="size">Size of each block</param>
-        public SymmetricBuilder WithBlockSize(int size)
-        {
-            _blockSize = size;
-            return this;
-        }
-
-        /// <summary>
-        /// If provided, will set the salt to be used
-        /// when deriving password bytes.
-        /// Otherwise, a random ASCII salt will be created.
-        /// </summary>
-        /// <param name="salt">The salt to be used. Should be 16 characters long</param>
-        public SymmetricBuilder WithSalt(string salt)
-        {
-            _salt = salt;
-            return this;
-        }
-
-        /// <summary>
-        /// If provided, will set the number of times the password deriver will work.
-        /// Otherwise it will be run 1000 times.
-        /// </summary>
-        /// <param name="count"></param>
-        public SymmetricBuilder WithIterations(int count)
-        {
-            _iterations = count;
-            return this;
-        }
-
-        /// <summary>
-        /// Builds a <see cref="Symmetric"/> with the set configuration.
-        /// </summary>
-        public Symmetric Build() 
-        {
-            if (string.IsNullOrEmpty(_salt))
+            return new Symmetric()
             {
-                var alpha = GetASCIICharacters();
-
-                var builder = new StringBuilder();
-
-                for(int i = 0; i < 16; i++)
-                {
-                    var index= Horus.Random(0, alpha.Length);
-                    builder.Append(alpha[index]);
-                }
-
-                _salt = builder.ToString();
-            }
-
-            return new Symmetric
-            {
-                BlockSize = _blockSize,
-                Algorithm = _algorithm,
-                Iterations = _iterations,
                 KeySize = _keySize,
-                Salt = _salt
+                Algorithm = algorithm,
+                BlockSize = _blockSize,
+                Salt = salt,
+                CipherMode = System.Security.Cryptography.CipherMode.CBC,
+                PaddingMode = System.Security.Cryptography.PaddingMode.PKCS7,
+                Iterations = _iterations
             };
         }
 
-        protected static string GetASCIICharacters()
+        /// <summary>
+        /// Creates a <see cref="ISymmetric"/> instance using the AES algorithm with a randomly created salt. The salt must be stored for future use.
+        /// </summary>
+        /// <returns>An <see cref="ISymmetric"/> instance using the AES algorithm with a random salt.</returns>
+        public static ISymmetric CreateAesRandom()
         {
-            StringBuilder alpha = new StringBuilder();
-            for (int i = 0x20; i <= 0x7e; i++)
-            {
-                char c = Convert.ToChar(i);
-                alpha.Append(c);
-            }
-
-            return alpha.ToString();
+            return Create(EncryptionAlgorithm.Aes, Horus.GenerateId(IdKind.Standard, 16));
         }
+
+        /// <summary>
+        /// Creates a <see cref="ISymmetric"/> algorithm using the AES algorithm with a hard coded salt.
+        /// While it not vital to store the salt value, this method is potentially risky in sensitive situations 
+        /// </summary>
+        /// <returns>A <see cref="ISymmetric"/> instance using the AES algorithm and a hard coded salt.</returns>
+        public static ISymmetric CreateAesFixed()
+        {
+            return Create(EncryptionAlgorithm.Aes, "k39vn4p9;hsgpo4");
+        }
+
+        /// <summary>
+        /// Creates a <see cref="ISymmetric"/> instance using the Rijndael algorithm with a randomly created salt. The salt must be stored for future use.
+        /// </summary>
+        /// <returns>An <see cref="ISymmetric"/> instance using the Rijndael algorithm with a random salt.</returns>
+        public static ISymmetric CreateRijndaelRandom()
+        {
+            return Create(EncryptionAlgorithm.Rijndael, Horus.GenerateId(IdKind.Standard, 16));
+        }
+
+        /// <summary>
+        /// Creates a <see cref="ISymmetric"/> algorithm using the Rijndael algorithm with a hard coded salt.
+        /// While it not vital to store the salt value, this method is potentially risky in sensitive situations 
+        /// </summary>
+        /// <returns>A <see cref="ISymmetric"/> instance using the Rijndael algorithm and a hard coded salt.</returns>
+        public static ISymmetric CreateRijndaelFixed()
+        {
+            return Create(EncryptionAlgorithm.Rijndael, "k39vn4p9;hsgpo4");
+        }
+        #endregion
     }
 }

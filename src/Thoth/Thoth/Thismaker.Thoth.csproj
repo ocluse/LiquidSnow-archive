@@ -14,6 +14,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Company>Ocluse</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageOutputPath>..\..\..\build</PackageOutputPath>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 

@@ -10,6 +10,11 @@ namespace Thismaker.Anubis
 {
     public abstract class Jector
     {
+        private byte[] _eofBytes;
+        private string _eof = EOF_STRING;
+
+        public const string EOF_STRING = "#$%-";
+
         /// <summary>
         /// The depth of the Least Significant Bit, increasing the value may allow storing bigger files,
         /// but may lead to noticable artifacts in the produced data. Value cannot be greater than 8
@@ -25,22 +30,44 @@ namespace Thismaker.Anubis
         /// the returned data is truncated at where the EOF was found.
         /// If the value is null, the EOF will not be added at the end nor will it be checked.
         /// </summary>
-        public string EOF { get; set; }
-        = "#$%-";
+        public string EOF
+        {
+            get => _eof;
+            set
+            {
+                _eof = value;
+
+                if (_eof == null)
+                {
+                    _eofBytes = null;
+                }
+                else
+                {
+                    _eofBytes = _eof.GetBytes<UTF8Encoding>();
+                }
+            }
+        }
 
         /// <summary>
         /// The EOF as a byte array, using UTF8 Encoding
         /// </summary>
-        protected byte[] Sign
+        protected byte[] EOFBytes
         {
-            get { return Encoding.UTF8.GetBytes(EOF); }
+            get
+            {
+                if(_eofBytes == null && _eof !=null)
+                {
+                    _eofBytes= _eof.GetBytes<UTF8Encoding>();
+                }
+                return _eofBytes;
+            }
         }
 
         /// <summary>
         /// When <see cref="true"/> throws <see cref="InvalidOperationException"/> 
         /// when the EOF cannot be written or was not read.
         /// </summary>
-        public bool EnsureSuccess { get; set; } = false;
+        public bool EnsureSuccess { get; set; }
 
         /// <summary>
         /// Injects data to a source stream, saving the data to the specified destination stream.
@@ -67,7 +94,7 @@ namespace Thismaker.Anubis
         {
             try
             {
-                foreach (var b in Sign)
+                foreach (byte b in EOFBytes)
                 {
 
                     if (b != input[index]) return false;

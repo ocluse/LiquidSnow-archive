@@ -6,7 +6,7 @@ namespace Thismaker.Horus.Classical
     /// The famouse Ceasar Cipher believed to have been employed by Julius Ceasar himself.
     /// Its the simplest form of subsitution cipher know.
     /// </summary>
-    public class Ceasar : ClassicalAlgorithm
+    public class Caesar : ClassicalAlgorithm
     {
         private char _key;
 

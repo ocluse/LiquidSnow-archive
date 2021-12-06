@@ -103,7 +103,7 @@ namespace Thismaker.Pluto
             {
                 Name = name,
                 Type = type,
-                Id = Horus.Horus.GenerateID()
+                Id = Horus.Horus.GenerateId()
             };
 
             Accounts.Add(account);

@@ -9,11 +9,11 @@ namespace Thismaker.Anubis.Media
         private void LoadHeader()
         {
             _stream.Position = 0;
-            using var reader = new BinaryReader(_stream, Encoding.ASCII, true);
+            using BinaryReader reader = new BinaryReader(_stream, Encoding.ASCII, true);
 
             //--------------------------------VALIDITY--------------------------------//
             //RIFF Marker
-            var str=reader.ReadChars(4);
+            char[] str =reader.ReadChars(4);
             if(!str.IsString("RIFF")) throw new InvalidDataException("The file is not a valid WAV file");
 
             //ChunkSize
@@ -38,10 +38,10 @@ namespace Thismaker.Anubis.Media
             _format.SampleRate = reader.ReadInt32();
 
             //theoritical ByteRate
-            var byteRate = reader.ReadInt32();
+            int byteRate = reader.ReadInt32();
 
             //theoritical BlockAlign
-            var blockAlign = reader.ReadInt16();
+            short blockAlign = reader.ReadInt16();
 
             //Theoritical BitsPerSample
             _format.BitsPerSample = reader.ReadInt16();
@@ -55,7 +55,7 @@ namespace Thismaker.Anubis.Media
             reader.BaseStream.Position+= (_fmtChunkSize - 16);
 
             //==========================DATA 2============================//
-            var strBuffer = new string(reader.ReadChars(4));
+            string strBuffer = new string(reader.ReadChars(4));
 
             if (strBuffer != "data")
             {
@@ -84,9 +84,9 @@ namespace Thismaker.Anubis.Media
 
         public Sample GetNextSample()
         {
-            using var reader = new BinaryReader(_stream, Encoding.ASCII, true);
+            using BinaryReader reader = new BinaryReader(_stream, Encoding.ASCII, true);
 
-            var sample = new Sample();
+            Sample sample = new Sample();
             for(int i = 0; i < _format.NumChannels; i++)
             {
                 if (reader.PeekChar() == -1)
@@ -100,9 +100,8 @@ namespace Thismaker.Anubis.Media
                         return sample;
                     }
                 }
-
-                var data=reader.ReadBytes(_format.BytesPerSample);
-                var channel = new Channel(data);
+                byte[] data =reader.ReadBytes(_format.BytesPerSample);
+                Channel channel = new Channel(data);
                 sample.Channels.Add(channel);
             }
 

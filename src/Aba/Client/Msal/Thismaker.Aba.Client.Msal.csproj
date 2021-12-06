@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <Authors>Thismaker</Authors>
     <Description>Extends the functionality of AbaClients so that they work as Msal clients. Useful if your client app is using AzureAd or AzureAdB2C to authenticate calls to a webApi.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>

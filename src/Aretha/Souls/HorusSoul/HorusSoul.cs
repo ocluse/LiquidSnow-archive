@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Thismaker.Horus;
 
 namespace Thismaker.Aretha
 {
@@ -62,7 +63,7 @@ namespace Thismaker.Aretha
                         Aretha.SoulSucceeded(Soul.Horus);
                         return;
                     }
-                    if (cmdlets[0] == "use")
+                    else if (cmdlets[0] == "use")
                     {
                         switch (cmdlets[1])
                         {
@@ -84,10 +85,40 @@ namespace Thismaker.Aretha
                                 throw new InvalidOperationException("Unknown operation");
                         }
                     }
-                    if (cmdlets[0] == "hash")
+                    else if (cmdlets[0] == "hash")
                     {
                         var input = Ask(isCase: true);
-                        Speak(Horus.Horus.GetHashString(input));
+                        Speak(Horus.Horus.GetHash(input));
+                    }
+                    else if (cmdlets[0] == "id")
+                    {
+                        if (cmdlets.Count == 1)
+                        {
+                            Speak(Horus.Horus.GenerateId(IdKind.Guid));
+                        }
+                        else
+                        {
+                            int max = 12;
+                            if (cmdlets.Count > 2)
+                            {
+                                if (!int.TryParse(cmdlets[2], out max))
+                                {
+                                    throw new InvalidOperationException("Value for length must be number");
+                                }
+                            }
+
+                            IdKind kind = cmdlets[1] switch
+                            {
+                                "standard" => IdKind.Standard,
+                                "date-time" => IdKind.DateTime,
+                                "guid" => IdKind.Guid,
+                                "random" => IdKind.Random,
+                                "hash" => IdKind.Hash,
+                                _ => throw new InvalidOperationException("Unkown ID Kind")
+                            };
+
+                            Speak(Horus.Horus.GenerateId(kind, max));
+                        }
                     }
 
                     cmdlets = new List<string>(Ask().Split(' '));

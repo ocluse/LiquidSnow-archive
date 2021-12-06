@@ -5,6 +5,7 @@
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageOutputPath>..\..\build</PackageOutputPath>
     <Description>Very useful library that provide some fundamental utlilities, extensions and models that are useful for speeding up development.</Description>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>

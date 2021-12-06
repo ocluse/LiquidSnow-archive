@@ -10,6 +10,7 @@
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageOutputPath>..\..\..\..\..\build</PackageOutputPath>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 

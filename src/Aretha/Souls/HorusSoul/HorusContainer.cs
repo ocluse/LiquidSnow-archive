@@ -86,7 +86,7 @@ namespace Thismaker.Aretha
                 if (resp.ToLower().StartsWith("path="))
                 {
                     _path = resp.Remove(0, "path=".Length);
-                    _path.Trim('"');
+                    _path = _path.Trim('"');
                     continue;
                 }
                 else if (resp.ToLower().StartsWith("key="))

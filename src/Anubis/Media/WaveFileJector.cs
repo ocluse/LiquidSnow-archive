@@ -11,28 +11,28 @@ namespace Thismaker.Anubis.Media
     {
         public override Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
-            using var input = new WaveFile(source);
-            using var output = new WaveFile(destination);
+            using WaveFile input = new WaveFile(source);
+            using WaveFile output = new WaveFile(destination);
             output.DuplicateFormat(input);
 
-            var ls_data = new List<byte>(data.ReadAllBytes());
+            List<byte> ls_data = new List<byte>(data.ReadAllBytes());
 
             if (!string.IsNullOrEmpty(EOF))
             {
-                ls_data.AddRange(Sign);
+                ls_data.AddRange(EOFBytes);
             }
 
-            var message = new BitArray(ls_data.ToArray());
+            BitArray message = new BitArray(ls_data.ToArray());
 
-            var count = message.Length;
-            var maxData= input.DataSize * input.Format.NumChannels * LsbDepth;
+            int count = message.Length;
+            int maxData = input.DataSize * input.Format.NumChannels * LsbDepth;
             if (EnsureSuccess)
             {
                 if(count>maxData)
                     throw new InvalidOperationException("There is not enough room in the audio file to write the data");
             }
 
-            var pos = 0;
+            int pos = 0;
             while (true)
             {
                 bool stop = false;
@@ -42,15 +42,15 @@ namespace Thismaker.Anubis.Media
                     cancellationToken.ThrowIfCancellationRequested();
                 }
 
-                var sample = input.GetNextSample();
+                Sample sample = input.GetNextSample();
 
                 if (sample == null) break;
 
-                foreach(var channel in sample.Channels)
+                foreach(Channel channel in sample.Channels)
                 {
                     if (stop == true) break;
 
-                    var bitArray = new BitArray(channel.Data);
+                    BitArray bitArray = new BitArray(channel.Data);
 
                     for (int i = 0; i < LsbDepth; i++)
                     {
@@ -71,7 +71,7 @@ namespace Thismaker.Anubis.Media
 
                 if (progress != null)
                 {
-                    var percent = pos / (float)maxData;
+                    float percent = pos / (float)maxData;
                     progress.Report(percent);
                 }
 
@@ -83,10 +83,10 @@ namespace Thismaker.Anubis.Media
 
         public override Task EjectAsync(Stream source, Stream destination, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
-            using var input = new WaveFile(source);
-            var count = input.DataSize * input.Format.NumChannels * LsbDepth;
-            var pos = 0;
-            var message = new BitArray(count, false);
+            using WaveFile input = new WaveFile(source);
+            int count = input.DataSize * input.Format.NumChannels * LsbDepth;
+            int pos = 0;
+            BitArray message = new BitArray(count, false);
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -94,12 +94,12 @@ namespace Thismaker.Anubis.Media
                     cancellationToken.ThrowIfCancellationRequested();
                 }
 
-                var sample = input.GetNextSample();
+                Sample sample = input.GetNextSample();
                 if (sample == null) break;
 
-                foreach(var channel in sample.Channels)
+                foreach(Channel channel in sample.Channels)
                 {
-                    var bitArray = new BitArray(channel.Data);
+                    BitArray bitArray = new BitArray(channel.Data);
                     for(int i = 0; i < LsbDepth; i++)
                     {
                         message[pos] = bitArray[i];
@@ -113,7 +113,7 @@ namespace Thismaker.Anubis.Media
                 }
             }
 
-            var bytes = message.ToBytes();
+            byte[] bytes = message.ToBytes();
             List<byte> result;
 
             if (string.IsNullOrEmpty(EOF))
@@ -123,11 +123,11 @@ namespace Thismaker.Anubis.Media
             else
             {
                 result = new List<byte>();
-                var success = false;
+                bool success = false;
 
                 for (int i = 0; i < bytes.Length; i++)
                 {
-                    if (bytes[i] == Sign[0])
+                    if (bytes[i] == EOFBytes[0])
                     {
                         //check sequence
                         if (IsSignature(bytes, i))

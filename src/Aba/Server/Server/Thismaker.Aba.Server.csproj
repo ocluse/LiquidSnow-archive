@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <Description>Rapidly create server side of client-server applications with custom authentication, allows you to work with AzureBlobs securely from the server etc. Develop your client with Thismaker.Aba.Client for smooth integration</Description>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>

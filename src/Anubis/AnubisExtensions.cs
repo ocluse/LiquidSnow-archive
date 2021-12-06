@@ -12,7 +12,7 @@ namespace Thismaker.Anubis
         /// <returns></returns>
         public static ulong ToULong(this BitArray ba)
         {
-            var len = Math.Min(64, ba.Count);
+            int len = Math.Min(64, ba.Count);
             ulong n = 0;
             for (int i = 0; i < len; i++)
             {
@@ -47,7 +47,7 @@ namespace Thismaker.Anubis
         public static byte[] ToBytes(this BitArray bits)
         {
             // Make sure we have enough space allocated even when number of bits is not a multiple of 8
-            var bytes = new byte[(bits.Length - 1) / 8 + 1];
+            byte[] bytes = new byte[(bits.Length - 1) / 8 + 1];
             bits.CopyTo(bytes, 0);
             return bytes;
         }

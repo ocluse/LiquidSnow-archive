@@ -9,7 +9,7 @@ namespace Thismaker.Anubis.Media
         {
             //Set stream position to origin:
             _stream.Position = 0;
-            using var writer = new BinaryWriter(_stream, Encoding.ASCII, true);
+            using BinaryWriter writer = new BinaryWriter(_stream, Encoding.ASCII, true);
 
             //RIFF Marker
             writer.Write("RIFF".ToCharArray());
@@ -61,8 +61,8 @@ namespace Thismaker.Anubis.Media
                 throw new InvalidDataException("Sample channels must be equal to WaveFile channel count");
 
             
-            using var writer = new BinaryWriter(_stream, Encoding.ASCII, true);
-            foreach(var channel in sample.Channels)
+            using BinaryWriter writer = new BinaryWriter(_stream, Encoding.ASCII, true);
+            foreach(Channel channel in sample.Channels)
             {
                 if (channel.Data.Length != _format.BytesPerSample)
                     throw new InvalidDataException("Invalid channel size for WaveFile");
