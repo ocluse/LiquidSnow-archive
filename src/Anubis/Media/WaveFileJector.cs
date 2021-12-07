@@ -7,9 +7,17 @@ using System.Threading.Tasks;
 
 namespace Thismaker.Anubis.Media
 {
+    /// <summary>
+    /// A <see cref="Jector"/> with functionality to perform steganographic operations on WAVE files
+    /// </summary>
+    /// <remarks>
+    /// This class only handles simple WAVE files that strictly follow the RIFF format.
+    /// Any additional data not specified in the RIFF standard may be discarded in the final output.
+    /// </remarks>
     public class WaveFileJector : Jector
     {
-        public override Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        ///<inheritdoc/>
+        public override Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             using WaveFile input = new WaveFile(source);
             using WaveFile output = new WaveFile(destination);
@@ -17,9 +25,9 @@ namespace Thismaker.Anubis.Media
 
             List<byte> ls_data = new List<byte>(data.ReadAllBytes());
 
-            if (!string.IsNullOrEmpty(EOF))
+            if (Eof != null)
             {
-                ls_data.AddRange(EOFBytes);
+                ls_data.AddRange(Eof);
             }
 
             BitArray message = new BitArray(ls_data.ToArray());
@@ -29,10 +37,11 @@ namespace Thismaker.Anubis.Media
             if (EnsureSuccess)
             {
                 if(count>maxData)
-                    throw new InvalidOperationException("There is not enough room in the audio file to write the data");
+                    throw new InsufficientSpaceException("A successful write cannot be ensured because the data is too large");
             }
 
             int pos = 0;
+            
             while (true)
             {
                 bool stop = false;
@@ -71,17 +80,15 @@ namespace Thismaker.Anubis.Media
 
                 if (progress != null)
                 {
-                    float percent = pos / (float)maxData;
-                    progress.Report(percent);
+                    progress.Report(pos / (double)maxData);
                 }
-
-                //if (stop) break;
             }
 
             return Task.CompletedTask;
         }
 
-        public override Task EjectAsync(Stream source, Stream destination, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        ///<inheritdoc/>
+        public override Task EjectAsync(Stream source, Stream destination, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             using WaveFile input = new WaveFile(source);
             int count = input.DataSize * input.Format.NumChannels * LsbDepth;
@@ -109,14 +116,14 @@ namespace Thismaker.Anubis.Media
 
                 if (progress != null)
                 {
-                    progress.Report(pos / (float)input.DataSize);
+                    progress.Report(pos / (double)input.DataSize);
                 }
             }
 
             byte[] bytes = message.ToBytes();
             List<byte> result;
 
-            if (string.IsNullOrEmpty(EOF))
+            if (Eof == null)
             {
                 result = new List<byte>(bytes);
             }
@@ -127,10 +134,9 @@ namespace Thismaker.Anubis.Media
 
                 for (int i = 0; i < bytes.Length; i++)
                 {
-                    if (bytes[i] == EOFBytes[0])
+                    if (bytes[i] == Eof[0])
                     {
-                        //check sequence
-                        if (IsSignature(bytes, i))
+                        if (IsEndOfFileSequence(bytes, i))
                         {
                             success = true;
                             break;

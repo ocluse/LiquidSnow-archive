@@ -9,22 +9,27 @@ using System.Threading;
 namespace Thismaker.Anubis.Imaging
 {
     /// <summary>
-    /// A Jector that allows for writing data into and from <see cref="Bitmap"/> 
-    /// image files.
+    /// A <see cref="Jector"/> with functionality for performing steganographic operations on bitmap image files.
     /// </summary>
+    /// <remarks>
+    /// While the input image can be of one of the many bitamp formats(PNG, JPEG, GIF, BMP, TIFF),
+    /// the resulting image is always a PNG image. This is so because the PNG format is not a lossy compression format,
+    /// which is important if the data is to be retained.
+    /// </remarks>
     public class BitmapJector : Jector
     {
         /// <summary>
-        /// When <see cref="true"/>, the Alpha Channel will also be written to, 
-        /// and read from,
-        /// allowing for writing more data into the image. 
-        /// However, the resultant image may have artifacts.
+        /// Get or sets a value determining whether the alpha channel of the image is written to.
         /// </summary>
-        public bool UseAlpha { get; set; } = false;
+        /// <remarks>
+        /// By default, the alpha channel is not written to when hiding the data.
+        /// However, setting the value to true allows more data to be written, increasing the capacity of the image, but may produce more artefacts in the output image.
+        /// </remarks>
+        public bool UseAlphaChannel { get; set; }
 
-        public override Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        ///<inheritdoc/>
+        public override Task InjectAsync(Stream source, Stream destination, Stream data, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
-            //Prepare the images:
             SKBitmap inputImage = SKBitmap.Decode(source);
 
             int width = inputImage.Width;
@@ -32,29 +37,29 @@ namespace Thismaker.Anubis.Imaging
 
             List<byte> ls_data = new List<byte>();
 
-            //Read the data to be injected
             ls_data.AddRange(data.ReadAllBytes());
-            //add the EOF:
-            if (!string.IsNullOrEmpty(EOF))
+            
+            if(Eof != null)
             {
-                ls_data.AddRange(EOFBytes);
+                ls_data.AddRange(Eof);
             }
 
-            //create the message:
             BitArray message = new BitArray(ls_data.ToArray());
 
             int count = message.Count;
 
             if (EnsureSuccess)
             {
-                int maxWritable = (UseAlpha ? 4 : 3) * LsbDepth * width * height;
+                int maxWritable = (UseAlphaChannel ? 4 : 3) * LsbDepth * width * height;
+                
                 if (count > maxWritable)
-                    throw new InvalidOperationException("There is not enough room in the picture to write the data");
+                {
+                    throw new InsufficientSpaceException("A successful write cannot be ensured because the data is too large");
+                }
+                    
             }
 
-            //create the output image:
             SKBitmap outputImage = inputImage.Copy();
-            //var outputImage = inputImage.Clone(new Rectangle(0, 0, inputImage.Width, inputImage.Height), inputImage.PixelFormat);
 
             int pos = 0;
 
@@ -63,13 +68,11 @@ namespace Thismaker.Anubis.Imaging
                 bool stop = false;
                 for (int x = 0; x < width; x++)
                 {
-                    //Check cancellation token:
                     if (cancellationToken.IsCancellationRequested)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                     }
 
-                    //Do our work
                     if (pos == count)
                     {
                         stop = true;
@@ -82,7 +85,7 @@ namespace Thismaker.Anubis.Imaging
 
                     for (int v = 0; v < vals.Length; v++)
                     {
-                        if (!UseAlpha && v == 0) continue;
+                        if (!UseAlphaChannel && v == 0) continue;
 
                         BitArray bitArray = new BitArray(new[] { vals[v] });
                         for (int i = 0; i < LsbDepth; i++)
@@ -103,36 +106,31 @@ namespace Thismaker.Anubis.Imaging
 
                     pixel=new SKColor((byte)vals[1], (byte)vals[2], (byte)vals[3], (byte)vals[0]);
 
-                    //pixel = Color.FromArgb(vals[0], vals[1], vals[2], vals[3]);
-
                     outputImage.SetPixel(x, y, pixel);
 
-                    //Report on progress:
                     if (progress != null)
                     {
-                        float percent = pos / (float)count;
-                        progress.Report(percent);
+                        progress.Report(pos / (double)count);
                     }
                 }
 
                 if (stop) break;
             }
+            
             outputImage.Encode(destination, SKEncodedImageFormat.Png, 100);
-            //outputImage.Save(destination, ImageFormat.Png);
+            
             return Task.CompletedTask;
         }
         
-        public override Task EjectAsync(Stream source, Stream destination, IProgress<float> progress=null, CancellationToken cancellationToken=default)
+        ///<inheritdoc/>
+        public override Task EjectAsync(Stream source, Stream destination, IProgress<double> progress=null, CancellationToken cancellationToken=default)
         {
-            //Prepare the image
-            //var inputImage = (Bitmap)Image.FromStream(source);
             SKBitmap inputImage =SKBitmap.Decode(source);
 
             int height = inputImage.Height;
             int width = inputImage.Width;
 
-            //Prepare the writing stage
-            int count = (width * height) * LsbDepth * (UseAlpha ? 4 : 3);
+            int count = (width * height) * LsbDepth * (UseAlphaChannel ? 4 : 3);
             BitArray message = new BitArray(count, false);
             int pos = 0;
 
@@ -140,7 +138,6 @@ namespace Thismaker.Anubis.Imaging
             {
                 for (int x = 0; x < width; x++)
                 {
-                    //Check cancellation token:
                     if (cancellationToken.IsCancellationRequested)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
@@ -148,7 +145,7 @@ namespace Thismaker.Anubis.Imaging
 
                     SKColor pixel = inputImage.GetPixel(x, y);
 
-                    byte[] vals = UseAlpha ? new byte[] { pixel.Alpha, pixel.Red, pixel.Green, pixel.Blue }
+                    byte[] vals = UseAlphaChannel ? new byte[] { pixel.Alpha, pixel.Red, pixel.Green, pixel.Blue }
                     : new byte[] { pixel.Red, pixel.Green, pixel.Blue }; ;
 
                     foreach (byte val in vals)
@@ -161,20 +158,17 @@ namespace Thismaker.Anubis.Imaging
                         }
                     }
 
-                    //Report on progress:
                     if (progress != null)
                     {
-                        progress.Report(pos / (float)count);
+                        progress.Report(pos / (double)count);
                     }
                 }
             }
 
-            //Write the result
             byte[] bytes = message.ToBytes();
             List<byte> result;
 
-            //Return the file cause there is no need to find the EOF
-            if (string.IsNullOrEmpty(EOF))
+            if (Eof == null)
             {
                 result = new List<byte>(bytes);
             }
@@ -185,10 +179,9 @@ namespace Thismaker.Anubis.Imaging
 
                 for (int i = 0; i < bytes.Length; i++)
                 {
-                    if (bytes[i] == EOFBytes[0])
+                    if (bytes[i] == Eof[0])
                     {
-                        //check sequence
-                        if (IsSignature(bytes, i))
+                        if (IsEndOfFileSequence(bytes, i))
                         {
                             success = true;
                             break;
@@ -204,6 +197,7 @@ namespace Thismaker.Anubis.Imaging
             destination.Position = 0;
             destination.Write(result.ToArray(), 0, result.Count);
             destination.Flush();
+            
             return Task.CompletedTask;
         }
 

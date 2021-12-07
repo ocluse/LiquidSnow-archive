@@ -54,7 +54,7 @@ namespace Thismaker.Horus.IO
                 ? overwrite ? _package.GetPart(uri) : throw new IOException("Item already exists")
                 : _package.CreatePart(uri, "");
 
-            Stream output = part.GetStream();
+            using Stream output = part.GetStream();
             using ICryptoFile ef = IOBuilder.CreateFile(Key, output);
             await ef.WriteAsync(input, progress, cancellationToken).ConfigureAwait(false);
         }
@@ -68,7 +68,7 @@ namespace Thismaker.Horus.IO
                 throw new FileNotFoundException("Item does not exist");
             }
 
-            Stream input = _package.GetPart(uri).GetStream();
+            using Stream input = _package.GetPart(uri).GetStream();
             using ICryptoFile ef = IOBuilder.CreateFile(Key, input);
             await ef.ReadAsync(output, progress, cancellationToken).ConfigureAwait(false);
         }
@@ -83,7 +83,7 @@ namespace Thismaker.Horus.IO
                 ? overwrite ? _package.GetPart(uri) : throw new InvalidOperationException("Part already exists")
                 : _package.CreatePart(uri, "");
 
-            Stream output = part.GetStream();
+            using Stream output = part.GetStream();
             using ICryptoFile ef = IOBuilder.CreateFile(Key, output);
             await ef.SerializeAsync(o).ConfigureAwait(false);
         }
@@ -97,7 +97,7 @@ namespace Thismaker.Horus.IO
                 throw new FileNotFoundException("The specified item does not exist");
             }
 
-            Stream input = _package.GetPart(uri).GetStream();
+            using Stream input = _package.GetPart(uri).GetStream();
             using ICryptoFile ef = IOBuilder.CreateFile(Key, input);
             return await ef.DeserializeAsync<T>().ConfigureAwait(false);
         }
@@ -139,12 +139,15 @@ namespace Thismaker.Horus.IO
             {
                 _ = Directory.CreateDirectory(outputDirecotry);
             }
+
             PackagePartCollection parts = _package.GetParts();
 
             int index = 0;
+            
             int count = parts.Count();
 
             Progress<double> innerProgress = new Progress<double> { };
+            
             innerProgress.ProgressChanged += (o, e) =>
             {
                 double percent = (index + e) / count;

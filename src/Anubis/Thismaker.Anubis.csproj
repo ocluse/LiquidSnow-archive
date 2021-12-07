@@ -7,13 +7,14 @@
     <Authors>Thismaker</Authors>
     <Description>Allows you to perform steganography in images and audio files. You can hide entire files in images using this library.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageOutputPath>..\..\build</PackageOutputPath>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>steganography</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>3.0.0-preview1.4</Version>
+    <Version>3.0.0-preview1.5</Version>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
