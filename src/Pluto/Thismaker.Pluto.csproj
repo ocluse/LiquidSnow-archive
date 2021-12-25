@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageOutputPath>..\..\build</PackageOutputPath>
     <Description>Rapidly build finance based applications. Allows for record keeping, transaction monitoring etc.</Description>
     <PackageTags>finance financial records transactions money</PackageTags>

@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Thismaker.Pluto
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     public class AccountNotFoundException : InvalidOperationException
     {

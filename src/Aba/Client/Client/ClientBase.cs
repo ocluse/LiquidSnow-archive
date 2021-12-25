@@ -295,9 +295,9 @@ namespace Thismaker.Aba.Client
                 // Content validation:
                 if (!serializeContent)
                 {
-                    if (!content.GetType().IsAssignableFrom(typeof(HttpContent)))
+                    if (!typeof(HttpContent).IsAssignableFrom(typeof(TContent)))
                     {
-                        throw new ArgumentException($"{nameof(content)} provided must be of type/derive from {nameof(HttpContent)} if {nameof(serializeContent)} is set to false", nameof(serializeContent));
+                        throw new ArgumentException($"{nameof(TContent)} provided must be of type/derive from {nameof(HttpContent)} if {nameof(serializeContent)} is set to false", nameof(serializeContent));
                     }
                 }
 

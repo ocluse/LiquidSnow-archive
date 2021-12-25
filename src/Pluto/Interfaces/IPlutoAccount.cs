@@ -2,6 +2,9 @@
 
 namespace Thismaker.Pluto
 {
+    /// <summary>
+    /// The interface that represents a single book of account.
+    /// </summary>
     public interface IPlutoAccount
     {
         string Id { get; set; }

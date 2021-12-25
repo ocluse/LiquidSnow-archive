@@ -27,6 +27,20 @@ namespace Thismaker.Horus.IO.Tests
             var readStudent = await container.GetAsync<Student>("student");
             Assert.AreEqual(plainText, readBack);
             Assert.IsTrue(Student.AreEqual(student, readStudent));
+
+            File.WriteAllText("input.txt", plainText);
+
+            using FileStream fsFile = File.OpenRead("input.txt");
+            
+            await container.AddAsync("file", fsFile, true, null);
+
+            using FileStream fs = File.Open("output.txt", FileMode.Create);
+
+            await container.GetAsync("file", fs,null);
+
+            fs.Close();
+
+            Assert.AreEqual(plainText, File.ReadAllText("output.txt"));
         }
     }
 
