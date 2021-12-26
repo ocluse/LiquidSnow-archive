@@ -6,10 +6,11 @@
     <Authors>Thismaker</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <Version>3.0.2</Version>
+    <Version>3.0.3-preview1.0</Version>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Allows you to rapidly build a client application that depend on a HTTP WebApi for updates etc.</Description>

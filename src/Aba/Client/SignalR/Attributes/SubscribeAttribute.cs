@@ -18,11 +18,18 @@ namespace Thismaker.Aba.Client.SignalR
             get; set;
         }
 
+        /// <summary>
+        /// Creates a new instance of the subscribe attribute
+        /// </summary>
         public SubscribeAttribute()
         {
             MethodName = null;
         }
 
+        /// <summary>
+        /// Creates a new instance of the subscribe attribute with the specified custom method name
+        /// </summary>
+        /// <param name="methodName">The name that will be used when subscribing to the hub</param>
         public SubscribeAttribute(string methodName)
         {
             MethodName = methodName;

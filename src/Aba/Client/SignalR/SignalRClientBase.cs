@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace Thismaker.Aba.Client.SignalR
 {
     /// <summary>
-    /// The <see cref="SignalRClientBase{T}"/> is an abstract class with the very basic fundamentals of what
-    /// all apps are supposed to contain
+    /// This class contains utility methods for building realtime applications that use ASP NETCore Signal R as the mode of transport.
     /// </summary>
     public abstract partial class SignalRClientBase<TClient> : ClientBase<TClient> where TClient : SignalRClientBase<TClient>
     {
@@ -46,10 +45,13 @@ namespace Thismaker.Aba.Client.SignalR
 
         #region Initialization
         /// <summary>
-        /// Initializes the HttpClient and the HubConnection. Should be called only onces during the lifetime of the application.
+        /// Initializes the HttpClient and the HubConnection. 
+        /// </summary>
+        /// <remarks>
+        /// Should be called only onces during the lifetime of the application.
         /// This method must be called before accessing any of the Hub and HttpClient methods.
         /// Overriding this method allows you to specify how the HttpClient and HubConnection should be initialized.
-        /// </summary>
+        /// </remarks>
         public override void MakeApp()
         {
             base.MakeApp();

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Thismaker.Aba.Client
 {
     /// <summary>
-    /// The context of the client. Should be impelemeted as e.g WindowsClient, AndroidClient, GeneralClient etc.
+    /// The context of the AbaClient. Useful for platform specific implementations, e.g specifying application data path
     /// </summary>
     public interface IContext
     {

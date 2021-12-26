@@ -2,6 +2,9 @@
 
 namespace Thismaker.Aba.Client
 {
+    /// <summary>
+    /// Extensions for the <see cref="AbaClientBuilder{T}"/>
+    /// </summary>
     public static class AbaClientBuilderExtensions
     {
         /// <summary>

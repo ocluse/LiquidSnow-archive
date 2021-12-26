@@ -17,19 +17,12 @@ namespace Thismaker.Aba.Client
         internal readonly T client;
         private bool made = false;
 
+        /// <summary>
+        /// Creates a new builder that will be used to build an instance of a client app
+        /// </summary>
         public AbaClientBuilder()
         {
             client = new T();
-        }
-
-        /// <summary>
-        /// Set the version number of the client
-        /// </summary>
-        /// <returns></returns>
-        public AbaClientBuilder<T> WithVersion(string version)
-        {
-            client.Version = version;
-            return this;
         }
 
         /// <summary>

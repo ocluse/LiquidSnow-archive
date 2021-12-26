@@ -3,11 +3,14 @@ using System;
 
 namespace Thismaker.Aba.Client
 {
+    /// <summary>
+    /// A class simplyfing dealing with access tokens, and checking their validity.
+    /// </summary>
     public class AccessToken
     {
 
         /// <summary>
-        /// The actual value of the access-token, usually a base64-encoded string
+        /// The value added to the request header
         /// </summary>
         public string Value { get; set; }
 
@@ -34,10 +37,13 @@ namespace Thismaker.Aba.Client
 
         /// <summary>
         /// Returns true if the access token has an expiry date that has been elapsed.
-        /// For security, the method adds a margin of 5 minutes to the actual expiry time so that the access token
-        /// is renewed well before expiry. This can be adjusted using 
         /// </summary>
-        /// <returns></returns>
+        /// <remarks>
+        /// A cushion is added meaning that the token is reported as expired at least a while before the actual expiration time.
+        /// This is important in cases where the server and client times may not be in perfect sync.
+        /// This margin is specified by the <see cref="ExpiryCushion"/> value.
+        /// </remarks>
+        /// <returns>True if the token has expired and needs to be refreshed</returns>
         public bool IsExpired()
         {
             return ExpiresOn.HasValue && DateTime.UtcNow > ExpiresOn.Value.AddMinutes(-ExpiryCushion).UtcDateTime;
