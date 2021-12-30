@@ -1,5 +1,8 @@
 ﻿namespace Thismaker.Thoth
 {
+    /// <summary>
+    /// A class used to define a particular language and its properties.
+    /// </summary>
     public class Locale
     {
         /// <summary>

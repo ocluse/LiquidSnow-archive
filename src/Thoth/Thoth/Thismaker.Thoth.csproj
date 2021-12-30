@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>2.0.0.3</Version>
+    <Version>3.0.0</Version>
     <Authors>Thismaker</Authors>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
@@ -14,6 +14,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Company>Ocluse</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageOutputPath>..\..\..\build</PackageOutputPath>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>

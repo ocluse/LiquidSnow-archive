@@ -305,7 +305,7 @@ namespace Thismaker.Thoth.Manager.Wpf
 
             try
             {
-                _data = await _locIO.LoadAsync(fsData);
+                _data = await LocalizationIO.LoadAsync(fsData);
             }
             catch
             {
@@ -351,7 +351,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             try
             {
                 using FileStream fsOpen = File.Open(_filePath, FileMode.Create);
-                await _locIO.SaveAsync(fsOpen, _data);
+                await LocalizationIO.SaveAsync(fsOpen, _data);
                 _edited = false;
             }
             catch

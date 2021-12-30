@@ -85,12 +85,20 @@ namespace Thismaker.Horus.Symmetrics
             using CryptoStream csInput = new CryptoStream(input, trans, CryptoStreamMode.Read);
 
             //TODO: As soon as the projects targets a higher .NET Version, get rid of this dirty hack
-            var prop = csInput
+            try
+            {
+                var prop = csInput
                 .GetType()
-                .GetField("_leaveOpen", System.Reflection.BindingFlags.NonPublic 
+                .GetField("_leaveOpen", System.Reflection.BindingFlags.NonPublic
                 | System.Reflection.BindingFlags.Instance);
 
-            prop.SetValue(csInput, true);
+                prop.SetValue(csInput, true);
+            }
+            catch(NullReferenceException)
+            {
+                //do nothing
+                //Unity Mono throws a NullReferenceException on this method
+            }
 
             while (true)
             {

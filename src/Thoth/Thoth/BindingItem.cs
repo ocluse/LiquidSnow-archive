@@ -4,12 +4,35 @@ using System.ComponentModel;
 
 namespace Thismaker.Thoth
 {
+    /// <summary>
+    /// A class with utility methods for binding objects to a locale item
+    /// and updating them when the locale changes.
+    /// </summary>
     public class BindingItem : LocalizationBindingBase
     {
+        /// <summary>
+        /// Gets or sets the unique identifier of the binding item
+        /// </summary>
         public string Id { get; set; }
+        
+        /// <summary>
+        /// Gets or set the key of the table to search for binding.
+        /// </summary>
         public string TableKey { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the key of the locale item to be bound to.
+        /// </summary>
         public string ItemKey { get; set; }
 
+        /// <summary>
+        /// The list of targets bound to the current locale item
+        /// </summary>
+        public List<BindingTarget> BindingTargets { get; set; }
+
+        /// <summary>
+        /// Sets or updates the targeted object's property, respecting any formatting provided.
+        /// </summary>
         public void SetString()
         {
             string val = LocalizationManager.GetLocalizedString(TableKey, ItemKey);
@@ -35,6 +58,39 @@ namespace Thismaker.Thoth
             }
         }
 
+        /// <summary>
+        /// Binds the property of the <paramref name="target"/> to the locale item.
+        /// </summary>
+        /// <param name="target">The object whose property is to be bound</param>
+        /// <param name="propertyName">The name of the property to be bound</param>
+        /// <returns>The current binding item with the target added</returns>
+        public BindingItem BindTarget(object target, string propertyName)
+        {
+            if (BindingTargets == null)
+            {
+                BindingTargets = new List<BindingTarget>();
+            }
+
+            BindingTarget item = new BindingTarget
+            {
+                PropertyName = propertyName,
+                Target = target,
+                IsObservable = false
+            };
+
+            BindingTargets.Add(item);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Binds the property of an object implementing <see cref="INotifyPropertyChanged"/> to the current item,
+        /// allowing for updating the property when a value changes in the object.
+        /// </summary>
+        /// <param name="target">The target object</param>
+        /// <param name="propertyName">The name of the property to be bound</param>
+        /// <param name="listen">Indicates whether to listen for property changes in the object</param>
+        /// <returns></returns>
         public BindingItem BindObservableTarget(INotifyPropertyChanged target, string propertyName, bool listen = true)
         {
             BindingItem inst = BindTarget(target, propertyName);
@@ -76,6 +132,9 @@ namespace Thismaker.Thoth
             SetString();
         }
 
+        /// <summary>
+        /// Removes all objects currently bound to the locale item
+        /// </summary>
         public void UnbindAllTargets()
         {
             if (BindingTargets == null)
@@ -94,63 +153,74 @@ namespace Thismaker.Thoth
             BindingTargets.Clear();
         }
 
-        public void UnbindTarget(object target, string propertyName)
+        /// <summary>
+        /// Searches for the <see cref="BindingTarget"/> of the <paramref name="target"/> object
+        /// and correctly unbinds it's property from the current binding item.
+        /// </summary>
+        /// <param name="target">The object who's property is to be unbinded</param>
+        /// <param name="propertyName">The name of the property to be unbinded</param>
+        /// <returns>True if the property was found and successfully removed</returns>
+        public bool UnbindTarget(object target, string propertyName)
         {
             BindingTarget bindingTarget = BindingTargets.Find(x => x.Target == target && x.PropertyName == propertyName);
 
-            if (bindingTarget == null)
-            {
-                throw new NullReferenceException("Target not found");
-            }
-
-            UnbindTarget(bindingTarget);
+            return UnbindTarget(bindingTarget);
         }
 
-        public void UnbindTarget(BindingTarget bindingTarget)
+        /// <summary>
+        /// Correctly unbinds a <see cref="BindingTarget"/> from the current item.
+        /// </summary>
+        /// <param name="bindingTarget">The target to be removed</param>
+        /// <returns>True if the target was found and successfuly removed</returns>
+        public bool UnbindTarget(BindingTarget bindingTarget)
         {
-            if (bindingTarget.IsObservable)
+            if (BindingTargets.Remove(bindingTarget))
             {
-                bindingTarget.Listen = false;
-                bindingTarget.ListenStatusChanged -= TargetListenStatusChanged;
+                if (bindingTarget.IsObservable)
+                {
+                    bindingTarget.Listen = false;
+                    bindingTarget.ListenStatusChanged -= TargetListenStatusChanged;
+                }
+
+                return true;
             }
 
-            _ = BindingTargets.Remove(bindingTarget);
+            return false;
         }
-
-        public BindingItem BindTarget(object target, string propertyName)
-        {
-            if (BindingTargets == null)
-            {
-                BindingTargets = new List<BindingTarget>();
-            }
-
-            BindingTarget item = new BindingTarget
-            {
-                PropertyName = propertyName,
-                Target = target,
-                IsObservable = false
-            };
-
-            BindingTargets.Add(item);
-
-            return this;
-        }
-
-        public List<BindingTarget> BindingTargets { get; set; }
     }
 
+    /// <summary>
+    /// A base class used by <see cref="BindingTarget"/> and <see cref="BindingItem"/>
+    /// </summary>
     public abstract class LocalizationBindingBase
     {
+        /// <summary>
+        /// Gets or sets the target object
+        /// </summary>
         public object Target { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the name of the property to be updated
+        /// </summary>
         public string PropertyName { get; set; }
     }
 
+    /// <summary>
+    /// A class with utility methods for binding an object's property to a locale item
+    /// </summary>
     public class BindingTarget : LocalizationBindingBase
     {
+        /// <summary>
+        /// Fired when the value of <see cref="Listen"/> changes. 
+        /// </summary>
         public event Action<BindingTarget, bool> ListenStatusChanged;
 
         private bool _listen;
-
+        
+        /// <summary>
+        /// Gets or sets a value determining whether the target's property will be updated 
+        /// when a change occurs, for example, if the locale is changed.
+        /// </summary>
         public bool Listen
         {
             get => _listen;
@@ -160,6 +230,10 @@ namespace Thismaker.Thoth
                 ListenStatusChanged?.Invoke(this, Listen);
             }
         }
+
+        /// <summary>
+        /// A value indicating if the target object implements <see cref="INotifyPropertyChanged"/>
+        /// </summary>
         public bool IsObservable { get; internal set; }
     }
 }
