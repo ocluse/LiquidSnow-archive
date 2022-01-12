@@ -61,70 +61,40 @@ namespace Thismaker.Goro
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return null;
-            var date = ((DateTime)value).ToLocalTime();
-
-            var dif = DateTime.Today - date;
-            var days = dif.TotalDays;
-            var onlyDate = parameter?.ToString() == "D";
-
-            if (onlyDate)
+            if (value == null)
             {
-                if (date.Date == DateTime.Today)
-                {
-                    return TodayText;
-                }
-                if (days < 2)
-                {
-                    return date < DateTime.Today ? YesterdayText : TomorrowText;
-                }
-                if (days < 7)
-                {
-                    if (date < DateTime.Today)
-                    {
-                        return LastPrefixed ?
-                            $"{LastText}{LastSeparator}{date:dddd}" :
-                            $"{date:dddd}{LastSeparator}";
-                    }
-                    else
-                    {
-                        return NextPrefixed ?
-                            $"{NextText}{NextSeparator}{date:dddd}" :
-                            $"{date:dddd}{NextSeparator}";
-                    }
-                }
+                return null;
+            }
 
-                return date.ToString("dddd, MMM M, yyyy", Culture.DateTimeFormat);
+            DateTime date = ((DateTime)value).ToLocalTime();
+
+            string datePart;
+
+            if (date.Date == DateTime.Today)
+            {
+                datePart = "Today";
+            }
+            else if (date.Date == DateTime.Today.AddDays(1))
+            {
+                datePart = "Tomorrow";
+            }
+            else if (date.Date == DateTime.Today.AddDays(-1))
+            {
+                datePart = "Yesterday";
+            }
+            else if (Math.Abs((DateTime.Today - date.Date).TotalDays) < 7)
+            {
+                string prefix = date.Date < DateTime.Today ? "Last" : "Next";
+                datePart = $"{prefix} {date:dddd}";
             }
             else
             {
-                if (date.Date == DateTime.Today)
-                {
-                    return $"{TodayText}, {date:hh:mm tt}";
-                }
-                if (days < 2)
-                {
-                    var prefix = date < DateTime.Today ? YesterdayText : TomorrowText;
-                    return $"{prefix} {date:hh:mm tt}";
-                }
-                if (days < 7)
-                {
-                    if (date < DateTime.Today)
-                    {
-                        return LastPrefixed ?
-                            $"{LastText}{LastSeparator}{date:dddd, hh:mm tt}" :
-                            $"{date:dddd}{LastSeparator}{date:, hh:mm tt}";
-                    }
-                    else
-                    {
-                        return NextPrefixed ?
-                            $"{NextText}{NextSeparator}{date:dddd, hh:mm tt}" :
-                            $"{date:dddd}{NextSeparator}{date:, hh:mm tt}";
-                    }
-                }
-
-                return date.ToString("dddd, MMM M, yyyy, hh:mm tt", Culture.DateTimeFormat);
+                datePart = $"{date: dddd, MMM M, yyyy}";
             }
+
+            return (parameter == null || parameter.ToString() != "d") ?
+                $"{datePart}, {date:hh:mm tt}" :
+                datePart;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
