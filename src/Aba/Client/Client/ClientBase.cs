@@ -185,15 +185,8 @@ namespace Thismaker.Aba.Client
         /// <returns>The response received from the server</returns>
         public async Task<HttpResponseMessage> HttpSendAsync(HttpRequestMessage requestMessage, bool isProtected, HttpCompletionOption option = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                await PrepareRequestAsync(requestMessage, isProtected);
-                return await HttpClient.SendAsync(requestMessage, option, cancellationToken);
-            }
-            catch
-            {
-                throw;
-            }
+            await PrepareRequestAsync(requestMessage, isProtected);
+            return await HttpClient.SendAsync(requestMessage, option, cancellationToken);
         }
 
         /// <summary>
