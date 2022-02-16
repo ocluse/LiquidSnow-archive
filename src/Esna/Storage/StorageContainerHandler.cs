@@ -105,6 +105,10 @@ namespace Thismaker.Esna
             {
                 throw new InvalidOperationException($"{Extensions.DIR_STRUCT_ID} cannot be used as an ID or Partition Key");
             }
+            else if(id.Contains('/') || id.Contains('\\') || pk.Contains('/') || pk.Contains('\\'))
+            {
+                throw new InvalidOperationException($"Id or Partition Key cannot contain / or \\");
+            }
         }
 
         private async Task EnsureExistsAsync(string id, object partitionKey)

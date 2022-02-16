@@ -47,7 +47,7 @@ namespace Thismaker.Horus.IO
 
         #region Stream IO
         
-        public async Task AddAsync(string name, Stream input, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default)
+        public async Task AddStreamAsync(string name, Stream input, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             Uri uri = PackUriHelper.CreatePartUri(new Uri(name, UriKind.Relative));
 
@@ -60,7 +60,7 @@ namespace Thismaker.Horus.IO
             await ef.WriteAsync(input, progress, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task GetAsync(string name, Stream output, IProgress<double> progress = null, CancellationToken cancellationToken = default)
+        public async Task GetStreamAsync(string name, Stream output, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             Uri uri = PackUriHelper.CreatePartUri(new Uri(name, UriKind.Relative));
 
@@ -109,13 +109,13 @@ namespace Thismaker.Horus.IO
         public async Task AddBytesAsync(string name, byte[] data, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             using MemoryStream msData = new MemoryStream(data);
-            await AddAsync(name, msData, overwrite, progress, cancellationToken).ConfigureAwait(false);
+            await AddStreamAsync(name, msData, overwrite, progress, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<byte[]> GetBytesAsync(string name, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             using MemoryStream msData = new MemoryStream();
-            await GetAsync(name, msData, progress, cancellationToken).ConfigureAwait(false);
+            await GetStreamAsync(name, msData, progress, cancellationToken).ConfigureAwait(false);
             return msData.ToArray();
         }
         #endregion
@@ -185,7 +185,7 @@ namespace Thismaker.Horus.IO
                 string name = part.Uri.ToString();
                 string path = IOUtility.CombinePath(outputDirecotry, name);
                 using FileStream fs = File.OpenWrite(path);
-                await GetAsync(name, fs, innerProgress);
+                await GetStreamAsync(name, fs, innerProgress);
                 index++;
             }
         }

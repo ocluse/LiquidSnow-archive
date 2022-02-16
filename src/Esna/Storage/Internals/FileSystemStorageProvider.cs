@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Thismaker.Core.Utilities;
 using Thismaker.Horus.IO;
@@ -73,16 +72,6 @@ namespace Thismaker.Esna
             string path=PartitionKeyPath(partitionKey);
             Directory.Delete(path, true);
             return Task.CompletedTask;
-        }
-
-        public override Task<IEnumerable<string>> EnumeratePartitionKeys()
-        {
-            return Task.FromResult(Directory.EnumerateDirectories(_path));
-        }
-
-        public override Task<IEnumerable<string>> EnumerateItemIds(string partitionKey)
-        {
-            return Task.FromResult(Directory.EnumerateFiles(PartitionKeyPath(partitionKey)));
         }
 
         public override async Task<Dictionary<string, string>> LoadDirectoryStructureAsync()

@@ -73,11 +73,11 @@ namespace Thismaker.Esna
 
         public async Task<List<TModel>> ExecuteAsync()
         {
-            List<TStorage> items = await _storageProvider.GetAllItemsAsync();
+            IQueryable<TStorage> items = (await _storageProvider.GetAllItemsAsync()).AsQueryable();
 
             foreach(var item in _queuedQueries)
             {
-                item.Execute(items.AsQueryable());
+                items = item.Execute(items);
             }
 
             List<TModel> result = new List<TModel>();

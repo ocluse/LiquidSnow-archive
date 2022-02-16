@@ -24,7 +24,7 @@ namespace Thismaker.Horus.IO
         /// </remarks>
         public static ISerializer Serializer
         {
-            internal get
+            get
             {
                 return _serializer ?? _defaultSerializer;
             }

@@ -69,17 +69,6 @@ namespace Thismaker.Esna
         IAsyncEnumerable<T> EnumerateItemsAsync();
         
         /// <summary>
-        /// Returns all the partition keys in the database
-        /// </summary>
-        Task<IEnumerable<string>> EnumeratePartitionKeys();
-        
-        /// <summary>
-        /// Returns all the Item IDs under the provided partition key
-        /// </summary>
-        /// <param name="partitionKey">The partition key to enumerate</param>
-        Task<IEnumerable<string>> EnumerateItemIds(string partitionKey);
-        
-        /// <summary>
         /// Returns all the items in the database
         /// </summary>
         Task<List<T>> GetAllItemsAsync();

@@ -32,11 +32,11 @@ namespace Thismaker.Horus.IO.Tests
 
             using FileStream fsFile = File.OpenRead("input.txt");
             
-            await container.AddAsync("file", fsFile, true, null);
+            await container.AddStreamAsync("file", fsFile, true, null);
 
             using FileStream fs = File.Open("output.txt", FileMode.Create);
 
-            await container.GetAsync("file", fs,null);
+            await container.GetStreamAsync("file", fs,null);
 
             fs.Close();
 

@@ -8,8 +8,6 @@ namespace Thismaker.Esna
     internal abstract class StorageProviderBase<T> : IStorageProvider<T>
     {
         public abstract Task DeleteAsync(string id, string partitionKey);
-        public abstract Task<IEnumerable<string>> EnumerateItemIds(string partitionKey);
-        public abstract Task<IEnumerable<string>> EnumeratePartitionKeys();
         public abstract Task<bool> ExistsAsync(string id, string partitionKey);
         public abstract Task<T> ReadAsync(string id, string partitionKey);
         public abstract Task UpsertAsync(T item, string id, string partitionKey);
@@ -20,12 +18,11 @@ namespace Thismaker.Esna
 
         public async IAsyncEnumerable<T> EnumerateItemsAsync()
         {
-            foreach (var partition in await EnumeratePartitionKeys())
+            var dirStruct = await LoadDirectoryStructureAsync();
+
+            foreach(var item in dirStruct)
             {
-                foreach (var itemId in await EnumerateItemIds(partition))
-                {
-                    yield return await ReadAsync(itemId, partition);
-                }
+                yield return await ReadAsync(item.Key, item.Value);
             }
         }
 

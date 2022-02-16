@@ -24,7 +24,7 @@ namespace Thismaker.Horus.IO
         /// <param name="overwrite">If true and the item already exists, it will be overwritten. If false and the item already exists, an <see cref="IOException"/> is thrown</param>
         /// <param name="progress">The subscriber notified of the progress of the operation</param>
         /// <param name="cancellationToken">The token used to monitor for cancellation requests</param>
-        Task AddAsync(string name, Stream data, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default);
+        Task AddStreamAsync(string name, Stream data, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Adds an object to the container, serializing it using the <see cref="IOSettings.Serializer"/>
@@ -34,10 +34,10 @@ namespace Thismaker.Horus.IO
         /// <param name="overwrite">If true and the item already exists, it will be overwritten. If false and the item already exists, an <see cref="IOException"/> is thrown</param>
         Task AddAsync<T>(string name, T o, bool overwrite = false);
         
-        ///<inheritdoc cref="AddAsync(string, Stream, bool, IProgress{double}, CancellationToken)"/>
+        ///<inheritdoc cref="AddStreamAsync(string, Stream, bool, IProgress{double}, CancellationToken)"/>
         Task AddBytesAsync(string name, byte[] data, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default);
         
-        /// <inheritdoc cref="AddAsync(string, Stream, bool, IProgress{double}, CancellationToken)"/>
+        /// <inheritdoc cref="AddStreamAsync(string, Stream, bool, IProgress{double}, CancellationToken)"/>
         Task AddTextAsync(string name, string data, bool overwrite = false, IProgress<double> progress = null, CancellationToken cancellationToken = default);
         
         /// <summary>
@@ -76,7 +76,7 @@ namespace Thismaker.Horus.IO
         /// <param name="output">The destination <see cref="Stream"/> of the decrypted item</param>
         /// <param name="progress">The subscriber notifed of the operation progress</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests</param>
-        Task GetAsync(string name, Stream output, IProgress<double> progress = null, CancellationToken cancellationToken = default);
+        Task GetStreamAsync(string name, Stream output, IProgress<double> progress = null, CancellationToken cancellationToken = default);
         
         /// <summary>
         /// Gets, decrypts and deserializes an item from the container using the <see cref="IOSettings.Serializer"/>
@@ -85,7 +85,7 @@ namespace Thismaker.Horus.IO
         /// <returns>The resultant object from the operation</returns>
         Task<T> GetAsync<T>(string name);
         
-        ///<inheritdoc cref="GetAsync(string, Stream, IProgress{double}, CancellationToken)"/>
+        ///<inheritdoc cref="GetStreamAsync(string, Stream, IProgress{double}, CancellationToken)"/>
         ///<returns>The data in bytes</returns>
         Task<byte[]> GetBytesAsync(string name, IProgress<double> progress = null, CancellationToken cancellationToken = default);
         

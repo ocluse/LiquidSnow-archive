@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Thismaker.Horus.IO;
 
 namespace Thismaker.Esna
 {
     internal class HorusStorageProvider<T> : StorageProviderBase<T>
-    {
+    { 
         private readonly string _path;
         private readonly string _key;
 
@@ -19,69 +22,43 @@ namespace Thismaker.Esna
 
         private ICryptoContainer GetParentContainer()
         {
-            using var fs = new FileStream(_path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            var fs = new FileStream(_path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             return IOBuilder.CreateContainer(_key, fs);
-        }
-
-        private async Task<ICryptoContainer> GetPartitionContainer(string partitonKey)
-        {
-
-            using var parent = GetParentContainer();
-            using var ms = new MemoryStream();
-
-            await parent.GetAsync(partitonKey, ms);
-            return IOBuilder.CreateContainer(_key, ms);
         }
 
         public override async Task UpsertAsync(T item, string id, string partitionKey)
         {
-            using var container = await GetPartitionContainer(partitionKey);
-            await container.AddAsync(id, item, true);
+            using var parent = GetParentContainer();
+            await parent.AddAsync($"{partitionKey}/{id}", item, true);
         }
 
         public override async Task<T> ReadAsync(string id, string partitionKey)
         {
-            using var container = await GetPartitionContainer(partitionKey);
-            return await container.GetAsync<T>(id);
+            using var parent = GetParentContainer();
+            return await parent.GetAsync<T>($"{partitionKey}/{id}");
         }
 
-        public override async Task DeleteAsync(string id, string partitionKey)
+        public override Task DeleteAsync(string id, string partitionKey)
         {
-            using var container = await GetPartitionContainer(partitionKey);
-            container.Delete(id);
+            using var parent = GetParentContainer();
+            parent.Delete($"{partitionKey}/{id}");
+            return Task.CompletedTask;
         }
 
-        public override async Task<bool> ExistsAsync(string id, string partitionKey)
+        public override Task<bool> ExistsAsync(string id, string partitionKey)
         {
-            using var container = await GetPartitionContainer(partitionKey);
-            return container.Exists(id);
+            using var parent = GetParentContainer();
+            return Task.FromResult(parent.Exists($"{partitionKey}/{id}"));
         }
 
         public override Task CreatePartitionAsync(string partitionKey)
         {
-            using var parent = GetParentContainer();
-            return parent.AddBytesAsync(partitionKey, new byte[0]);
+            return Task.CompletedTask;
         }
 
         public override Task DeletePartitionAsync(string partitionKey)
         {
-            using var parent = GetParentContainer();
-            parent.Delete(partitionKey);
             return Task.CompletedTask;
-        }
-
-        public override Task<IEnumerable<string>> EnumeratePartitionKeys()
-        {
-            using var parent = GetParentContainer();
-            return Task.FromResult(parent.EnumerateItems().AsEnumerable());
-        }
-
-        public override Task<IEnumerable<string>> EnumerateItemIds(string partitionKey)
-        {
-            var task = GetPartitionContainer(partitionKey);
-            task.Wait();
-            using var container = task.Result;
-            return Task.FromResult(container.EnumerateItems().AsEnumerable());
         }
 
         public override async Task<Dictionary<string, string>> LoadDirectoryStructureAsync()
@@ -98,7 +75,7 @@ namespace Thismaker.Esna
         public override async Task SaveDirectoryStructureAsync(Dictionary<string, string> directory)
         {
             using var parent = GetParentContainer();
-            await parent.AddAsync(_key, directory, true);
+            await parent.AddAsync(Extensions.DIR_STRUCT_ID, directory, true);
         }
     }
 }
