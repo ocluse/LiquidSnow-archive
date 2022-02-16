@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Thismaker.Core.Utilities;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Thismaker.Horus.IO
 {
@@ -133,6 +134,21 @@ namespace Thismaker.Horus.IO
         #endregion
 
         #region Misc Methods
+
+        public List<string> EnumerateItems()
+        {
+            PackagePartCollection parts = _package.GetParts();
+
+            List<string> result = new List<string>();
+
+            foreach(var part in parts)
+            {
+                result.Add(part.Uri.ToString());
+            }
+
+            return result;
+        }
+
         public async Task ExtractContainerAsync(string outputDirecotry, IProgress<double> progress = null, CancellationToken cancellationToken = default)
         {
             if (!Directory.Exists(outputDirecotry))

@@ -14,7 +14,7 @@ namespace Thismaker.Mercury
     {
         #region Private Fields
         private TcpClient _client;
-        private Timer _timeoutTImer;
+        private Timer _timeoutTimer;
         private Stream _stream;
         private bool _connected;
         private string _serverAddress;
@@ -133,12 +133,12 @@ namespace Thismaker.Mercury
             //When a value for timeout has been provided, set the client to timeout after that while
             if (TimeoutMilliseconds.HasValue && TimeoutMilliseconds.Value > 0)
             {
-                _timeoutTImer = new Timer(TimeoutMilliseconds.Value)
+                _timeoutTimer = new Timer(TimeoutMilliseconds.Value)
                 {
                     AutoReset = true,
                     Enabled = true,
                 };
-                _timeoutTImer.Elapsed += OnTimeout;
+                _timeoutTimer.Elapsed += OnTimeout;
             }
         }
         #endregion
@@ -157,10 +157,10 @@ namespace Thismaker.Mercury
             _connected = false;
             _stream.Dispose();
             _client.Close();
-            if (_timeoutTImer != null)
+            if (_timeoutTimer != null)
             {
-                _timeoutTImer.Elapsed -= OnTimeout;
-                _timeoutTImer.Dispose();
+                _timeoutTimer.Elapsed -= OnTimeout;
+                _timeoutTimer.Dispose();
             }
             Closed?.Invoke(ex);
         }
@@ -172,10 +172,10 @@ namespace Thismaker.Mercury
             {
                 try
                 {
-                    if (_timeoutTImer != null)
+                    if (_timeoutTimer != null)
                     {
-                        _timeoutTImer.Stop();
-                        _timeoutTImer.Start();
+                        _timeoutTimer.Stop();
+                        _timeoutTimer.Start();
                     }
 
                     var bufferSize = _client.Available;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,7 +62,13 @@ namespace Thismaker.Horus.IO
         /// <param name="cancellationToken">The token to monitor for cancellation requests</param>
         /// <returns></returns>
         Task ExtractContainerAsync(string outputDirecotry, IProgress<double> progress = null, CancellationToken cancellationToken = default);
-        
+
+        /// <summary>
+        /// Returns the URIs of all the items in the container.
+        /// </summary>
+        /// <returns></returns>
+        List<string> EnumerateItems();
+
         /// <summary>
         /// Gets and decrypt an item from the container
         /// </summary>

@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="....\src\Anubis\Thismaker.Anubis.csproj" />
+    <ProjectReference Include="..\..\src\Anubis\Thismaker.Anubis.csproj" />
   </ItemGroup>
 
 </Project>
