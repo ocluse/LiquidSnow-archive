@@ -14,7 +14,7 @@ namespace Thismaker.Esna
         private string _pkPropertyName;
         private PropertyInfo _idProperty;
         private PropertyInfo _pkProperty;
-        private Func<TModel, TStorage> _convertToStorage;
+        private Func<TModel, ConvertArgs, TStorage> _convertToStorage;
         private Func<TStorage, TModel> _convertToModel;
 
         /// <summary>
@@ -24,13 +24,13 @@ namespace Thismaker.Esna
         /// When no function is provided and it is null, the <typeparamref name="TModel"/> and <typeparamref name="TStorage"/> are considered to be the same.
         /// This means that attempting to convert the model to the storage will return the same object.
         /// </remarks>
-        public Func<TModel, TStorage> ConvertToStorage
+        public Func<TModel, ConvertArgs, TStorage> ConvertToStorage
         {
             get
             {
                 if (_convertToStorage == null)
                 {
-                    return (o) => (TStorage)(object)o;
+                    return (o,e) => (TStorage)(object)o;
                 }
                 return _convertToStorage;
             }

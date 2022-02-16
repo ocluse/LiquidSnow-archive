@@ -51,11 +51,6 @@ namespace Thismaker.Esna
             if (File.Exists(path))
             {
                 File.Delete(path);
-
-                if (!Directory.EnumerateFiles(PartitionKeyPath(partitionKey)).Any())
-                {
-                    Directory.Delete(PartitionKeyPath(partitionKey));
-                }
             }
             return Task.CompletedTask;
         }

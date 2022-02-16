@@ -65,11 +65,11 @@ namespace Thismaker.Esna
         }
 
         /// <inheritdoc/>
-        public virtual async Task CreateAsync(TModel item)
+        public virtual async Task CreateAsync(TModel item, ConvertArgs args = null)
         {
             try
             {
-                TStorage storage = _containerSettings.ConvertToStorage(item);
+                TStorage storage = _containerSettings.ConvertToStorage(item, args);
                 _ = await _inner.CreateItemAsync(storage);
             }
             catch(CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
@@ -93,9 +93,9 @@ namespace Thismaker.Esna
         }
 
         /// <inheritdoc/>
-        public async Task UpdateAsync(TModel item)
+        public async Task UpdateAsync(TModel item, ConvertArgs args = null)
         {
-            TStorage storage = _containerSettings.ConvertToStorage(item);
+            TStorage storage = _containerSettings.ConvertToStorage(item, args);
 
             string id = _containerSettings.GetId(item);
 

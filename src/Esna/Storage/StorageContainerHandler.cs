@@ -132,7 +132,7 @@ namespace Thismaker.Esna
 
         #region IContainerHandler
         ///<inheritdoc/>
-        public async Task CreateAsync(TModel item)
+        public async Task CreateAsync(TModel item, ConvertArgs args = null)
         {
             await EnsureLoadedDirectoryStructure();
             
@@ -143,7 +143,7 @@ namespace Thismaker.Esna
                 throw new ResourceConflictException();
             }
 
-            TStorage storage = _containerSettings.ConvertToStorage(item);
+            TStorage storage = _containerSettings.ConvertToStorage(item, args);
 
             object partitionKey = _containerSettings.GetPartitionKey(storage);
 
@@ -173,9 +173,9 @@ namespace Thismaker.Esna
         }
 
         ///<inheritdoc/>
-        public async Task UpdateAsync(TModel item)
+        public async Task UpdateAsync(TModel item, ConvertArgs args = null)
         {
-            TStorage storage = _containerSettings.ConvertToStorage(item);
+            TStorage storage = _containerSettings.ConvertToStorage(item, args);
             
             string id = _containerSettings.GetId(item);
             object partitionKey = _containerSettings.GetPartitionKey(storage);
