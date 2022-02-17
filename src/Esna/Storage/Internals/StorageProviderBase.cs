@@ -8,7 +8,6 @@ namespace Thismaker.Esna
     internal abstract class StorageProviderBase<T> : IStorageProvider<T>
     {
         public abstract Task DeleteAsync(string id, string partitionKey);
-        public abstract Task<bool> ExistsAsync(string id, string partitionKey);
         public abstract Task<T> ReadAsync(string id, string partitionKey);
         public abstract Task UpsertAsync(T item, string id, string partitionKey);
         public abstract Task<Dictionary<string, string>> LoadDirectoryStructureAsync();

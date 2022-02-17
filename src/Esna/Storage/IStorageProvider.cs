@@ -45,14 +45,6 @@ namespace Thismaker.Esna
         Task DeletePartitionAsync(string partitionKey);
 
         /// <summary>
-        /// Checks if an item exists in the database.
-        /// </summary>
-        /// <param name="id">The ID of the item to check if exists</param>
-        /// <param name="partitionKey">The PartitionKey of the item to confirm if exists</param>
-        /// <returns>True if the item exists, false if it does not exist</returns>
-        Task<bool> ExistsAsync(string id, string partitionKey);
-
-        /// <summary>
         /// Returns a dictionary that defines all item Ids with their partition keys
         /// </summary>
         Task<Dictionary<string, string>> LoadDirectoryStructureAsync();

@@ -54,12 +54,6 @@ namespace Thismaker.Esna
             return Task.CompletedTask;
         }
 
-        public override Task<bool> ExistsAsync(string id, string partitionKey)
-        {
-            string path = ItemPath(id, partitionKey);
-            return Task.FromResult(File.Exists(path));
-        }
-
         public override Task CreatePartitionAsync(string partitionKey)
         {
             string path = PartitionKeyPath(partitionKey);

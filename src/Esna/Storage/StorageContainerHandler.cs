@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azure.Storage.Blobs;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -77,6 +78,27 @@ namespace Thismaker.Esna
             IOSettings.Serializer = serializer;
             return new StorageContainerHandler<TModel, TStorage>(provider, containerSettings);
         }
+
+        ///<inheritdoc cref="CreateBlobContainerHandler(BlobClient, ContainerSettings{TModel, TStorage}, ISerializer)"/>
+        public static StorageContainerHandler<TModel, TStorage> CreateBlobContainerHandler(BlobClient blob, ContainerSettings<TModel, TStorage> containerSettings)
+        {
+            var serializer = new InternalSerializer();
+            return CreateBlobContainerHandler(blob, containerSettings, serializer);
+        }
+        
+        /// <summary>
+        /// Creates a <see cref="StorageContainerHandler{TModel, TStorage}"/> that stores it's database in an Azure Blob Storage blob.
+        /// </summary>
+        /// <param name="blob">The blob where the database will be stored.</param>
+        /// <param name="containerSettings">The settings to use.</param>
+        /// <param name="serializer">The serializer to use.</param>
+        /// <returns>A <see cref="StorageContainerHandler{TModel, TStorage}"/> that stores its database in Azure Blob Storage.</returns>
+        public static StorageContainerHandler<TModel, TStorage> CreateBlobContainerHandler(BlobClient blob, ContainerSettings<TModel,TStorage> containerSettings, ISerializer serializer)
+        {
+            var provider = new AzureBlobStorageProvider<TStorage>(blob, serializer);
+            return new StorageContainerHandler<TModel, TStorage>(provider, containerSettings);
+        }
+        
         #endregion
 
         #region Private Methods
@@ -139,7 +161,6 @@ namespace Thismaker.Esna
         public async Task CreateAsync(TModel item, ConvertArgs args = null)
         {
             await EnsureLoadedDirectoryStructure();
-            
             string id = _containerSettings.GetId(item);
 
             if (_dirStruct.ContainsKey(id))
@@ -148,9 +169,7 @@ namespace Thismaker.Esna
             }
 
             TStorage storage = _containerSettings.ConvertToStorage(item, args);
-
             object partitionKey = _containerSettings.GetPartitionKey(storage);
-
             string pk = GetPartitionKey(id, partitionKey);
 
             EnsureAllowed(id, pk);
@@ -163,7 +182,6 @@ namespace Thismaker.Esna
             await _storageProvider.UpsertAsync(storage, id, pk);
 
             _dirStruct.Add(id, pk);
-
             await _storageProvider.SaveDirectoryStructureAsync(_dirStruct);
         }
 

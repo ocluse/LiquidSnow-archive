@@ -45,12 +45,6 @@ namespace Thismaker.Esna
             return Task.CompletedTask;
         }
 
-        public override Task<bool> ExistsAsync(string id, string partitionKey)
-        {
-            using var parent = GetParentContainer();
-            return Task.FromResult(parent.Exists($"{partitionKey}/{id}"));
-        }
-
         public override Task CreatePartitionAsync(string partitionKey)
         {
             return Task.CompletedTask;
