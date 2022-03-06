@@ -3,7 +3,7 @@
 namespace Thismaker.Core
 {
     /// <summary>
-    /// A simple static class that can be used to tell the interval between two periods.
+    /// Contains utility methods for determining the interval of time between two events.
     /// </summary>
     public static class DeltaTime
     {
@@ -22,7 +22,7 @@ namespace Thismaker.Core
         }
 
         /// <summary>
-        /// Returns the time that has elapsed in miliseconds since the last <see cref="Capture"/> was called
+        /// Returns the time that has elapsed in milliseconds since the last <see cref="Capture"/> was called
         /// </summary>
         public static double Elapsed
         {

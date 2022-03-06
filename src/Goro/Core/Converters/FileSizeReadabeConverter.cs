@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using Thismaker.Core.Utilities;
 
-namespace Thismaker.Goro
+namespace Thismaker.Goro.Converters
 {
     /// <summary>
     /// Converts a <see cref="long"/> value representing file size in bytes to a more readable string, for example 2MB or 34.5GB.

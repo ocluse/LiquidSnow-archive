@@ -10,9 +10,19 @@ namespace Thismaker.Core.Models
     /// <typeparam name="T"></typeparam>
     public class ObservableQueue<T>:Queue<T>,INotifyPropertyChanged,INotifyCollectionChanged
     {
+        /// <summary>
+        /// Raised when an item is queued or dequeued, or if the queue structure changes.
+        /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+        
+        /// <summary>
+        /// Raised when a property of the queue changes.
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Creates an instance of the observable queue.
+        /// </summary>
         public ObservableQueue() : base() { }
 
         /// <summary>
@@ -27,9 +37,7 @@ namespace Thismaker.Core.Models
         /// <param name="collection">the collection to copy the items from</param>
         public ObservableQueue(IEnumerable<T> collection) : base(collection) { }
 
-        /// <summary>
-        /// Queues a new item, raising the collection changed event
-        /// </summary>
+        ///<inheritdoc cref="Queue{T}.Enqueue(T)"/>
         public new void Enqueue(T item)
         {
             base.Enqueue(item);
@@ -37,10 +45,7 @@ namespace Thismaker.Core.Models
             CollectionChanged?.Invoke(this, e); 
         }
 
-        /// <summary>
-        /// Dequeues an item, raising the collection changed event
-        /// </summary>
-        /// <returns></returns>
+        ///<inheritdoc cref="Queue{T}.Dequeue"/>
         public new T Dequeue()
         {
             var item = base.Dequeue();
@@ -50,9 +55,7 @@ namespace Thismaker.Core.Models
             return item;
         }
 
-        /// <summary>
-        /// Clears the items in the queue notifying collection change
-        /// </summary>
+        ///<inheritdoc cref="Queue{T}.Clear"/>
         public new void Clear()
         {
             var oldItems = new List<T>(this);
@@ -62,6 +65,7 @@ namespace Thismaker.Core.Models
             CollectionChanged?.Invoke(this, e);
         }
 
+        ///<inheritdoc cref="Queue{T}.TrimExcess"/>
         public new void TrimExcess()
         {
             base.TrimExcess();

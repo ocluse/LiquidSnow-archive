@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace Thismaker.Core.Utilities
 {
+    /// <summary>
+    /// Contains utility methods for date time.
+    /// </summary>
     public static class DateTimeUtility
     {
         /// <summary>
@@ -36,6 +39,25 @@ namespace Thismaker.Core.Utilities
 
             // Subtract 3 days from Thursday to get Monday, which is the first weekday in ISO8601
             return result.AddDays(-3);
+        }
+
+        /// <summary>
+        /// Gets the week range of a DateTime, i.e the first day of that date's week and the last.
+        /// </summary>
+        /// <param name="startDate">The date whose week is to be obtained.</param>
+        /// <param name="firstDay">The day to be used as first day of the week</param>
+        /// <param name="weekRange">The number of days  in the week.</param>
+        /// <returns>A tuple containing the first and last day the week where date time object is found.</returns>
+        public static Tuple<DateTime, DateTime> GetWeek(DateTime startDate, DayOfWeek firstDay = DayOfWeek.Monday, int weekRange = 7)
+        {
+            while (startDate.DayOfWeek != firstDay)
+            {
+                startDate = startDate.AddDays(-1);
+            }
+
+            DateTime endDate = startDate.AddDays(weekRange);
+
+            return Tuple.Create(startDate, endDate);
         }
     }
 }

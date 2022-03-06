@@ -1,6 +1,12 @@
-﻿namespace System.IO
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace System.IO
 
 {
+    /// <summary>
+    /// Extensions for the System.IO namespace.
+    /// </summary>
     public static class SystemIOExtensions
     {
         /// <summary>
@@ -8,7 +14,7 @@
         /// data is returned as a byte array. An IOException is
         /// thrown if any of the underlying IO calls fail.
         /// </summary>
-        /// <param name="stream">The stream to read.</param>
+        /// <param name="source">The stream to read.</param>
         /// <returns>A byte array containing the contents of the stream.</returns>
         /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
         /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
@@ -51,6 +57,42 @@
             finally
             {
                 source.Position = originalPosition;
+            }
+        }
+
+        /// <summary>
+        /// Copies all the contents of one stream to another, reporting the bytes copied so far.
+        /// </summary>
+        /// <param name="source">The source stream.</param>
+        /// <param name="destination">The destination stream.</param>
+        /// <param name="progress">The progress reported for the total bytes copied thus far.</param>
+        /// <param name="bufferSize">The buffer size of the copy.</param>
+        /// <param name="cancellationToken">The token for cancellation.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public static async Task CopyToAsync(this Stream source, Stream destination,  IProgress<long> progress, int bufferSize = 81920, CancellationToken cancellationToken = default)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (!source.CanRead)
+                throw new ArgumentException("Has to be readable", nameof(source));
+            if (destination == null)
+                throw new ArgumentNullException(nameof(destination));
+            if (!destination.CanWrite)
+                throw new ArgumentException("Has to be writable", nameof(destination));
+            if (bufferSize < 0)
+                throw new ArgumentOutOfRangeException(nameof(bufferSize));
+
+            var buffer = new byte[bufferSize];
+            long totalBytesRead = 0;
+            int bytesRead;
+            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
+            {
+                await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+                totalBytesRead += bytesRead;
+                progress?.Report(totalBytesRead);
             }
         }
     }

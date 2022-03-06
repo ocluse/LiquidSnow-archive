@@ -3,12 +3,14 @@ using System.Linq;
 
 namespace System.Collections.ObjectModel
 {
+    /// <summary>
+    /// Extension methods for the System.Collections.ObjectModel namespace.
+    /// </summary>
     public static class ObjectModelExtensions
     {
         /// <summary>
         /// Adds a range of items to the collection
         /// </summary>
-        /// <param name="items">The items to add</param>
         public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> items)
         {
             if (items == null) return;
@@ -22,7 +24,6 @@ namespace System.Collections.ObjectModel
         /// <summary>
         /// Removes all the items provided from the collection
         /// </summary>
-        /// <param name="items">The items to remove</param>
         public static void RemoveAll<T>(this ObservableCollection<T> collection, IEnumerable<T> items)
         {
             if (items == null) return;
@@ -57,6 +58,7 @@ namespace System.Collections.ObjectModel
         /// <param name="collection"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
+        [Obsolete("Use System.Linq instead.", true)]
         public static IEnumerable<T> FindAll<T>(this ObservableCollection<T> collection, Func<T, bool> predicate)
         {
             return collection.Where(predicate);
@@ -70,6 +72,7 @@ namespace System.Collections.ObjectModel
         /// <param name="collection"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
+        [Obsolete("Use System.Linq instead.", true)]
         public static T Find<T>(this ObservableCollection<T> collection, Func<T, bool> predicate)
         {
             return collection.FirstOrDefault(predicate);
@@ -82,6 +85,7 @@ namespace System.Collections.ObjectModel
         /// <param name="collection"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
+        [Obsolete("Use System.Linq instead.", true)]
         public static bool Exists<T>(this ObservableCollection<T> collection, Func<T, bool> predicate)
         {
             return collection.Any(predicate);

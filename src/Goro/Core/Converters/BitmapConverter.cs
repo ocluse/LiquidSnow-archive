@@ -5,7 +5,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Thismaker.Goro.Utilities;
 
-namespace Thismaker.Goro
+namespace Thismaker.Goro.Converters
 {
     /// <summary>
     /// A converter that allows conversion of <see cref="Bitmap"/> to <see cref="BitmapImage"/>

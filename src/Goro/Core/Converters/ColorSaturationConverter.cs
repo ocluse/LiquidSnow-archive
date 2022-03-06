@@ -5,7 +5,7 @@ using System.Windows.Media;
 using Thismaker.Goro.Utilities;
 using Color = System.Windows.Media.Color;
 
-namespace Thismaker.Goro
+namespace Thismaker.Goro.Converters
 {
     /// <summary>
     /// A converter that modifies the saturation of a provided <see cref="Color"/> or <see cref="SolidColorBrush"/>.

@@ -9,7 +9,14 @@ namespace Thismaker.Core.Logging
     /// </summary>
     public static class Logger
     {
+        /// <summary>
+        /// An event that is raised whenever a log is entered.
+        /// </summary>
         public static event Action<LogObject> LogEntered;
+        
+        /// <summary>
+        /// The path to the file to write the logs.
+        /// </summary>
         public static string LogFilePath { get; set; }
 
         /// <summary>
@@ -98,11 +105,29 @@ namespace Thismaker.Core.Logging
         }
     }
 
+    /// <summary>
+    /// Represents a log
+    /// </summary>
     public struct LogObject
     {
+        /// <summary>
+        /// Gets or sets the level of severity of the log.
+        /// </summary>
         public LogLevel Level { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value determining whether the log will invoke the <see cref="Logger.LogEntered"/> event when logged.
+        /// </summary>
         public bool Notifiable { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the message of the log.
+        /// </summary>
         public string Message { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the timestamp of the log.
+        /// </summary>
         public DateTime Timestamp { get; set; }
 
         /// <summary>
@@ -119,20 +144,50 @@ namespace Thismaker.Core.Logging
             Timestamp = DateTime.UtcNow;
         }
 
+        /// <summary>
+        /// A neatly formatted string representing the log
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
-            var prefix = Timestamp.ToString();
-            if (Level == LogLevel.Error) prefix += " Error: ";
-            if (Level == LogLevel.Info) prefix += " Info: ";
-            if (Level == LogLevel.Warning) prefix += " Warning: ";
-
-            return prefix + Message.ToString();
+            return $"[{Timestamp:dd/MM/yyyy hh:mm:ss tt}] {Level.ToString().ToUpperInvariant()}: {Message}";
         }
     }
 
+    /// <summary>
+    /// Represents a log severity level
+    /// </summary>
     public enum LogLevel
     {
-        Success, Info, Warning, Error
+        /// <summary>
+        /// A verbose log
+        /// </summary>
+        Verbose,
+        /// <summary>
+        /// A debug log
+        /// </summary>
+        Debug,
+        /// <summary>
+        /// A successful log
+        /// </summary>
+        Success,
+        /// <summary>
+        /// An info log
+        /// </summary>
+        Info,
+        /// <summary>
+        /// A warning log
+        /// </summary>
+        Warning,
+        /// <summary>
+        /// An error log
+        /// </summary>
+        Error,
+        /// <summary>
+        /// A failure log
+        /// </summary>
+        Failure,
+
     }
 
 }

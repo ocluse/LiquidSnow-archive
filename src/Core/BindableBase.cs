@@ -6,7 +6,6 @@ namespace Thismaker.Core
     /// <summary>
     /// Implementation of <see cref="INotifyPropertyChanged"/> to simplify models.
     /// </summary>
-    //[Windows.Foundation.Metadata.WebHostHidden]
     public abstract class BindableBase : INotifyPropertyChanged
     {
         /// <summary>

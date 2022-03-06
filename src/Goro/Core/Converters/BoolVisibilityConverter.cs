@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Thismaker.Goro
+namespace Thismaker.Goro.Converters
 {
     /// <summary>
     /// A converter that converts from <see cref="bool"/> to <see cref="Visibility"/> and vice-versa.

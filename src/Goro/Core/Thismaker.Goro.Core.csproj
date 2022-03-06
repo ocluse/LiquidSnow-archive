@@ -7,7 +7,7 @@
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageOutputPath>..\..\..\build</PackageOutputPath>
-	<Version>3.0.0-preview1</Version>
+	<Version>3.0.0-preview1.1</Version>
 	<Authors>Thismaker</Authors>
 	<Company>Ocluse</Company>
 	<Copyright>©2021 Ocluse</Copyright>
@@ -15,6 +15,7 @@
 	<RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<Description>Core utilities for Goro.</Description>
   </PropertyGroup>
 
   <ItemGroup>

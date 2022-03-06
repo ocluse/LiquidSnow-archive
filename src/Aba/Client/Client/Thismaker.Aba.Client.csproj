@@ -6,7 +6,7 @@
     <Authors>Thismaker</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <Version>3.0.3-preview1.0</Version>
+    <Version>3.0.3-preview1.1</Version>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

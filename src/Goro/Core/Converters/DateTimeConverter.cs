@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Thismaker.Goro
+namespace Thismaker.Goro.Converters
 {
     /// <summary>
     /// A converter that converts <see cref="DateTime"/> to a neatly formatted string.

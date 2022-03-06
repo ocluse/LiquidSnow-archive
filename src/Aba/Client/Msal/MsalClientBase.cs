@@ -9,20 +9,24 @@ using Thismaker.Aba.Client.SignalR;
 
 namespace Thismaker.Aba.Client.Msal
 {
-    /// <summary>
-    /// A base class that inherits from <see cref="ClientBase"/>.
-    /// Useful when using AzureADB2C in it's default state. Note that for this client,
-    /// <see cref="SignalRClientBase.AccessToken"/> is predetemined and cannot be changed
-    /// </summary>
+    ///<summary>
+    /// Contains utility methods for obtaining access tokens for users in Azure Active Directory and access a protected API.
+    ///</summary>
     public abstract class MsalClientBase<T> : SignalRClientBase<T> where T : MsalClientBase<T>
     {
         #region Properties
 
+        /// <summary>
+        /// Gets the ID token obtained after logging a user in.
+        /// </summary>
         public string IdToken { get; protected set; }
 
+        /// <summary>
+        /// Gets the refresh token obtained after logging in a user.
+        /// </summary>
         public string RefreshToken { get; protected set; }
 
-        ///<inheritdoc/>
+        ///<inheritdoc cref="ClientBase{TClient}.Context"/>
         public new IMsalContext Context => (IMsalContext)base.Context;
 
         /// <summary>
@@ -31,12 +35,12 @@ namespace Thismaker.Aba.Client.Msal
         public string ClientID { get; set; }
 
         /// <summary>
-        /// The sign-up,sign in policy to be used in token acquisiton
+        /// The sign-up,sign in policy to be used in token acquisiton.
         /// </summary>
         public string PolicySUSI { get; set; }
 
         /// <summary>
-        /// The application's redirect uri, as provided in the Azure Portal
+        /// The application's redirect uri, as provided in the Azure Portal.
         /// </summary>
         public string RedirectUri { get; set; }
 
@@ -45,6 +49,9 @@ namespace Thismaker.Aba.Client.Msal
         /// </summary>
         public string Tenant { get; set; }
 
+        /// <summary>
+        /// Gets or sets the AadIstance e.g thismaker.b2clogin.com
+        /// </summary>
         public string AadInstance { get; set; }
 
         /// <summary>
@@ -67,8 +74,14 @@ namespace Thismaker.Aba.Client.Msal
         /// </summary>
         public IPublicClientApplication PublicClient { get; protected set; }
 
+        /// <summary>
+        /// Gets the args used to obtain the access token.
+        /// </summary>
         public TokenAccessArgs ApiTokenAccessArgs { get; protected set; }
 
+        /// <summary>
+        /// An event that is fired whenever the access token is renewed, silently or interactively.
+        /// </summary>
         protected event Action<AuthenticationResult> TokenRenewed;
 
         #endregion
@@ -90,6 +103,7 @@ namespace Thismaker.Aba.Client.Msal
                .Build();
         }
 
+        ///<inheritdoc/>
         public override void SetContext(IContext context)
         {
             if (context is IMsalContext)
@@ -131,6 +145,10 @@ namespace Thismaker.Aba.Client.Msal
             };
         }
 
+        /// <summary>
+        /// Helper used to parse the ID token and obtain the various parts.
+        /// </summary>
+        /// <returns></returns>
         protected JsonDocument ParseIdToken()
         {
             // Parse the idToken to get user info

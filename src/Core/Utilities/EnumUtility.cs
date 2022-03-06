@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Thismaker.Core.Utilities
 {
+    /// <summary>
+    /// Utility methods for working with enums.
+    /// </summary>
     public class EnumUtility
     {
         /// <summary>
@@ -12,6 +15,9 @@ namespace Thismaker.Core.Utilities
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+#if NET
+        [Obsolete("Use Enum.GetValues<T> instead starting .NET 5", true)]
+#endif
         public static IEnumerable<T> GetValues<T>()
         {
             return Enum.GetValues(typeof(T)).Cast<T>();

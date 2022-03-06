@@ -2,6 +2,9 @@
 using System.Linq;
 using System.Text;
 
+/// <summary>
+/// Extensions methods for global typenames
+/// </summary>
 public static class GlobalExtensions
 {
     /// <summary>
@@ -39,6 +42,7 @@ public static class GlobalExtensions
     /// <summary>
     /// Quickly check if a character array is the same as the input string
     /// </summary>
+    /// <param name="chars">An array of characters to determine if is equal to a string</param>
     /// <param name="value">The string to see if is same as the character array</param>
     /// <returns>true if the character array is equal to the provided string</returns>
     public static bool IsString(this char[] chars, string value)
@@ -50,6 +54,7 @@ public static class GlobalExtensions
     /// <summary>
     /// Quickly tests if a string is similar to a character array.
     /// </summary>
+    /// <param name="value">The string to check if is equal to an array of characters</param>
     /// <param name="chars">The character array to test whether is the same as the string</param>
     /// <returns>true if the string is equal to the character array</returns>
     public static bool IsCharArray(this string value, char[] chars)
@@ -150,6 +155,7 @@ public static class GlobalExtensions
     /// <summary>
     /// Converts an integer to it's equivalent byte array.
     /// </summary>
+    /// <returns>A byte array represented by the int.</returns>
     public static byte[] GetBytes(this int val)
     {
         return BitConverter.GetBytes(val);
@@ -158,17 +164,14 @@ public static class GlobalExtensions
     /// <summary>
     /// Converts a byte array to it's equivalent byte array.
     /// </summary>
+    /// <returns>An int representing the byte array</returns>
     public static int GetInt(this byte[] bytes)
     {
         var i = BitConverter.ToInt32(bytes, 0);
         return i;
     }
 
-    /// <summary>
-    /// Returns the current value of a property with the provided name in the object.
-    /// </summary>
-    /// <param name="propertyName">The name of the property to retrieve</param>
-    /// <returns></returns>
+    ///<inheritdoc cref="GetPropValue{T}(object, string)"/>
     public static object GetPropValue(this object obj, string propertyName)
     {
         var prop = obj.GetType().GetProperty(propertyName);
@@ -176,13 +179,12 @@ public static class GlobalExtensions
     }
 
     /// <summary>
-    /// Returns the value of a property with the provided name in the object.
-    /// This method casts the value obtained to <typeparamref name="T"/>
+    /// Gets the value of a property with the provided name in the object.
     /// </summary>
     /// <typeparam name="T">The type to cast the property to</typeparam>
-    /// <param name="obj"></param>
+    /// <param name="obj">The object whose property is to be obtained</param>
     /// <param name="propertyName">The name of the property to retrieve</param>
-    /// <returns>the value of the property</returns>
+    /// <returns>The value of the property otained from the object</returns>
     public static T GetPropValue<T>(this object obj, string propertyName)
     {
         return (T)GetPropValue(obj, propertyName);
@@ -191,6 +193,7 @@ public static class GlobalExtensions
     /// <summary>
     /// Sets the value of a property with the provided name to the provided value
     /// </summary>
+    /// <param name="obj">The object whose property is to be set</param>
     /// <param name="value">The value to set to the property</param>
     /// <param name="propertyName">The name of the property</param>
     public static void SetPropValue(this object obj, string propertyName, object value)
@@ -202,7 +205,7 @@ public static class GlobalExtensions
     /// <summary>
     /// Converts a string to the block format, where the first letter is capitalized and the rest are converted to small letters.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A string that has been converted to block format</returns>
     public static string ToBlock(this string s)
     {
         // Check for empty string.  
@@ -215,10 +218,10 @@ public static class GlobalExtensions
     }
 
     /// <summary>
-    /// Returns true if a string is composed of letters and numbers only.
+    /// Checks if a string is composed of letters and digits only.
     /// </summary>
     /// <param name="s"></param>
-    /// <returns></returns>
+    /// <returns>True if a string is composed of letters and numbers only.</returns>
     public static bool IsAlphaNumeric(this string s)
     {
         return s.All(char.IsLetterOrDigit);
@@ -227,8 +230,9 @@ public static class GlobalExtensions
     /// <summary>
     /// Checks whether the bytes of this array are the same as those of the second array
     /// </summary>
+    /// <param name="a1">The source array</param>
     /// <param name="array">The array to check</param>
-    /// <returns></returns>
+    /// <returns>True if the bytes are the same</returns>
     public static bool Compare(this byte[] a1, byte[] array)
     {
         if (a1.Length != array.Length)
@@ -242,8 +246,11 @@ public static class GlobalExtensions
     }
 
     /// <summary>
-    /// True if the string contains the specified character
+    /// Checks if a character exists in a string.
     /// </summary>
+    /// <returns>
+    /// True if the character exists in the string.
+    /// </returns>
     public static bool Contains(this string str, char c)
     {
         foreach (var ch in str)
