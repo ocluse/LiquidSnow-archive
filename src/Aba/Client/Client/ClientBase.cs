@@ -64,19 +64,6 @@ namespace Thismaker.Aba.Client
 
         #region Abstract Methods
         /// <summary>
-        /// When overriden in a derived class, starts the ClientApp, 
-        /// allowing for performing basic tasks.
-        /// Should be called once <see cref="MakeApp"/> has been called.
-        /// </summary>
-        public abstract Task StartAsync();
-
-        /// <summary>
-        /// Called when the lifetime of the client has ended to cleanup resources
-        /// and persist data if need be.
-        /// </summary>
-        public abstract Task StopAsync();
-
-        /// <summary>
         /// Called whenever the <see cref="AccessToken"/> has expired and the client is
         /// allowed to automatically renew the token
         /// </summary>
