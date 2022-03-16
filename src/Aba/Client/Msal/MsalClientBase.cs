@@ -30,6 +30,11 @@ namespace Thismaker.Aba.Client.Msal
         public new IMsalContext Context => (IMsalContext)base.Context;
 
         /// <summary>
+        /// Specifies whether the client should use the embedded webview or sysem default browser when renewing access tokens
+        /// </summary>
+        public bool UseEmbeddedWebView { get; set; }
+
+        /// <summary>
         /// The identifier of the client, Provided in the Azure Portal.
         /// </summary>
         public string ClientID { get; set; }
@@ -184,6 +189,7 @@ namespace Thismaker.Aba.Client.Msal
                     .WithB2CAuthority(AuthoritySUSI)
                     .WithAccount(ApiTokenAccessArgs.UserAccount)
                     .WithParentActivityOrWindow(Context.GetMainWindow())
+                    .WithUseEmbeddedWebView(UseEmbeddedWebView)
                     .ExecuteAsync()
                     .ConfigureAwait(false);
             }
