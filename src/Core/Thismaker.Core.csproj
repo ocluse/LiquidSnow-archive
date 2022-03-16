@@ -13,7 +13,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>thismaker core extensions fundamentals generic</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>3.0.0-preview1.6</Version>
+    <Version>3.0.0-preview2.0</Version>
     <PackageReleaseNotes></PackageReleaseNotes>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>

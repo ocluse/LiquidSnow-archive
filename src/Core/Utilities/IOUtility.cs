@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Thismaker.Core.Utilities
 {
@@ -9,6 +11,46 @@ namespace Thismaker.Core.Utilities
     /// </summary>
     public static class IOUtility
     {
+        /// <summary>
+        /// Waits until a file is available then opens it. If the timeout is 0, or less than 0, the timeout is ignored.
+        /// </summary>
+        /// <exception cref="TimeoutException">When the set timeout has ellapsed</exception>
+        /// <exception cref="OperationCanceledException">When the token passed is cancelled</exception>
+        public static async Task<FileStream> WaitForFileAsync(string path, FileMode mode, FileAccess access, FileShare share, double timeoutMilliseconds = 0, CancellationToken cancellationToken = default)
+        {
+            if (timeoutMilliseconds > 0)
+            {
+                return await WaitForFileAsync(path, mode, access, share, cancellationToken).TimeoutAfter(timeoutMilliseconds);
+            }
+            else
+            {
+                return await WaitForFileAsync(path, mode, access, share, cancellationToken);
+            }
+        }
+
+        private static async Task<FileStream> WaitForFileAsync(string path, FileMode mode, FileAccess access, FileShare share, CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                FileStream fs = null;
+                try
+                {
+                    fs = new FileStream(path, mode, access, share);
+                    return fs;
+                }
+                catch (IOException)
+                {
+                    if (fs != null)
+                    {
+                        fs.Dispose();
+                    }
+
+                    await Task.Delay(300, cancellationToken);
+                }
+            }
+        }
+
         /// <summary>
         /// Converts a Windows OS path to the Unix format.
         /// </summary>
@@ -32,7 +74,7 @@ namespace Thismaker.Core.Utilities
         /// <param name="path">The path for which availability should be tested.</param>
         /// <param name="numberPattern">The pattern to be applied in the event that the file already exists</param>
         /// <returns></returns>
-        public static string NextAvailableFileName(string path, string numberPattern =" ({0})")
+        public static string GetNextAvailableFileName(string path, string numberPattern =" ({0})")
         {
             // Short-cut if already available
             if (!File.Exists(path))
@@ -86,7 +128,7 @@ namespace Thismaker.Core.Utilities
         /// <param name="path">The path for which availability should be tested.</param>
         /// <param name="numberPattern">The pattern to be applied in the event that the directory already exists</param>
         /// <returns></returns>
-        public static string NextAvailableDirectoryName(string path, string numberPattern = " ({0})")
+        public static string GetNextAvailableDirectoryName(string path, string numberPattern = " ({0})")
         {
             // Short-cut if already available
             if (!Directory.Exists(path))

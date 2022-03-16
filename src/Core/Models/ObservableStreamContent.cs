@@ -88,7 +88,8 @@ namespace Thismaker.Core.Models
         private TransferState _state;
         private long _transferredBytes;
         private double _progress;
-        
+        private readonly IProgress<long> _transferredBytesProgress;
+        private readonly IProgress<double> _transferProgress;
         /// <summary>
         /// Gets the current state of the transfer.
         /// </summary>
@@ -104,7 +105,13 @@ namespace Thismaker.Core.Models
         public long TransferredBytes
         {
             get => _transferredBytes;
-            private set => SetProperty(ref _transferredBytes, value);
+            private set
+            {
+                if(SetProperty(ref _transferredBytes, value))
+                {
+                    _transferredBytesProgress?.Report(value);
+                }
+            }
         }
 
         /// <summary>
@@ -121,20 +128,34 @@ namespace Thismaker.Core.Models
         public double Progress
         {
             get => _progress;
-            private set => SetProperty(ref _progress, value);
+            private set
+            {
+                if(SetProperty(ref _progress, value))
+                {
+                    _transferProgress?.Report(value);
+                }
+            }
         }
 
-        /// <inheritdoc cref="ObservableStreamContent(Stream,int)"/>
+        /// <inheritdoc cref="ObservableStreamContent(Stream,int, IProgress{long}, IProgress{double})"/>
         public ObservableStreamContent(Stream content) : this(content, defaultBufferSize) { }
+
+        /// <inheritdoc cref="ObservableStreamContent(Stream,int, IProgress{long}, IProgress{double})"/>
+        public ObservableStreamContent(Stream content, IProgress<long> transferredBytesProgress) : this(content, defaultBufferSize, transferredBytesProgress: transferredBytesProgress) { }
+
+        /// <inheritdoc cref="ObservableStreamContent(Stream,int, IProgress{long}, IProgress{double})"/>
+        public ObservableStreamContent(Stream content, IProgress<double> transferProgress) : this(content, defaultBufferSize, transferProgress: transferProgress) { }
 
         /// <summary>
         /// Creates a new instance of an <see cref="ObservableStreamContent"/>
         /// </summary>
         /// <param name="content">The base stream to be read from.</param>
         /// <param name="bufferSize">The buffer size.</param>
+        /// <param name="transferredBytesProgress">The progress of bytes that have been successfully transferred</param>
+        /// <param name="transferProgress">The % progress of the transfer, between 0-1</param>
         /// <exception cref="ArgumentOutOfRangeException">When the buffer size is less than 0</exception>
         /// <exception cref="ArgumentNullException">When the <paramref name="content"/> is null</exception>
-        public ObservableStreamContent(Stream content, int bufferSize)
+        public ObservableStreamContent(Stream content, int bufferSize, IProgress<long> transferredBytesProgress=null, IProgress<double> transferProgress=null)
         {
             if (bufferSize <= 0)
             {
@@ -143,6 +164,8 @@ namespace Thismaker.Core.Models
 
             _content = content ?? throw new ArgumentNullException(nameof(content));
             _bufferSize = bufferSize;
+            _transferredBytesProgress = transferredBytesProgress;
+            _transferProgress = transferProgress;
         }
 
         ///<inheritdoc/>

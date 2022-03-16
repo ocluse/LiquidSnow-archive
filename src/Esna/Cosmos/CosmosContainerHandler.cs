@@ -118,7 +118,7 @@ namespace Thismaker.Esna
         /// <param name="item">The item to patch</param>
         /// <param name="patchOperations">The patch operations to perform on the item.</param>
         /// <param name="args">The args to pass to the converter.</param>
-        public async Task PatchUserAsync(TModel item, List<PatchOperation> patchOperations, ConvertArgs args = null)
+        public async Task PatchAsync(TModel item, List<PatchOperation> patchOperations, ConvertArgs args = null)
         {
             string id=_containerSettings.GetId(item);
             object pk = _containerSettings.GetPartitionKey(_containerSettings.ConvertToStorage(item, args));
