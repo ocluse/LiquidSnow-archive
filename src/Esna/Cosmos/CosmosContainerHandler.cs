@@ -112,18 +112,12 @@ namespace Thismaker.Esna
         /// <summary>
         /// Patch an item.
         /// </summary>
-        /// <remarks>
-        /// The item itself is not patched, but instead what is stored in Azure Db. The item is only used for obtaining a PK and ID.
-        /// </remarks>
-        /// <param name="item">The item to patch</param>
         /// <param name="patchOperations">The patch operations to perform on the item.</param>
-        /// <param name="args">The args to pass to the converter.</param>
-        public async Task PatchAsync(TModel item, List<PatchOperation> patchOperations, ConvertArgs args = null)
+        /// <param name="id">The Id of the item to be patched</param>
+        /// <param name="partitionKey">The partition key of the item to patch</param>
+        public async Task PatchAsync(List<PatchOperation> patchOperations, string id, object partitionKey = null)
         {
-            string id=_containerSettings.GetId(item);
-            object pk = _containerSettings.GetPartitionKey(_containerSettings.ConvertToStorage(item, args));
-
-            await _inner.PatchItemAsync<TStorage>(id, GetPartitionKey(id, pk), patchOperations);
+            await _inner.PatchItemAsync<TStorage>(id, GetPartitionKey(id, partitionKey), patchOperations);
         }
 
         /// <inheritdoc/>
