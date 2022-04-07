@@ -15,7 +15,7 @@
     <PackageLicenseFile></PackageLicenseFile>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>3.0.1-preview1.4</Version>
+    <Version>3.0.1-preview1.5</Version>
     <Company>Ocluse</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>

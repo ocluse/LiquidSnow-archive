@@ -13,6 +13,7 @@ namespace Thismaker.Aba.Client
     /// <typeparam name="TClient">The type of the clent</typeparam>
     public abstract partial class ClientBase<TClient> where TClient : ClientBase<TClient>
     {
+        private class RenewAccessNotImplementedException : Exception { }
         private enum HttpVerb
         {
             Get, Post, Put, Delete
@@ -50,12 +51,6 @@ namespace Thismaker.Aba.Client
         public AccessToken AccessToken { get; set; }
 
         /// <summary>
-        /// If true, the client auto renews the access token once it expires by calling
-        /// <see cref="RenewAccessTokenAsync"/> method;
-        /// </summary>
-        public bool AutoRenewAccessToken { get; set; }
-
-        /// <summary>
         /// The client used to make Http Requests
         /// </summary>
         protected HttpClient HttpClient { get; set; }
@@ -63,12 +58,6 @@ namespace Thismaker.Aba.Client
         #endregion
 
         #region Abstract Methods
-        /// <summary>
-        /// Called whenever the <see cref="AccessToken"/> has expired and the client is
-        /// allowed to automatically renew the token
-        /// </summary>
-        protected abstract Task RenewAccessTokenAsync();
-
         /// <summary>
         /// Called by the HTTP helpers to deserialize a response. Override to customize how deserialization works
         /// </summary>
@@ -85,7 +74,6 @@ namespace Thismaker.Aba.Client
         #endregion
 
         #region Initialization
-
         /// <summary>
         /// Makes the app the singleton that can be easily accessed by <see cref="ClientBase{T}.Instance"/>
         /// </summary>
@@ -104,6 +92,18 @@ namespace Thismaker.Aba.Client
         public virtual void MakeApp()
         {
             HttpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Called whenever the <see cref="AccessToken"/> has expired or is null.
+        /// </summary>
+        protected virtual Task RenewAccessTokenAsync()
+        {
+            throw new RenewAccessNotImplementedException();
         }
 
         #endregion
@@ -136,13 +136,13 @@ namespace Thismaker.Aba.Client
         {
             if (isProtected)
             {
-                if (AccessToken.IsExpired())
+                if (AccessToken == null || AccessToken.IsExpired())
                 {
-                    if (AutoRenewAccessToken)
+                    try
                     {
                         await RenewAccessTokenAsync();
                     }
-                    else
+                    catch(RenewAccessNotImplementedException)
                     {
                         throw new ExpiredTokenException();
                     }

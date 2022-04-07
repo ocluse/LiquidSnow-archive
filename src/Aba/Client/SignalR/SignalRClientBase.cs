@@ -68,8 +68,6 @@ namespace Thismaker.Aba.Client.SignalR
             HubConnection.Reconnected += OnHubConnectionReconnected;
             HubConnection.Reconnecting += OnHubConnectionReconnecting;
             HubConnection.Closed += OnHubConnectionClosed;
-
-            AutoRenewAccessToken = true;
         }
 
         #endregion

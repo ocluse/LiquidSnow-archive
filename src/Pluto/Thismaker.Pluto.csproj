@@ -11,7 +11,7 @@
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>3.0.0-alpha3</Version>
+    <Version>3.0.0-preview1.0</Version>
     <Copyright>©2021 Ocluse</Copyright>
     <Company>Ocluse</Company>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

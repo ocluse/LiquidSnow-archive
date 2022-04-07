@@ -106,7 +106,7 @@ namespace Thismaker.Goro.Converters
             {
                 result = YesterdayText;
             }
-            else if (DateTime.Today.AddDays(7) > date.Date || DateTime.Today.AddDays(-7) < date.Date)
+            else if (DateTime.Today.AddDays(7) > date.Date && DateTime.Today.AddDays(-7) < date.Date)
             {
                 if (date < DateTime.Today)
                 {
