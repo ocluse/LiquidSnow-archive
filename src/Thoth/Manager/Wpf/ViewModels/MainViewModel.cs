@@ -4,11 +4,9 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows;
 using Thismaker.Core;
 using Thismaker.Goro;
-using Thismaker.Goro.Commands;
 
 namespace Thismaker.Thoth.Manager.Wpf
 {

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>thoth-icon.ico</ApplicationIcon>
     <Authors>Thismaker</Authors>
@@ -19,7 +19,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Goro\Thismaker.Goro.csproj" />
+    <ProjectReference Include="..\..\..\Goro\Core\Thismaker.Goro.Core.csproj" />
+    <ProjectReference Include="..\..\..\Goro\Goro\Thismaker.Goro.csproj" />
     <ProjectReference Include="..\..\Thoth\Thismaker.Thoth.csproj" />
   </ItemGroup>
 

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Goro\Thismaker.Goro.csproj" />
+    <ProjectReference Include="..\..\src\Goro\Goro\Thismaker.Goro.csproj" />
   </ItemGroup>
 
 </Project>

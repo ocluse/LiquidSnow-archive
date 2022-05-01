@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Thismaker.Core;
-using Thismaker.Goro.Commands;
+using Thismaker.Goro;
 
 namespace Thismaker.Thoth.Manager.Wpf
 {

@@ -14,7 +14,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>ui ux ui/ux ui-ux user-interface material-design themes</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>3.0.0-preview3</Version>
+    <Version>3.0.0-preview3.2</Version>
     <PackageReleaseNotes></PackageReleaseNotes>
     <Company>Ocluse</Company>
     <Copyright>©2021 Ocluse</Copyright>
