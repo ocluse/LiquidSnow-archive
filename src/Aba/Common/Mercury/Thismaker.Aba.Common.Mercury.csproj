@@ -12,6 +12,7 @@
 	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

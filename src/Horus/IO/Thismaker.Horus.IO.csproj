@@ -10,7 +10,7 @@
     <PackageTags>encryption encrypt-files</PackageTags>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Copyright>©2021 Ocluse</Copyright>
     <Company>Ocluse</Company>

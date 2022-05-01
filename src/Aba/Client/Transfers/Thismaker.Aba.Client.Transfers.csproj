@@ -7,7 +7,7 @@
 	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <Description>Facilitates working with Azure Blobs from the AbaClient. This allows you to easily set up secure and safe blob containers. Should be used with Thismaker.Aba.Server on the server-side to allow smooth operation.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Version>3.0.0</Version>

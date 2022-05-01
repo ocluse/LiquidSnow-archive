@@ -6,7 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<PackageOutputPath>..\..\build</PackageOutputPath>
     <Description>Simplifies Server-Client communications directly over TCP Sockets</Description>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

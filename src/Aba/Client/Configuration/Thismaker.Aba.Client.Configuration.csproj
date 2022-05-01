@@ -6,7 +6,7 @@
     <Company>Ocluse</Company>
     <Description>Allows the easy configuration of AbaClients using configuration sources like JSON.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <PackageTags>client-application client-app signalr webapi web-api client-server</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

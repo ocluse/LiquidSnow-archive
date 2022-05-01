@@ -9,7 +9,7 @@
 	<PackageOutputPath>..\..\..\build</PackageOutputPath>
     <Description>Horus greatly simplifies cryptography and encryption, allowing you to work with symmetric algorithms by taking care of the difficult part of setting them to work properly</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>encryption security symmetric-algorithm aes encrypted</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

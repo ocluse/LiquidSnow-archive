@@ -8,7 +8,7 @@
     <Authors>Thismaker</Authors>
     <Description>Extends the functionality of AbaClients so that they work as Msal clients. Useful if your client app is using AzureAd or AzureAdB2C to authenticate calls to a webApi.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <PackageTags>client-application client-app signalr webapi web-api azure-ad azure-adb2c</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>

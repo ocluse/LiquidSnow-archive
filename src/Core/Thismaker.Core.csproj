@@ -8,7 +8,7 @@
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageOutputPath>..\..\build</PackageOutputPath>
     <Description>Very useful library that provide some fundamental utlilities, extensions and models that are useful for speeding up development.</Description>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <PackageTags>thismaker core extensions fundamentals generic</PackageTags>

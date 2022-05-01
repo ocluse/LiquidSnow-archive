@@ -7,7 +7,7 @@
     <PackageTags>ceasar-cipher playfair enigma enigma-machine</PackageTags>
     <Authors>Thismaker</Authors>
     <Description>This libary simplifies working with classical ciphers such as playfair, ceaser and vigenere, including working with Engima Machines which operate perfectly the same as the physical devices.</Description>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <Copyright>©2021 Ocluse</Copyright>

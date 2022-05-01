@@ -14,6 +14,7 @@
 	<PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Allows you to rapidly build a client application that depend on a HTTP WebApi for updates etc.</Description>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
