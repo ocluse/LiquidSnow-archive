@@ -25,6 +25,6 @@ jobs:
       run: dotnet test --no-build --verbosity normal
     #PUBLISH
     - name: Publish to Nuget
-      run: dotnet nuget push "./build/*.nupkg" -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      run: dotnet nuget push ".\build\*.nupkg" -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
     - name: Publish to GitHub
-      run: dotnet nuget push "./build/*.nupkg" -k ${{secrets.GITHUB_TOKEN}} -s https://nuget.pkg.github.com/ocluse/index.json --skip-duplicate
+      run: dotnet nuget push ".\build\*.nupkg" -k ${{secrets.GITHUB_TOKEN}} -s https://nuget.pkg.github.com/ocluse/index.json --skip-duplicate
