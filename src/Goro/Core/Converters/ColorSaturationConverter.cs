@@ -36,7 +36,7 @@ namespace Thismaker.Goro.Converters
             {
                 mode = parameter.ToString();
 
-                if(mode is not "D" or "W")
+                if(mode != "D" && mode != "W")
                 {
                     throw new ArgumentException("The parameter provided is not valid, please use L, D or W", nameof(parameter));
                 }

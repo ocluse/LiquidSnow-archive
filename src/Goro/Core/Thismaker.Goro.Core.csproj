@@ -7,7 +7,7 @@
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageOutputPath>..\..\..\build</PackageOutputPath>
-	<Version>3.0.0-preview1.2</Version>
+	<Version>3.0.0-preview1.3</Version>
 	<Authors>Thismaker</Authors>
 	<Company>Ocluse</Company>
 	<Copyright>©2021 Ocluse</Copyright>
