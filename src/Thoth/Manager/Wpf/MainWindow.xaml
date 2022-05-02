@@ -25,6 +25,7 @@
                 <MenuItem Header="Open" Command="{Binding OpenDataCommand}"/>
                 <MenuItem Header="Save" Command="{Binding SaveDataCommand}"/>
                 <MenuItem Header="Save As" Command="{Binding SaveDataAsCommand}"/>
+                <MenuItem Header="Generate C# Files" Command="{Binding ExportDataCommand}"/>
             </MenuItem>
             <MenuItem Header="Table">
                 <MenuItem Header="Add New Table" Command="{Binding AddTableCommand}"/>
@@ -53,6 +54,7 @@
             <goro:ButtonIcon Icon="NewFolder" Command="{Binding CreateDataCommand}" ToolTip="Create a new localization database"/>
             <goro:ButtonIcon Icon="FolderOpen" Command="{Binding OpenDataCommand}" ToolTip="Open existing localization database"/>
             <goro:ButtonIcon Icon="Save" Command="{Binding SaveDataCommand}" ToolTip="Save the localization database"/>
+            <goro:ButtonIcon Icon="Share" Command="{Binding ExportDataCommand}" ToolTip="Generate C# Files for the database"/>
         </WrapPanel>
         <TabControl Grid.Row="2" Margin="0 10 0 0">
             <TabItem Header="Tables">

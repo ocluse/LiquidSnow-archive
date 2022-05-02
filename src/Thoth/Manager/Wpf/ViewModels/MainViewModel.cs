@@ -248,6 +248,7 @@ namespace Thismaker.Thoth.Manager.Wpf
             OpenDataCommand = new RelayCommand(OnOpenData);
             SaveDataCommand = new RelayCommand(OnSaveData, CanSaveData);
             SaveDataAsCommand = new RelayCommand(OnSaveDataAs);
+            ExportDataCommand = new(OnExportData);
 
             AddTableCommand = new RelayCommand(OnAddTable);
             EditTableCommand = new RelayCommand(OnEditTable, CanEditTable);
@@ -682,6 +683,25 @@ namespace Thismaker.Thoth.Manager.Wpf
         {
             return !string.IsNullOrEmpty(LocaleName)
                 && !string.IsNullOrEmpty(LocaleShortName);
+        }
+
+        public RelayCommand ExportDataCommand { get; private set; }
+
+        private void OnExportData()
+        {
+            try
+            {
+                LocalizationData data = new();
+                data.SetLocTables(Tables);
+                data.SetManagedLocales(Locales);
+                GenerateWindow window = new(data);
+                window.ShowDialog();
+            }
+            catch
+            {
+                _ = GoroMessageBox.Show("Error", "Operation failed. Ensure keys are unique and that you have access to the provided directory", MessageBoxButton.OK, StatusInfo.Error);
+                throw;
+            }
         }
 
         #endregion

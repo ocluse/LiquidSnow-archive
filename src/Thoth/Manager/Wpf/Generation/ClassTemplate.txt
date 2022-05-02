@@ -1,0 +1,11 @@
+﻿using Thismaker.Thoth;
+
+namespace [NAMESPACE]
+{
+public static class [TABLE_NAME]
+{
+	public const string TABLE = "[TABLE_NAME]";
+	[BODY]
+}
+}
+

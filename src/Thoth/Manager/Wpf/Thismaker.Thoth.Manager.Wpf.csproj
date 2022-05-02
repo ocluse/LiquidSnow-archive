@@ -9,7 +9,7 @@
     <Product>Thoth Manager</Product>
     <Description>Used to manage Thoth Localization Data files.</Description>
     <Copyright>©2021 Ocluse</Copyright>
-    <Version>2.1.0</Version>
+    <Version>2.2.0</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>thoth-icon.png</PackageIcon>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
@@ -17,6 +17,16 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Generation\ClassTemplate.txt" />
+    <None Remove="Generation\ItemTemplate.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Generation\ClassTemplate.txt" />
+    <EmbeddedResource Include="Generation\ItemTemplate.txt" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Goro\Core\Thismaker.Goro.Core.csproj" />

@@ -1,0 +1,2 @@
+﻿	public static string [ITEM_KEY] => "[ITEM_KEY]";
+	public static string Get[ITEM_KEY]() => LocalizationManager.GetLocalizedString(TABLE, [ITEM_KEY]);
