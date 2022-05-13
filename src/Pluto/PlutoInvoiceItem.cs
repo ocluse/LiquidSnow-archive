@@ -29,6 +29,7 @@ namespace Thismaker.Pluto
             get => _quantity * Amount;
         }
 
+        ///<inheritdoc/>
         public override void Update(IPlutoCharge source)
         {
             if (source.GetType().IsAssignableFrom(typeof(PlutoInvoiceItem)))

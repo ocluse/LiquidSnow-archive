@@ -6,7 +6,7 @@
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <Authors>Thismaker</Authors>
-    <Description>Extends the functionality of AbaClients so that they work as Msal clients. Useful if your client app is using AzureAd or AzureAdB2C to authenticate calls to a webApi.</Description>
+    <Description>Extends the functionality of AbaClients so that they work as public Msal clients. Useful if your client app is using AzureAd or AzureAdB2C to authenticate calls to a webApi.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <PackageTags>client-application client-app signalr webapi web-api azure-ad azure-adb2c</PackageTags>
@@ -14,9 +14,9 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>3.1.0-preview1.5</Version>
+    <Version>3.1.0</Version>
     <Company>Ocluse</Company>
-    <Copyright>©2021 Ocluse</Copyright>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 

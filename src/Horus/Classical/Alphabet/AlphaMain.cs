@@ -232,18 +232,38 @@ namespace Thismaker.Horus.Classical
     /// </summary>
     public struct Dimensions : IEquatable<Dimensions> 
     {
+        /// <summary>
+        /// The number of items in the X (Horizontal) direction.
+        /// </summary>
         public int X { get; set; }
+        /// <summary>
+        /// The number of items in the Y (Vertical) direction
+        /// </summary>
         public int Y { get; set; }
         
+        /// <summary>
+        /// Creates a new instance using the specified dimensions
+        /// </summary>
         public Dimensions(int x, int y) { X = x; Y = y; }
 
+        /// <summary>
+        /// The product of the <see cref="X"/> and <see cref="Y"/> dimensions
+        /// </summary>
         public int Size { get { return X * Y; } }
 
+        /// <summary>
+        /// Truncates the dimensions to match the dimensions provided
+        /// </summary>
+        /// <param name="dimensions">The dimensions to be matched</param>
         public void Limit(Dimensions dimensions)
         {
             Limit(dimensions.X, dimensions.Y);
         }
-
+        /// <summary>
+        /// Truncates the dimensions to match the provided X and Y
+        /// </summary>
+        /// <param name="max_x">The maximum dimension in the X direction</param>
+        /// <param name="max_y">The maximum dimension in the Y direction</param>
         public void Limit(int max_x, int max_y)
         {
             X %= max_x;
@@ -252,11 +272,12 @@ namespace Thismaker.Horus.Classical
 
 
         #region Object Overrides
+        ///<inheritdoc/>
         public bool Equals(Dimensions other)
         {
             return X == other.X && Y == other.Y;
         }
-
+        ///<inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -265,17 +286,21 @@ namespace Thismaker.Horus.Classical
 
             return X == other.X && Y == other.Y;
         }
-
+        ///<inheritdoc/>
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
-
+        /// <summary>
+        /// Checks if two dimensions are equal
+        /// </summary>
         public static bool operator == (Dimensions d1, Dimensions d2)
         {
             return d1.Equals(d2);
         }
-
+        /// <summary>
+        /// Checks if two dimensions are not equal
+        /// </summary>
         public static bool operator !=(Dimensions d1, Dimensions d2)
         {
             return !d1.Equals(d2);
@@ -284,7 +309,6 @@ namespace Thismaker.Horus.Classical
         /// <summary>
         /// Returns a neatly formatted string of the dimensions, e.g. 2x4
         /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             return $"{X}x{Y}";

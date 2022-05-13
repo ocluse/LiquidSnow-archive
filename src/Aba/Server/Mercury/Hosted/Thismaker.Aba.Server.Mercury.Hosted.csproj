@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>3.0.0</Version>
+    <Version>3.1.0</Version>
     <Authors>Thismaker</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <Description>This subset of Aba Mercury server works well in hosted environments, such as AspNetCore</Description>
     <Company>Ocluse</Company>
-    <Copyright>©2021 Ocluse</Copyright>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	  <PackageOutputPath>..\..\..\..\..\build</PackageOutputPath>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

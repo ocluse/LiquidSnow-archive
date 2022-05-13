@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>2.0.0.0</Version>
+    <Version>3.1.0</Version>
     <Authors>Thismaker</Authors>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <Description>Common infrastructure between Aba Mercury client and server</Description>
     <Company>Ocluse</Company>
-    <Copyright>©2021 Ocluse</Copyright>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

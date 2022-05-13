@@ -11,11 +11,15 @@ using System.Collections;
 
 namespace Thismaker.Aba.Client.Transfers
 {
+    /// <summary>
+    /// Provides utility methods for queuing and performing transfers
+    /// </summary>
     public class TransferManager : INotifyCollectionChanged, IEnumerable<Transfer>
     {
+        ///<inheritdoc/>
         #region Implementations
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-
+        ///<inheritdoc/>
         public IEnumerator<Transfer> GetEnumerator()
         {
             var active = new List<Transfer>();
@@ -52,10 +56,19 @@ namespace Thismaker.Aba.Client.Transfers
 
         #region Properties
 
+        /// <summary>
+        /// Determines whether, if an error occurs in a transfer queue, the transfer should be requeued to be executed again.
+        /// </summary>
+        /// <remarks>
+        /// The default value is true.
+        /// </remarks>
         public bool RequeueOnError { get; set; } = true;
         #endregion
 
         #region Initialization
+        /// <summary>
+        /// Creates a new transfer manager with the provided authenticator.
+        /// </summary>
         public TransferManager(ITransferAuthenticator authenticator)
         {
             //Set authenticator:

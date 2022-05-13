@@ -3,10 +3,16 @@ using System.Collections.Generic;
 
 namespace Thismaker.Horus.Classical
 {
+    /// <summary>
+    /// Provides utlilty methods for further scrambling the output of the Enigma Machine.
+    /// </summary>
     public class Plugboard
     {
         private readonly Dictionary<char, char> _socketPairs;
 
+        /// <summary>
+        /// Creates a new instane with an empty socket pair.
+        /// </summary>
         public Plugboard()
         {
             _socketPairs = new Dictionary<char, char>();

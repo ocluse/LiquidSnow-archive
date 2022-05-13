@@ -15,12 +15,12 @@ namespace Thismaker.Goro
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public static readonly DependencyProperty StatusProperty
+
             = DependencyProperty.Register(nameof(Status), typeof(StatusInfo), typeof(StatusIndicator), new PropertyMetadata(StatusInfo.Information));
 
         public static readonly DependencyProperty DesignProperty
             = DependencyProperty.Register(nameof(Design), typeof(IconDesign), typeof(StatusIndicator), new PropertyMetadata(IconDesign.Segoe));
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-
         /// <summary>
         /// The status state of the indicator
         /// </summary>

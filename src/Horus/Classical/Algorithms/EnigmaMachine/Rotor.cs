@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 namespace Thismaker.Horus.Classical
 {
+    /// <summary>
+    /// A rotor provides utility methods for scrambling an enigma message.
+    /// </summary>
+    /// <remarks>
+    /// This class simulates the behaviour of the Enigma machine's rotors as the current passes through them.
+    /// </remarks>
     public class Rotor : EnigmaWheel
     {
         #region Private Fields

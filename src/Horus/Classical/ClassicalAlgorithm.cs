@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Thismaker.Horus.Classical
 {
+	/// <summary>
+	/// The base class upon which classical algorithms, such as Playfair, are built.
+	/// </summary>
     public abstract class ClassicalAlgorithm : DictionaryAttackerBase
     {
 		/// <summary>

@@ -1,5 +1,8 @@
 ﻿namespace Thismaker.Horus.Classical
 {
+	/// <summary>
+	/// Defines a possible key from a hack, with the output as well
+	/// </summary>
     public class AttackPossibility
 	{
 		/// <summary>
@@ -12,6 +15,9 @@
 		/// </summary>
 		public string Output { get; }
 
+		/// <summary>
+		/// Creates a new instance of the <see cref="AttackPossibility"/>.
+		/// </summary>
 		public AttackPossibility(string key, string output)
 		{
 			Key = key;
@@ -30,10 +36,21 @@
 	}
 
 	/// <summary>
-	/// Dictionary type determines whether the dictionary will be used as a key reference
-	/// for the attack, or as a language reference. The language reference allows you to check
-	/// whether any sequence of characters in the attacked data match any meaningful words
-	/// of a specified language. When combined, it will be used as both key and language refs.
+	/// Used to determine the function a dictionary will be used for.
 	/// </summary>
-	public enum DictionaryType { Language, Key, Combined};
+	public enum DictionaryType 
+	{ 
+		/// <summary>
+		/// The dictionary will be used to check if any sequence of characters in the attacked data match any meaningful words.
+		/// </summary>
+		Language,
+		/// <summary>
+		/// The dictionary will be used to provide keys used to attack a particular cyphertext.
+		/// </summary>
+		Key, 
+		/// <summary>
+		/// The dictionary is used both as a source of language and to obtain attack keys.
+		/// </summary>
+		Combined
+	};
 }

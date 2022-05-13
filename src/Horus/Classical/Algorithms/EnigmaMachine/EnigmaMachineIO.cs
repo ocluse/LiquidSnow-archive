@@ -7,7 +7,13 @@ namespace Thismaker.Horus.Classical
 {
     public partial class EnigmaMachine
     {
-
+        /// <summary>
+        /// Saves the current enigma machine to the specified stream using a specific codec.
+        /// </summary>
+        /// <remarks>
+        /// This method saves the alphabet and the confiugration of the rotors, including the ETw and UKW
+        /// </remarks>
+        /// <param name="stream">The stream to save the machine options to</param>
         public void Save(Stream stream)
         {
             //header
@@ -72,6 +78,12 @@ namespace Thismaker.Horus.Classical
             }
         }
 
+        /// <summary>
+        /// Loads an enigma machine configruration from the provided stream.
+        /// </summary>
+        /// <param name="stream">The stream containing the Enigma Machine configuration</param>
+        /// <returns>An <see cref="EnigmaMachine"/> represented by the configuration in the <paramref name="stream"/></returns>
+        /// <exception cref="FormatException">When the stream is not a valid enigma machine configuration.</exception>
         public static EnigmaMachine Load(Stream stream)
         {
 

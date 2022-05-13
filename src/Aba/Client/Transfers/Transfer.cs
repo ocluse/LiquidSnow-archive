@@ -15,6 +15,9 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public Stream Stream { get; internal set; }
 
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
         public StreamTransfer() : base()
         {
 
@@ -31,12 +34,18 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public string Path { get; internal set; }
 
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
         public FileTransfer() : base()
         {
 
         }
     }
 
+    /// <summary>
+    /// Base class for transfers
+    /// </summary>
     public abstract class Transfer : BindableBase
     {
         #region Private Fields
@@ -48,7 +57,9 @@ namespace Thismaker.Aba.Client.Transfers
         #endregion
 
         #region Init
-
+        /// <summary>
+        /// Invoked when the transfer is cancelled.
+        /// </summary>
         public event Action<Transfer> TransferCancelled;
 
         internal Transfer()
@@ -129,14 +140,44 @@ namespace Thismaker.Aba.Client.Transfers
         }
         #endregion
     }
-
+    /// <summary>
+    /// The state of the transfer
+    /// </summary>
     public enum TransferState
     {
-        Processing, Waiting, Error, Requeued, Canceled
+        /// <summary>
+        /// The transfer is in progress
+        /// </summary>
+        Processing, 
+        /// <summary>
+        /// Waiting to be executed
+        /// </summary>
+        Waiting, 
+        /// <summary>
+        /// An error occured during execution but has not been requeued
+        /// </summary>
+        Error, 
+        /// <summary>
+        /// Queued again after an error.
+        /// </summary>
+        Requeued, 
+        /// <summary>
+        /// Transfer has been cancalled.
+        /// </summary>
+        Canceled
     }
-
+    /// <summary>
+    /// The direction
+    /// </summary>
     public enum TransferMode
     {
-        Upload, Download
+        /// <summary>
+        /// Uploading to the cloud.
+        /// </summary>
+        Upload,
+        /// <summary>
+        /// Downloading from the cloud.
+        /// </summary>
+        Download
     }
 }
