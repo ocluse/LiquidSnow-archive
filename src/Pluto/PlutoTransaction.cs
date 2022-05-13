@@ -20,6 +20,7 @@
 
         #endregion
 
+        ///<inheritdoc/>
         public override void Update(IPlutoCharge source)
         {
             if (source.GetType().IsAssignableFrom(typeof(PlutoTransaction)))

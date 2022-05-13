@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>3.0.0</Version>
+    <Version>3.1.0</Version>
     <Authors>Thismaker</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <Description>The server side library for working with Thismaker.Mercury for remote procedure calls and realtime communications between a server and client</Description>
-    <Copyright>©2021 Ocluse</Copyright>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
     <Company>Ocluse</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	  <PackageOutputPath>..\..\..\..\..\build</PackageOutputPath>

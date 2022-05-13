@@ -212,8 +212,6 @@ namespace Thismaker.Pluto
         /// Attempts to delete the provided transaction from the account
         /// </summary>
         /// <returns>True if that transaction has been removed successfully</returns>
-        /// <param name="accountId"></param>
-        /// <param name="transaction"></param>
         /// <exception cref="AccountNotFoundException"></exception>
         /// <exception cref="TransactionNotFoundException"></exception>
         public bool DeleteTransaction(string accountId, string transactionId)

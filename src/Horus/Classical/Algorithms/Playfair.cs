@@ -83,7 +83,9 @@ namespace Thismaker.Horus.Classical
 			return output.ToString();
         }
 	}
-
+	/// <summary>
+	/// Used to determined the direction in the grid to move where for example, the same character forms the diagram, e.g. FF or KK
+	/// </summary>
 	public enum PrefferredOrientation
 	{
 		/// <summary>

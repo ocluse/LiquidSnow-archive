@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace Thismaker.Aba.Client.Transfers
 {
+    /// <summary>
+    /// Provides methods required by the <see cref="TransferManager"/> to authenticate an item.
+    /// </summary>
     public interface ITransferAuthenticator
     {
         /// <summary>

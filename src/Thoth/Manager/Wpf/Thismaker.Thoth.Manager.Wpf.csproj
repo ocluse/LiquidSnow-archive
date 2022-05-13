@@ -8,8 +8,8 @@
     <Authors>Thismaker</Authors>
     <Product>Thoth Manager</Product>
     <Description>Used to manage Thoth Localization Data files.</Description>
-    <Copyright>©2021 Ocluse</Copyright>
-    <Version>2.1.0</Version>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <Version>3.1.0</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>thoth-icon.png</PackageIcon>
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>

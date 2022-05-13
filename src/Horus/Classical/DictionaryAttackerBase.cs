@@ -6,13 +6,28 @@ using System.Threading.Tasks;
 
 namespace Thismaker.Horus.Classical
 {
+	/// <summary>
+	/// Base class for classes that can perform dictionary attacks.
+	/// </summary>
     public abstract class DictionaryAttackerBase
     {
-		protected bool dictLoaded = false;
+		/// <summary>
+		/// True when the dictionary has been loaded.
+		/// </summary>
+		protected bool dictLoaded;
 
         #region Properties
+		/// <summary>
+		/// Determines the number of characters to match from the dictionary before the potential attack being considered as a possibility. The default is 3.
+		/// </summary>
         public int MatchLength { get; set; } = 3;
+		/// <summary>
+		/// The list of string items that will be used in attempt to decrypt.
+		/// </summary>
 		public List<string> KeyDictionary { get; set; }
+		/// <summary>
+		/// The list of strings that will be used to evaluate whether an output is a possibility
+		/// </summary>
 		public List<string> LanguageDictionary { get; set; }
         #endregion
 

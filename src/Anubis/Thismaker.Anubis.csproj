@@ -14,9 +14,9 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>steganography</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>3.0.0-preview1.5</Version>
+    <Version>3.0.0</Version>
     <Company>Ocluse</Company>
-    <Copyright>©2021 Ocluse</Copyright>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 

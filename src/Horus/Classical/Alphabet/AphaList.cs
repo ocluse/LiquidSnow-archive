@@ -71,6 +71,7 @@ namespace Thismaker.Horus.Classical
             get => _items[index]; 
             set => _items[index]=value; }
 
+        ///<inheritdoc/>
         public IEnumerator<char> GetEnumerator()
         {
             return _items.GetEnumerator();

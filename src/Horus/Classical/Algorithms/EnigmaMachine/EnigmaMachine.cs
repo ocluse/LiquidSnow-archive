@@ -132,7 +132,7 @@ namespace Thismaker.Horus.Classical
         }
 
         /// <summary>
-        /// Returns a <see cref="char[]"/> of the characters currently visible through the window.
+        /// Returns a <see cref="char"/> array of the characters currently visible through the window.
         /// </summary>
         public char[] Windows
         {

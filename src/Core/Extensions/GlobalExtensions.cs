@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Extensions methods for global typenames
@@ -215,6 +216,24 @@ public static class GlobalExtensions
         }
         // Return char and concat substring.  
         return char.ToUpper(s[0]) + s.Substring(1).ToLower();
+    }
+
+    /// <summary>
+    /// Converts a string to the KebabCase where saces are replaced with dashes.
+    /// </summary>
+    /// <remarks>
+    /// The returned string will always be lowercase. The method also inserts a dash between two capitalised letters, for example HelloWorld becomes hello-world.
+    /// </remarks>
+    /// <returns>The current string in Kebab case</returns>
+    public static string ToKebabCase(this string value)
+    {
+        return value == null
+                ? null
+                : Regex.Replace(value,
+                                 "([a-z])([A-Z])",
+                                 "$1-$2",
+                                 RegexOptions.CultureInvariant,
+                                 TimeSpan.FromMilliseconds(100)).ToLowerInvariant().Replace(' ', '-');
     }
 
     /// <summary>
