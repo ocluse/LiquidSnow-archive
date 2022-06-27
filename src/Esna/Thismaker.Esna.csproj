@@ -6,7 +6,7 @@
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	  <PackageOutputPath>..\..\build</PackageOutputPath>
-	  <Version>1.1.0</Version>
+	  <Version>1.1.1</Version>
 	  <Authors>Thismaker</Authors>
 	  <Company>Ocluse</Company>
 	  <Description>Simplifies working with databases created in Cosmos, the File System or Horus Crypto Containers</Description>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
-    <Version>3.1.0</Version>
+    <Version>3.1.1</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <Description>This is a type of client that works with Thismker.Mercury for real-time communication atrhoug remote procedure calls from a server-client and vice-versa</Description>
