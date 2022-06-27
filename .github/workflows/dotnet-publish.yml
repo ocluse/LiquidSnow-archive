@@ -1,9 +1,7 @@
-name: .NET
+name: .NET Publish
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
 
 jobs:
@@ -19,11 +17,10 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
+    - name: Build packages
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    #PUBLISH
+    
+      #PUBLISH
     - name: Publish to Nuget
       run: dotnet nuget push ".\build\*.nupkg" -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
     - name: Publish to GitHub
