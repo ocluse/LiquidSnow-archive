@@ -11,14 +11,17 @@
     <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.2</Version>
-    <AssemblyVersion>1.0.1.1</AssemblyVersion>
-    <FileVersion>1.0.1.1</FileVersion>
+    <Version>2.0.0.0</Version>
+    <Copyright>©2021 Ocluse</Copyright>
+    <Company>Ocluse</Company>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Anubis\Thismaker.Anubis.csproj" />
-    <ProjectReference Include="..\Horus\Thismaker.Horus.csproj" />
+    <ProjectReference Include="..\Horus\Classical\Thismaker.Horus.Classical.csproj" />
+    <ProjectReference Include="..\Horus\Horus\Thismaker.Horus.csproj" />
+    <ProjectReference Include="..\Horus\IO\Thismaker.Horus.IO.csproj" />
   </ItemGroup>
 
   <ItemGroup>

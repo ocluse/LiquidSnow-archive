@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Authors>Thismaker</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <Description>Rapidly create server side of client-server applications with custom authentication, allows you to work with AzureBlobs securely from the server etc. Develop your client with Thismaker.Aba.Client for smooth integration</Description>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>server jwt custom-authentication client-server webapi</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>3.2.0</Version>
+    <Company>Ocluse</Company>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.12.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

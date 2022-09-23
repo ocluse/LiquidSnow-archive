@@ -1,0 +1,27 @@
+name: .NET Publish
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build packages
+      run: dotnet build --no-restore
+    
+      #PUBLISH
+    - name: Publish to Nuget
+      run: dotnet nuget push ".\build\*.nupkg" -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+    - name: Publish to GitHub
+      run: dotnet nuget push ".\build\*.nupkg" -k ${{secrets.GITHUB_TOKEN}} -s https://nuget.pkg.github.com/ocluse/index.json --skip-duplicate

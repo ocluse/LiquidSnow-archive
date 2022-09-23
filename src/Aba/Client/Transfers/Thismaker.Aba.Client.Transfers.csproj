@@ -3,18 +3,22 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <Description>Facilitates working with Azure Blobs from the AbaClient. This allows you to easily set up secure and safe blob containers. Should be used with Thismaker.Aba.Server on the server-side to allow smooth operation.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.7</Version>
-    <PackageReleaseNotes>Fixed an issue that was closing StreamTransfers, making them virtual unuseful for MemoryStreams</PackageReleaseNotes>
+    <Version>3.1.1</Version>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Company>Ocluse</Company>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.8.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.12.0" />
   </ItemGroup>
 
   <ItemGroup>

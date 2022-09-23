@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-
-namespace Thismaker.Core.Models
+﻿namespace Thismaker.Core.Models
 {
-    /// <summary>
+    ///<summary>
+    /// A class that can be used for universal messages.
+    ///</summary>
+    /// <remarks>
     /// A template that can be used for univeral messages.
     /// I thought I'd just throw this there, it may be useful, you never know.
     /// It is Binding ready, and notifies whenever there are changes.
-    /// </summary>
+    /// </remarks>
     public class UniversalMessage : BindableBase
     {
-
         #region Properties
 
         private string sender, header, content;

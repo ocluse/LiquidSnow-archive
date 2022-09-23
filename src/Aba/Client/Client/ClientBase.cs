@@ -1,30 +1,38 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using System;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
-using Thismaker.Aba.Common;
 
 namespace Thismaker.Aba.Client
 {
     /// <summary>
-    /// The <see cref="ClientBase{T}"/> is an abstract class with the very basic fundamentals of what
-    /// all apps are supposed to contain
+    /// The base class client with utility methods for sending HTTP requests to server and managing client authorization.  
     /// </summary>
-    public abstract class ClientBase<T> where T : ClientBase<T>
+    /// <typeparam name="TClient">The type of the clent</typeparam>
+    public abstract partial class ClientBase<TClient> where TClient : ClientBase<TClient>
     {
-        private AccessToken accessToken;
+        private class RenewAccessNotImplementedException : Exception { }
+        private enum HttpVerb
+        {
+            Get, Post, Put, Delete
+        }
 
         #region Properties
-        public virtual IContext Context { get; set; }
-
-        public static T Instance { get; private set; }
+        /// <summary>
+        /// The context of the client.
+        /// </summary>
+        /// <remarks>
+        /// This is usually platform specific, and is useful where there are plaftform specific
+        /// method implementations required, for example, when defining app data paths.
+        /// </remarks>
+        public IContext Context { get; private set; }
 
         /// <summary>
-        /// The version number of the current <b>local</b> client.
+        /// The singleton instance of the client
         /// </summary>
-        public string Version { get; set; }
+        public static TClient Instance { get; private set; }
 
         /// <summary>
         /// Represents the base url address to the server api endpoint e.g www.liquidsnow.com
@@ -32,347 +40,446 @@ namespace Thismaker.Aba.Client
         public string BaseAddress { get; set; }
 
         /// <summary>
-        /// The default address where the Api calls will be made. 
-        /// If left null, the endpoint must be included in the requestUri 
-        /// when calling <see cref="ApiGetAsync(string)"/> or any of the related methods
+        /// The default endpoint preppended to every request made using the Api HTTP Verbs.
+        /// If left as null, the endpoint must be included in the request uri
         /// </summary>
         public string ApiEndpoint { get; set; }
 
-        public string HubEndpoint { get; set; }
-
         /// <summary>
-        /// The access token that is usually added as an authorization header
-        /// to the app's <see cref="HubConnection"/> and <see cref="HttpClient"/>.
+        /// The access token that allows the client to access a protected resource
         /// </summary>
-        public AccessToken AccessToken 
-        {
-            get
-            {
-                return accessToken;
-            } 
-            protected set
-            {
-                if (accessToken != null && accessToken.Kind==AccessTokenKind.Custom)
-                {
-                    HttpClient.DefaultRequestHeaders.Remove(accessToken.Key);
-                }
-                accessToken = value;
-
-                if (accessToken.Kind == AccessTokenKind.Custom)
-                {
-                    HttpClient.DefaultRequestHeaders.Add(accessToken.Key, accessToken.Value);
-                }
-                else
-                {
-                    HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(accessToken.Key, accessToken.Value);
-                }
-            } 
-        }
+        public AccessToken AccessToken { get; set; }
 
         /// <summary>
-        /// The client used to access the server api
+        /// The client used to make Http Requests
         /// </summary>
         protected HttpClient HttpClient { get; set; }
 
-        /// <summary>
-        /// The connection to the server's hub
-        /// </summary>
-        protected HubConnection HubConnection { get; set; }
-
-        #endregion
-
-        #region Events
-        /// <summary>
-        /// Fired when the underlying <see cref="HubConnection"/> is reconnecting
-        /// </summary>
-        public event Action<Exception> HubReconnecting;
-
-        /// <summary>
-        /// Fired when the underlying <see cref="HubConnection"/> is reconnected
-        /// </summary>
-        public event Action<string> HubReconnected;
-
-        /// <summary>
-        /// Fired when the underlying <see cref="HubConnection"/> is closed.
-        /// Exception will be null in case no error occurred when closing the hub
-        /// </summary>
-        public event Action<Exception> HubClosed;
         #endregion
 
         #region Abstract Methods
         /// <summary>
-        /// When overriden in a derived class, starts the ClientApp, 
-        /// allowing for performing basic tasks.
-        /// Should be called once <see cref="MakeApp"/> has been called.
+        /// Called by the HTTP helpers to deserialize a response. Override to customize how deserialization works
         /// </summary>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        public abstract Task Start(IProgress<string> progress);
+        /// <typeparam name="T">The type of required result</typeparam>
+        /// <param name="args">The string to deserialize</param>
+        protected abstract T Deserialize<T>(string args);
 
         /// <summary>
-        /// When overidden in a derived class, returns the version of the cloud client.
+        /// Called by the HTTP helpers to serialize Http string content
         /// </summary>
-        /// <returns></returns>
-        public abstract Task<string> GetCloudVersion();
+        /// <typeparam name="T">The type of object being serialized</typeparam>
+        /// <param name="args">The object to serialize</param>
+        protected abstract string Serialize<T>(T args);
         #endregion
 
         #region Initialization
         /// <summary>
-        /// Should be called before accessing the Client-App's methods. Initializes the basics.
-        /// Where a costom <see cref="AccessToken"/> is used, this should be called again to refresh the AccessToken.
-        /// Note that this destroys previous bindings to the Hub and HttpClient, and therefore those must be refreshed.
+        /// Makes the app the singleton that can be easily accessed by <see cref="ClientBase{T}.Instance"/>
+        /// </summary>
+        /// <remarks>
+        /// This is useful where only one Client App is needed accross the entire application
+        /// </remarks>
+        public void MakeSingleton()
+        {
+            Instance = (TClient)this;
+        }
+
+        /// <summary>
+        /// Initializes the HttpClient. Should be called only once during the lifetime 
+        /// of the client app. Overrride to customize how the client is made
         /// </summary>
         public virtual void MakeApp()
         {
             HttpClient = new HttpClient { BaseAddress = new Uri(BaseAddress) };
-            HubConnection = new HubConnectionBuilder()
-                   .WithAutomaticReconnect()
-                   .WithUrl($"{BaseAddress}/{HubEndpoint}/",
-                   options =>
-                   {
-                       options.AccessTokenProvider = GetAccessTokenAsync;
-                   })
-                   .Build();
-
-            HubConnection.Reconnected += OnHubConnectionReconnected;
-            HubConnection.Reconnecting += OnHubConnectionReconnecting;
-            HubConnection.Closed += OnHubConnectionClosed;
-        }
-
-        /// <summary>
-        /// Makes the app the singleton that can be easily accessed by <see cref="ClientBase{T}.Instance"/>
-        /// Can be used for persistance accross the environment's lifetime.
-        /// </summary>
-        public void MakeSingleton()
-        {
-            Instance = (T)this;
         }
 
         #endregion
 
-        #region Private Methods
-        private Task OnHubConnectionClosed(Exception arg)
+        #region Protected Methods
+
+        /// <summary>
+        /// Called whenever the <see cref="AccessToken"/> has expired or is null.
+        /// </summary>
+        protected virtual Task RenewAccessTokenAsync()
         {
-            HubClosed?.Invoke(arg);
-            return Task.CompletedTask;
+            throw new RenewAccessNotImplementedException();
         }
 
-        private Task OnHubConnectionReconnecting(Exception arg)
-        {
-            HubReconnecting?.Invoke(arg);
-            return Task.CompletedTask;
-        }
-
-        private Task OnHubConnectionReconnected(string arg)
-        {
-            HubReconnected?.Invoke(arg);
-            return Task.CompletedTask;
-        }
-
-        private Task<string> GetAccessTokenAsync()
-        {
-            return Task.FromResult(AccessToken?.Value);
-        }
         #endregion
 
-        #region Api Methods
-        /// <summary>
-        /// Calls the HTTP GET on the server's Api
-        /// </summary>
-        /// <param name="requestUri">The specific request uri, will be combined with the path info</param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> ApiGetAsync(string requestUri)
-        {
-            try
-            {
-                return await HttpClient.GetAsync(ApiEndpoint==null?$"/{requestUri}"
-                    :$"/{ApiEndpoint}/{requestUri}");
-            }
-            catch
-            {
-                throw;
-            }
-        }
+        #region Public Methods
 
         /// <summary>
-        /// Sends a HTTP GET request to the specified endpoint
+        /// Sets the <see cref="Context"/>
         /// </summary>
-        /// <param name="endpoint">The endpoint that will be attached to the base address and called.</param>
-        /// <param name="requestUri">The request Url</param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> EndpointGetAsync(string endpoint, string requestUri)
+        public virtual void SetContext(IContext context)
         {
-            try
-            {
-                return await HttpClient.GetAsync($"{endpoint}/{requestUri}");
-            }
-            catch
-            {
-                throw;
-            }
+            Context = context;
         }
 
-        /// <summary>
-        /// Sends a HTTP GET request to the specified endpoint
-        /// </summary>
-        /// <param name="endpoint">The endpoint that will be attached to the base address and called.</param>
-        /// <param name="requestUri">The request Url</param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> EndpointPostAsync(string endpoint, string requestUri, HttpContent content)
-        {
-            try
-            {
-                return await HttpClient.PostAsync($"{endpoint}/{requestUri}", content);
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Calls a HTTP POST on the server's Api
-        /// </summary>
-        /// <param name="requestUri">The specific uri to the post resource</param>
-        /// <param name="content">The content to send to the server</param>
-        /// <returns></returns>
-        public async Task<HttpResponseMessage> ApiPostAsync(string requestUri, HttpContent content)
-        {
-            try
-            {
-                return await HttpClient.PostAsync(ApiEndpoint == null ? $"/{requestUri}"
-                    : $"/{ApiEndpoint}/{requestUri}", content);
-            }
-            catch
-            {
-                throw;
-            }
-        }
         #endregion
 
-        #region Hub
+        #region Http Methods
 
-        public abstract void SubscribeHub();
-
-        public abstract void UnsubscribeHub();
-
-        public async Task ConnectHub()
+        /// <summary>
+        /// Adds the required Authorization headers to the <paramref name="requestMessage"/>
+        /// </summary>
+        /// <remarks>
+        /// Overriding allows the addition of other specific headers to the request message.
+        /// The method will check if the <see cref="AccessToken"/> is currently valid.
+        /// </remarks>
+        /// <param name="requestMessage">The request message to add Authorization headers to</param>
+        /// <param name="isProtected">If true, the authorization headers will be added depending on the <see cref="AccessToken"/> information</param>
+        /// <exception cref="ExpiredTokenException"></exception>
+        protected virtual async Task PrepareRequestAsync(HttpRequestMessage requestMessage, bool isProtected)
         {
-            try
+            if (isProtected)
             {
-                await HubConnection.StopAsync();
+                if (AccessToken == null || AccessToken.IsExpired())
+                {
+                    try
+                    {
+                        await RenewAccessTokenAsync();
+                    }
+                    catch(RenewAccessNotImplementedException)
+                    {
+                        throw new ExpiredTokenException();
+                    }
+                }
+
+                if (AccessToken.HeaderName == "Authorization")
+                {
+                    requestMessage.Headers.Authorization
+                        = AccessToken.Value == null ?
+                        new AuthenticationHeaderValue(AccessToken.Scheme) :
+                        new AuthenticationHeaderValue(AccessToken.Scheme, AccessToken.Value);
+                }
+                else
+                {
+                    requestMessage.Headers.Add(AccessToken.HeaderName, AccessToken.Value);
+                }
             }
-            catch
+        }
+
+        /// <summary>
+        /// Seends a HTTP request to the server base address.
+        /// </summary>
+        /// <param name="requestMessage">The HTTP request to send</param>
+        /// <param name="isProtected">If true, authorization header is added automatically</param>
+        /// <param name="option">The value specifying when the response should be determined as complete</param>
+        /// <param name="cancellationToken">The token to monitor for cancelling the request</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> HttpSendAsync(HttpRequestMessage requestMessage, bool isProtected, HttpCompletionOption option = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
+        {
+            await PrepareRequestAsync(requestMessage, isProtected);
+            return await HttpClient.SendAsync(requestMessage, option, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends a HTTP GET to the API endpoint of the server
+        /// </summary>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> ApiGetAsync(string requestUri, bool isProtected = true)
+        {
+            return await EndpointGetAsync(ApiEndpoint, requestUri, isProtected);
+        }
+
+        /// <summary>
+        /// Sends a HTTP POST to the API endpoint of the server
+        /// </summary>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="content">The body of the request</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> ApiPostAsync(string requestUri, HttpContent content, bool isProtected = true)
+        {
+            return await EndpointPostAsync(ApiEndpoint, requestUri, content, isProtected);
+        }
+
+        /// <summary>
+        /// Sends a HTTP PUT to the API endpoint of the server
+        /// </summary>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="content">The body of the request</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> ApiPutAsync(string requestUri, HttpContent content, bool isProtected = true)
+        {
+            return await EndpointPutAsync(ApiEndpoint, requestUri, content, isProtected);
+        }
+
+        /// <summary>
+        /// Sends a HTTP DELETE to the API endpoint of the server
+        /// </summary>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> ApiDeleteAsync(string requestUri, bool isProtected = true)
+        {
+            return await EndpointDeleteAsync(ApiEndpoint, requestUri, isProtected);
+        }
+
+        /// <summary>
+        /// Sends a HTTP GET to the specified endpoint of the server
+        /// </summary>
+        /// <param name="endpoint">The endpoint to send the request to</param>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> EndpointGetAsync(string endpoint, string requestUri, bool isProtected = true)
+        {
+            return await ExecuteVerbAsync(HttpVerb.Get, endpoint, requestUri, null, isProtected);
+        }
+
+        /// <summary>
+        /// Sends a HTTP POST to the specified endpoint of the server
+        /// </summary>
+        /// <param name="endpoint">The endpoint to send the request to</param>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="content">The body of the request</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> EndpointPostAsync(string endpoint, string requestUri, HttpContent content, bool isProtected = true)
+        {
+            return await ExecuteVerbAsync(HttpVerb.Post, endpoint, requestUri, content, isProtected);
+        }
+
+        /// <summary>
+        /// Sends a HTTP PUT to the specified endpoint of the server
+        /// </summary>
+        /// <param name="endpoint">The endpoint to send the request to</param>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="content">The body of the request</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> EndpointPutAsync(string endpoint, string requestUri, HttpContent content, bool isProtected = true)
+        {
+            return await ExecuteVerbAsync(HttpVerb.Put, endpoint, requestUri, content, isProtected);
+        }
+
+        /// <summary>
+        /// Sends a HTTP DELETE to the specified endpoint of the server
+        /// </summary>
+        /// <param name="endpoint">The endpoint to send the request to</param>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <returns>The response received from the server</returns>
+        public async Task<HttpResponseMessage> EndpointDeleteAsync(string endpoint, string requestUri, bool isProtected = true)
+        {
+            return await ExecuteVerbAsync(HttpVerb.Delete, endpoint, requestUri, null, isProtected);
+        }
+
+        private async Task<HttpResponseMessage> ExecuteVerbAsync(HttpVerb verb, string endpoint, string requestUri, HttpContent content, bool isProtected = true)
+        {
+            HttpMethod method = verb switch
             {
-                //do nothing
+                HttpVerb.Get => HttpMethod.Get,
+                HttpVerb.Post => HttpMethod.Post,
+                HttpVerb.Put => HttpMethod.Put,
+                HttpVerb.Delete => HttpMethod.Delete,
+                _ => throw new NotImplementedException("Unknown/unimplemented verb")
+            };
+
+            Uri uri = string.IsNullOrEmpty(endpoint)
+                ? new Uri(requestUri, UriKind.Relative)
+                : new Uri($"{endpoint}/{requestUri}", UriKind.Relative);
+
+            HttpRequestMessage requestMessage = new HttpRequestMessage()
+            {
+                RequestUri = uri,
+                Method = method,
+                Content = content
+            };
+
+            return await HttpSendAsync(requestMessage, isProtected);
+        }
+
+        #region Simple Methods
+
+        /// <summary>
+        /// Sends a HTTP GET to the API endpoint of the server, deserializing the content body of the response
+        /// </summary>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <param name="requiredStatusCode">If specified, an exception is thrown if the response status code is different, otherwise, any success status code suffices</param>
+        /// <returns>The deserialized content body of the response</returns>
+        public async Task<TResult> ApiGetSimpleAsync<TResult>(string requestUri, bool isProtected = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await EndpointGetSimpleAsync<TResult>(ApiEndpoint, requestUri, isProtected, requiredStatusCode);
+        }
+
+        /// <summary>
+        /// Sends a HTTP POST to the API endpoint of the server, deserializing the content body of the response
+        /// </summary>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="content">The content body of the request</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <param name="serializeContent">If true, the content will be serialized and added as string content to the HTTP request, otherwise it is treated as HttpContent</param>
+        /// <param name="deserializeResult">If true, the HTTP response content body will be deserialized, otherwise, the method returns the ressponse message</param>
+        /// <param name="requiredStatusCode">If specified, an exception is thrown if the response status code is different, otherwise, any success status code suffices</param>
+        /// <returns>The deserialized content body of the response</returns>
+        public async Task<TResult> ApiPostSimpleAsync<TContent, TResult>(string requestUri, TContent content, bool isProtected = true, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await EndpointPostSimpleAsync<TContent, TResult>(ApiEndpoint, requestUri, content, isProtected, serializeContent, deserializeResult, requiredStatusCode);
+        }
+
+        /// <summary>
+        /// Sends a HTTP PUT to the API endpoint of the server, deserializing the content body of the response
+        /// </summary>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="content">The content body of the request</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <param name="serializeContent">If true, the content will be serialized and added as string content to the HTTP request, otherwise it is treated as HttpContent</param>
+        /// <param name="deserializeResult">If true, the HTTP response content body will be deserialized, otherwise, the method returns the ressponse message</param>
+        /// <param name="requiredStatusCode">If specified, an exception is thrown if the response status code is different, otherwise, any success status code suffices</param>
+        /// <returns>The deserialized content body of the response</returns>
+        public async Task<TResult> ApiPutSimpleAsync<TContent, TResult>(string requestUri, TContent content, bool isProtected = true, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await EndpointPutSimpleAsync<TContent, TResult>(ApiEndpoint, requestUri, content, isProtected, serializeContent, deserializeResult, requiredStatusCode);
+        }
+
+        /// <summary>
+        /// Sends a HTTP DELETE to the API endpoint of the server, deserializing the content body of the response
+        /// </summary>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <param name="requiredStatusCode">If specified, an exception is thrown if the response status code is different, otherwise, any success status code suffices</param>
+        /// <returns>The deserialized content body of the response</returns>
+        public async Task<TResult> ApiDeleteSimpleAsync<TResult>(string requestUri, bool isProtected = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await EndpointDeleteSimpleAsync<TResult>(ApiEndpoint, requestUri, isProtected, requiredStatusCode);
+        }
+
+        /// <summary>
+        /// Sends a HTTP GET to the specified endpoint of the server, deserializing the content body of the response
+        /// </summary>
+        /// <param name="endpoint">The endpoint to send the request to</param>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <param name="requiredStatusCode">If specified, an exception is thrown if the response status code is different, otherwise, any success status code suffices</param>
+        /// <returns>The deserialized content body of the response</returns>
+        public async Task<TResult> EndpointGetSimpleAsync<TResult>(string endpoint, string requestUri, bool isProtected = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await ExecuteVerbSimpleAsync<bool, TResult>(HttpVerb.Get, endpoint, requestUri, false, isProtected, requiredStatusCode: requiredStatusCode);
+        }
+
+        /// <summary>
+        /// Sends a HTTP POST to the specified endpoint of the server, deserializing the content body of the response
+        /// </summary>
+        /// <param name="endpoint">The endpoint to send the request to</param>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="content">The content body of the request</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <param name="serializeContent">If true, the content will be serialized and added as string content to the HTTP request, otherwise it is treated as HttpContent</param>
+        /// <param name="deserializeResult">If true, the HTTP response content body will be deserialized, otherwise, the method returns the ressponse message</param>
+        /// <param name="requiredStatusCode">If specified, an exception is thrown if the response status code is different, otherwise, any success status code suffices</param>
+        /// <returns>The deserialized content body of the response</returns>
+        public async Task<TResult> EndpointPostSimpleAsync<TContent, TResult>(string endpoint, string requestUri, TContent content, bool isProtected = true, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await ExecuteVerbSimpleAsync<TContent, TResult>(HttpVerb.Post, endpoint, requestUri, content, isProtected, serializeContent, deserializeResult, requiredStatusCode);
+        }
+
+        /// <summary>
+        /// Sends a HTTP PUT to the specified endpoint of the server, deserializing the content body of the response
+        /// </summary>
+        /// <param name="endpoint">The endpoint to send the request to</param>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="content">The content body of the request</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <param name="serializeContent">If true, the content will be serialized and added as string content to the HTTP request, otherwise it is treated as HttpContent</param>
+        /// <param name="deserializeResult">If true, the HTTP response content body will be deserialized, otherwise, the method returns the ressponse message</param>
+        /// <param name="requiredStatusCode">If specified, an exception is thrown if the response status code is different, otherwise, any success status code suffices</param>
+        /// <returns>The deserialized content body of the response</returns>
+        public async Task<TResult> EndpointPutSimpleAsync<TContent, TResult>(string endpoint, string requestUri, TContent content, bool isProtected = true, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await ExecuteVerbSimpleAsync<TContent, TResult>(HttpVerb.Put, endpoint, requestUri, content, isProtected, serializeContent, deserializeResult, requiredStatusCode);
+        }
+
+        /// <summary>
+        /// Sends a HTTP DELETE to the specified endpoint of the server, deserializing the content body of the response
+        /// </summary>
+        /// <param name="endpoint">The endpoint to send the request to</param>
+        /// <param name="requestUri">The relative URI of the resource</param>
+        /// <param name="isProtected">Whether authorization is required to access the resource</param>
+        /// <param name="requiredStatusCode">If specified, an exception is thrown if the response status code is different, otherwise, any success status code suffices</param>
+        /// <returns>The deserialized content body of the response</returns>
+        public async Task<TResult> EndpointDeleteSimpleAsync<TResult>(string endpoint, string requestUri, bool isProtected = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            return await ExecuteVerbSimpleAsync<bool, TResult>(HttpVerb.Delete, endpoint, requestUri, false, isProtected, requiredStatusCode: requiredStatusCode);
+        }
+
+        private bool RequiresContent(HttpVerb verb)
+        {
+            return verb == HttpVerb.Put || verb == HttpVerb.Post;
+        }
+
+        private async Task<TResult> ExecuteVerbSimpleAsync<TContent, TResult>(HttpVerb verb, string endpoint, string requestUri, TContent content, bool isProtected, bool serializeContent = true, bool deserializeResult = true, HttpStatusCode? requiredStatusCode = null)
+        {
+            bool requiresContent = RequiresContent(verb);
+
+            HttpContent finalContent = null;
+
+            if (requiresContent)
+            {
+                // Content validation:
+                if (!serializeContent)
+                {
+                    if (!typeof(HttpContent).IsAssignableFrom(typeof(TContent)))
+                    {
+                        throw new ArgumentException($"{nameof(TContent)} provided must be of type/derive from {nameof(HttpContent)} if {nameof(serializeContent)} is set to false", nameof(serializeContent));
+                    }
+                }
+
+                //Result validation
+                if (!deserializeResult)
+                {
+                    if (!typeof(HttpResponseMessage).IsAssignableFrom(typeof(TResult)))
+                    {
+                        throw new ArgumentException($"Generic {nameof(TResult)} provided must be of type or base of {nameof(HttpResponseMessage)} if {nameof(deserializeResult)} is set to false", nameof(serializeContent));
+                    }
+                }
+
+                finalContent = serializeContent ?
+                    GetStringContent(content) : (HttpContent)(object)content;
             }
 
-            try
+
+            HttpResponseMessage response = await ExecuteVerbAsync(verb, endpoint, requestUri, finalContent, isProtected);
+
+
+            if (!deserializeResult)
             {
-                await HubConnection.StartAsync();
+                return (TResult)(object)response;
             }
-            catch(Exception ex)
+
+            if ((requiredStatusCode.HasValue && response.StatusCode != requiredStatusCode) ||
+                (!requiredStatusCode.HasValue && !response.IsSuccessStatusCode))
             {
-                throw ex;
+                throw new SimpleRequestException(response);
             }
-            
+
+            string responseContent = await response.Content.ReadAsStringAsync();
+            return Deserialize<TResult>(responseContent);
         }
 
-        public async Task HubSend(string methodName)
+        #endregion
+
+        #region Helpers
+
+
+        /// <summary>
+        /// Called by the HTTP POST helper to create a string content out of a provided object. Override to customize the behaviour.
+        /// By default, the string content is encoded using UTF8 encoding with a mediatype of "application/json"
+        /// </summary>
+        protected virtual StringContent GetStringContent<T>(T o)
         {
-            await HubConnection.SendAsync(methodName);
+            return new StringContent(Serialize(o), System.Text.Encoding.UTF8, "application/json");
         }
 
-        public async Task HubSend<T1>(string methodName, T1 arg1)
-        {
-            await HubConnection.SendAsync(methodName, arg1);
-        }
-
-        public async Task HubSend<T1, T2>(string methodName, T1 arg1, T2 arg2)
-        {
-            await HubConnection.SendAsync(methodName, arg1, arg2);
-        }
-
-        public async Task HubSend<T1,T2,T3>(string methodName, T1 arg1, T2 arg2, T3 arg3)
-        {
-            await HubConnection.SendAsync(methodName, arg1, arg2, arg3);
-        }
-
-        public void UnbindHub(Action action)
-        {
-            var name = action.Method.Name;
-            HubConnection.Remove(name);
-        }
-
-        public void UnbindHub<T1>(Action<T1> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-        
-        public void UnbindHub<T1,T2>(Action<T1,T2> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-        
-        public void UnbindHub<T1,T2,T3>(Action<T1,T2,T3> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        public void BindHub(Action action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        public void BindHub<T1>(Action<T1> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        public void BindHub<T1,T2>(Action<T1,T2> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        public void BindHub<T1,T2,T3>(Action<T1,T2,T3> action)
-        {
-            var name = action.Method.Name;
-            HubConnection.On(name, action);
-        }
-
-        [Obsolete("Still under construction", true)]
-        public async Task<Result> CallHubAsync<Result>(string methodName)
-        {
-            var tcs = new TaskCompletionSource<Result>();
-            HubConnection.On<Result>(methodName, result =>
-            {
-                HubConnection.Remove(methodName);
-                tcs.SetResult(result);
-            });
-            await HubConnection.SendAsync(methodName);
-
-            return await tcs.Task;
-        }
-
-        [Obsolete("Still under construction", true)]
-        public async Task<Result> CallHubAsync<Result, TPack>(IAbaPackage<TPack> package, [CallerMemberName] string methodName = null)
-        {
-            var tcs = new TaskCompletionSource<Result>();
-            HubConnection.On<Result>(methodName, result =>
-            {
-                HubConnection.Remove(methodName);
-                tcs.SetResult(result);
-            });
-            await HubConnection.SendAsync(methodName, package.ToJson());
-
-            return await tcs.Task;
-        }
+        #endregion
 
         #endregion
     }

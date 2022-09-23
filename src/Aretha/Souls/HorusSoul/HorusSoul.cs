@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Thismaker.Horus;
-using Thismaker.Horus.IO;
-using Thismaker.Horus.Classical;
 
 namespace Thismaker.Aretha
 {
@@ -32,9 +28,11 @@ namespace Thismaker.Aretha
         public async void WaitForCommand(string[] args=null)
         {
             List<string> cmdlets;
+            
+            string cmd;
             if (args == null || args.Length == 0)
             {
-                var cmd = Ask();
+                cmd = Ask();
                 if (cmd == null) return;
 
                 cmdlets = new List<string>(cmd.Split(' '));
@@ -42,6 +40,18 @@ namespace Thismaker.Aretha
             else
             {
                 cmdlets = new List<string>(args);
+                StringBuilder sb = new();
+
+                for (int i = 0; i < cmdlets.Count; i++){
+                    sb.Append(cmdlets[i]);
+
+                    if (i != cmdlets.Count - 1)
+                    {
+                        sb.Append(' ');
+                    }
+                }
+
+                cmd = sb.ToString();
             }
 
             while (true)
@@ -53,7 +63,7 @@ namespace Thismaker.Aretha
                         Aretha.SoulSucceeded(Soul.Horus);
                         return;
                     }
-                    if (cmdlets[0] == "use")
+                    else if (cmdlets[0] == "use")
                     {
                         switch (cmdlets[1])
                         {
@@ -73,6 +83,41 @@ namespace Thismaker.Aretha
                                 break;
                             default:
                                 throw new InvalidOperationException("Unknown operation");
+                        }
+                    }
+                    else if (cmdlets[0] == "hash")
+                    {
+                        var input = Ask(isCase: true);
+                        Speak(Horus.Horus.GetHash(input));
+                    }
+                    else if (cmdlets[0] == "id")
+                    {
+                        if (cmdlets.Count == 1)
+                        {
+                            Speak(Horus.Horus.GenerateId(IdKind.Guid));
+                        }
+                        else
+                        {
+                            int max = 12;
+                            if (cmdlets.Count > 2)
+                            {
+                                if (!int.TryParse(cmdlets[2], out max))
+                                {
+                                    throw new InvalidOperationException("Value for length must be number");
+                                }
+                            }
+
+                            IdKind kind = cmdlets[1] switch
+                            {
+                                "standard" => IdKind.Standard,
+                                "date-time" => IdKind.DateTime,
+                                "guid" => IdKind.Guid,
+                                "random" => IdKind.Random,
+                                "hash" => IdKind.Hash,
+                                _ => throw new InvalidOperationException("Unkown ID Kind")
+                            };
+
+                            Speak(Horus.Horus.GenerateId(kind, max));
                         }
                     }
 

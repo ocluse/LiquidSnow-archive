@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Thismaker.Horus.Classical;
 
@@ -134,7 +132,7 @@ namespace Thismaker.Aretha
             _alg = algName switch
             {
                 "playfair" => new Playfair(),
-                "ceasar" => new Ceasar(),
+                "caesar" => new Caesar(),
                 "vigenere" => new Vigenere(),
                 _ => throw
                 new InvalidOperationException("The classical algorithm provided is unknown")

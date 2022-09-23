@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>thoth-icon.ico</ApplicationIcon>
+    <Authors>Thismaker</Authors>
+    <Product>Thoth Manager</Product>
+    <Description>Used to manage Thoth Localization Data files.</Description>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <Version>3.1.0</Version>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>thoth-icon.png</PackageIcon>
+    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <Company>Ocluse</Company>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Goro\Core\Thismaker.Goro.Core.csproj" />
+    <ProjectReference Include="..\..\..\Goro\Goro\Thismaker.Goro.csproj" />
+    <ProjectReference Include="..\..\Thoth\Thismaker.Thoth.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\assets\images\Icons\thoth-icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

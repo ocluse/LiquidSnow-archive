@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageOutputPath>..\..\..\build</PackageOutputPath>
+	<Version>3.1.0</Version>
+	<Authors>Thismaker</Authors>
+	<Company>Ocluse</Company>
+	<Copyright>© Ocluse. All rights reserved</Copyright>
+	<PackageIcon>Thisicon-Prime.png</PackageIcon>
+	<RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
+	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<Description>Core utilities for Goro.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Thismaker.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -3,28 +3,29 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageOutputPath>..\..\build</PackageOutputPath>
     <Description>Rapidly build finance based applications. Allows for record keeping, transaction monitoring etc.</Description>
     <PackageTags>finance financial records transactions money</PackageTags>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.2</Version>
+    <Version>3.0.1</Version>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <Company>Ocluse</Company>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Horus\Thismaker.Horus.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\assets\images\Thisicon-Prime.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Horus\Horus\Thismaker.Horus.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Thismaker</Authors>
+    <Version>3.1.1</Version>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <Description>This is a type of client that works with Thismker.Mercury for real-time communication atrhoug remote procedure calls from a server-client and vice-versa</Description>
+    <Company>Ocluse</Company>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Mercury\Thismaker.Mercury.csproj" />
+    <ProjectReference Include="..\..\Common\Mercury\Thismaker.Aba.Common.Mercury.csproj" />
+    <ProjectReference Include="..\Client\Thismaker.Aba.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

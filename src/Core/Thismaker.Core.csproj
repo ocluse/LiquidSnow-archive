@@ -4,15 +4,19 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Thismaker</Authors>
     <LangVersion>8.0</LangVersion>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>Very useful library that provide some fundamental utlilities, extensions and abilities that are usually used in almost every other development scenario.</Description>
-    <RepositoryUrl>https:\\github.com\thismaker\LiquidSnow</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageOutputPath>..\..\build</PackageOutputPath>
+    <Description>Provides common extensions and utility methods useful in a wide range of scenarios</Description>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>thismaker core extensions fundamentals  generic</PackageTags>
+    <PackageTags>thismaker core extensions fundamentals generic</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.3</Version>
-    <PackageReleaseNotes>Fixed namespaces.</PackageReleaseNotes>
+    <Version>3.0.0</Version>
+    <Company>Ocluse</Company>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,44 +2,45 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
 using System.Text;
-using System.Text.Json;
 
 namespace Thismaker.Horus.Classical
 {
-    /// <summary>
-    /// Represents an Enigma Machine, true to the physical device.
-    /// The Enigma was famously used by the German's in WWII to send secret messages.
-    /// Due to the enormous size of the mathematical probabilities (in the quitntillions or sth)
-    /// the German's errenously believed that it was <b>unbreakable</b>
-    /// This is what inspired me to create the entire Enigma library, and by extension Liquid Snow.
-    /// So glad that this thing actually works, like the real machine :) Enjoy
-    /// </summary>
+    ///<summary>
+    ///Provides functionality for performing cryptographic operations by simulating the Enigma Machine
+    ///</summary>
+    /// <remarks>
+    /// The Enigma machine was used by the German army during World War 2 for top secret communication.
+    /// While this class does it's best to simulate the behaviour of the physical device,
+    /// there may still be a few places it falls short. Configuration is necessary to obtain desirable behaviour.
+    /// </remarks>
     public partial class EnigmaMachine : ClassicalAlgorithm
     {
-        #region Private Fields
-        #endregion
 
         #region Constructors
-        
-
+        /// <summary>
+        /// Creates a new instance of an Enigma Machine
+        /// </summary>
         public EnigmaMachine()
         {
-            Rotors.CollectionChanged += Rotors_CollectionChanged;
+            Rotors.CollectionChanged += OnRotorsChanged;
         }
 
+        /// <summary>
+        /// Creates a new instance of an Enigma Machine with the provided rotors
+        /// </summary>
+        /// <param name="rotors">The rotors to be used by the Enigma Machine</param>
         public EnigmaMachine(IEnumerable<Rotor> rotors)
         {
-            Rotors.CollectionChanged += Rotors_CollectionChanged;
+            Rotors.CollectionChanged += OnRotorsChanged;
 
             Rotors.AddRange(rotors);
         }
 
-        private void Rotors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnRotorsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add
-                ||e.Action==NotifyCollectionChangedAction.Replace)
+                || e.Action == NotifyCollectionChangedAction.Replace)
             {
                 foreach (var item in e.NewItems)
                 {
@@ -48,8 +49,8 @@ namespace Thismaker.Horus.Classical
                 }
             }
             if (e.Action == NotifyCollectionChangedAction.Remove
-                ||e.Action==NotifyCollectionChangedAction.Replace
-                ||e.Action==NotifyCollectionChangedAction.Reset)
+                || e.Action == NotifyCollectionChangedAction.Replace
+                || e.Action == NotifyCollectionChangedAction.Reset)
             {
                 foreach (var item in e.OldItems)
                 {
@@ -57,44 +58,61 @@ namespace Thismaker.Horus.Classical
                     rotor.HitNotch -= OnRotorHitNotch;
                 }
             }
-            
         }
         #endregion
 
         #region Properties
-
         /// <summary>
-        /// The rotors(i.e) moving parts of the machine. Current traverses through the rotors when a key is depressed(pressed).
+        /// Gets or sets rotors of the Enigma Machine. 
         /// </summary>
+        /// <remarks>
+        /// The rotors are the moving parts of the machine. Current traverses through the rotors when a key is pressed and goes through the wiring, 
+        /// changing contact points from one rotor to the next. This action scarmbles the letters
+        /// </remarks>
         public ObservableCollection<Rotor> Rotors { get; private set; }
         = new ObservableCollection<Rotor>();
 
         /// <summary>
-        /// When true, resets the position of the rotors to match the <see cref="ClassicalAlgorithm.Key"/>
-        /// each time the algorithm is <see cref="Run(string, bool)"/>. Useful for back-forth communication
-        /// as the rotors, if not in the same exact location, will produce different results.
-        /// No resetting is done when <see cref="Run(char)"/> is called though.
+        /// Gets or sets a value indicating whether the rotors should be reset to the key position after each run.
         /// </summary>
         public bool AutoReset { get; set; } = false;
 
         /// <summary>
-        /// The intention is to allow the simulation of the double step. Currently not implemented.
+        /// Gets or sets a value indicating if double stepping should be simulated.
         /// </summary>
         public bool DoubleStep { get; set; } = false;
 
         /// <summary>
-        /// The entry point of the current. The Germans called it sth sth(ETW in short)
+        /// Gets or sets the ETW of the machine.
         /// </summary>
+        /// <remarks>
+        /// This is the first 'wheel' that the electric current flows into before heading to the actual rotors.
+        /// It is fixed and does not rotate.
+        /// </remarks>
         public EnigmaWheel Stator { get; set; }
 
         /// <summary>
-        /// Reflects the current back through the wheels. Is what causes the Enigma to be able to decrypt the message properly
+        /// Gets or sets the reflector of the machine
         /// </summary>
+        /// <remarks>
+        /// Reflects the electric current back through the wheels. This action is what enables the Enigma encryption to be reversable.
+        /// </remarks>
         public EnigmaWheel Reflector { get; set; }
 
         /// <summary>
-        /// The current rotation of each of the rotors
+        /// Gets or sets the machine's plugboard.
         /// </summary>
+        /// <remarks>
+        /// The plugboard switch allows for further scrambling by substituting character pairs.
+        /// </remarks>
+        public Plugboard Plugboard { get; set; }
+
+        /// <summary>
+        /// Gets the current rotation of each of the rotors.
+        /// </summary>
+        /// <remarks>
+        /// Returns an array of integers, with each representing the index of rotation of the currently visible character through the window.
+        /// </remarks>
         public int[] RotorConfig
         {
             get
@@ -114,7 +132,7 @@ namespace Thismaker.Horus.Classical
         }
 
         /// <summary>
-        /// Returns a <see cref="char[]"/> of the characters currently visible through the window.
+        /// Returns a <see cref="char"/> array of the characters currently visible through the window.
         /// </summary>
         public char[] Windows
         {
@@ -144,6 +162,15 @@ namespace Thismaker.Horus.Classical
             if (index == -1) throw new NullReferenceException("The rotor that hit the notch was not found");
 
             if (index == Rotors.Count - 1) return;//the last rotor, no need to rotate
+
+            //Perform any necessary double stepping
+            if (DoubleStep && index+1>=Rotors.Count)
+            {
+                if (Rotors[index + 1].IsTurnOver())
+                {
+                    Rotors[index + 1].Rotate();
+                }
+            }
 
             index++; //Rotate the next rotor;
             Rotors[index].Rotate(forward);
@@ -219,7 +246,14 @@ namespace Thismaker.Horus.Classical
             //Pass the current through the Stator:
             index = Stator.GetPath(index, false);
 
-            return Alphabet[index];
+            var result= Alphabet[index];
+
+            //perform plugboard simulation:
+            if (Plugboard != null)
+            {
+                result = Plugboard.Simulate(result);
+            }
+            return result;
             
         }
         #endregion

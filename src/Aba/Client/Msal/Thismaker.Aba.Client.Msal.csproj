@@ -1,26 +1,27 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <PackageOutputPath>..\..\..\..\build</PackageOutputPath>
     <Authors>Thismaker</Authors>
-    <Description>Extends the functionality of AbaClients so that they work as Msal clients. Useful if your client app is using AzureAd or AzureAdB2C to authenticate calls to a webApi.</Description>
+    <Description>Extends the functionality of AbaClients so that they work as public Msal clients. Useful if your client app is using AzureAd or AzureAdB2C to authenticate calls to a webApi.</Description>
     <PackageIcon>Thisicon-Prime.png</PackageIcon>
-    <RepositoryUrl>https://github.com/thismaker/LiquidSnow</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
     <PackageTags>client-application client-app signalr webapi web-api azure-ad azure-adb2c</PackageTags>
-    <PackageReleaseNotes>First release. Generally frozen, most methods work well as expected.</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseFile></PackageLicenseFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Version>1.0.2</Version>
+    <Version>3.1.1</Version>
+    <Company>Ocluse</Company>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.25.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Client\Thismaker.Aba.Client.csproj" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.43.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SignalR\Thismaker.Aba.Client.SignalR.csproj" />
   </ItemGroup>
 
 </Project>

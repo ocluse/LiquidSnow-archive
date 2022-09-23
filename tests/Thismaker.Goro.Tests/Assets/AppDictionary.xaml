@@ -1,0 +1,6 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:goro="http://schemas.thismaker.com/liquidsnow/goro">
+    <goro:IconDesign x:Key="DefaultDesign">MaterialDesign</goro:IconDesign>
+    <goro:ThemeMode x:Key="AppTheme">Light</goro:ThemeMode>
+</ResourceDictionary>

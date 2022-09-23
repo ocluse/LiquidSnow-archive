@@ -1,19 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Thismaker.Horus.Classical
 {
+	/// <summary>
+	/// Base class for classes that can perform dictionary attacks.
+	/// </summary>
     public abstract class DictionaryAttackerBase
     {
-		protected bool dictLoaded = false;
+		/// <summary>
+		/// True when the dictionary has been loaded.
+		/// </summary>
+		protected bool dictLoaded;
 
         #region Properties
+		/// <summary>
+		/// Determines the number of characters to match from the dictionary before the potential attack being considered as a possibility. The default is 3.
+		/// </summary>
         public int MatchLength { get; set; } = 3;
+		/// <summary>
+		/// The list of string items that will be used in attempt to decrypt.
+		/// </summary>
 		public List<string> KeyDictionary { get; set; }
+		/// <summary>
+		/// The list of strings that will be used to evaluate whether an output is a possibility
+		/// </summary>
 		public List<string> LanguageDictionary { get; set; }
         #endregion
 
@@ -45,9 +59,7 @@ namespace Thismaker.Horus.Classical
 			while (true)
 			{
 				var str = strReader.ReadLine();
-				if (str == null) break;
-
-				str = str.CapitalizeAndCompress();
+				if (string.IsNullOrEmpty(str)) break;
 
 				if (type == DictionaryType.Key || type == DictionaryType.Combined)
 				{
@@ -63,6 +75,12 @@ namespace Thismaker.Horus.Classical
 			dictLoaded = true;
 		}
 
+		/// <summary>
+		/// Returns true if a similar value is found in the dictionary,
+		/// depending on the provided match length
+		/// </summary>
+		/// <param name="input">The string to check in the dictionary</param>
+		/// <returns></returns>
 		public bool CheckDictionary(string input)
         {
 			return CheckDictionary(input, MatchLength);

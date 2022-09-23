@@ -1,65 +1,83 @@
 ﻿
+using System;
+
 namespace Thismaker.Aba.Client
 {
+    /// <summary>
+    /// A class simplyfing dealing with access tokens, and checking their validity.
+    /// </summary>
     public class AccessToken
     {
-        private string value, key;
-        private AccessTokenKind kind;
 
         /// <summary>
-        /// The actual value of the access-token, usually a random base64-encoded string
+        /// The value added to the request header
         /// </summary>
-        public string Value
+        public string Value { get; set; }
+
+        /// <summary>
+        /// The key added to the request headers, e.g Authorization
+        /// </summary>
+        public string HeaderName { get; set; }
+
+        /// <summary>
+        /// The scheme of the access token, e.g Bearer
+        /// </summary>
+        public string Scheme { get; set; }
+
+        /// <summary>
+        /// The expiry time of the token, after which it should be renewed
+        /// </summary>
+        public DateTimeOffset? ExpiresOn { get; set; }
+
+        /// <summary>
+        /// The cushion time, in minutes that is added to the actual token expiry when checking whether the token is expired.
+        /// The default value is 5 minutes
+        /// </summary>
+        public double ExpiryCushion { get; set; } = 5;
+
+        /// <summary>
+        /// Returns true if the access token has an expiry date that has been elapsed.
+        /// </summary>
+        /// <remarks>
+        /// A cushion is added meaning that the token is reported as expired at least a while before the actual expiration time.
+        /// This is important in cases where the server and client times may not be in perfect sync.
+        /// This margin is specified by the <see cref="ExpiryCushion"/> value.
+        /// </remarks>
+        /// <returns>True if the token has expired and needs to be refreshed</returns>
+        public bool IsExpired()
         {
-            get { return value; }
-            set { this.value = value; }
+            return ExpiresOn.HasValue && DateTime.UtcNow > ExpiresOn.Value.AddMinutes(-ExpiryCushion).UtcDateTime;
         }
 
         /// <summary>
-        /// The key used to identify the <see cref="AccessToken"/> in the header for the HTTP requests
+        /// Creates a Bearer access token
         /// </summary>
-        public string Key
+        public static AccessToken Bearer(string value, DateTimeOffset? expiry = null)
         {
-            get { return key; }
-            set { key = value; }
-        }
-
-        /// <summary>
-        /// The kind of the <see cref="AccessToken"/>, usually Bearer, Basic or Custom for custom auth schemes
-        /// </summary>
-        public AccessTokenKind Kind
-        {
-            get { return kind; }
-            set { kind = value; }
-        }
-
-        public static AccessToken Bearer(string value)
-        {
-            var result = new AccessToken
+            AccessToken result = new AccessToken
             {
-                Key = "Bearer",
-                Kind = AccessTokenKind.Bearer,
-                Value = value
+                HeaderName = "Authorization",
+                Scheme = "Bearer",
+                Value = value,
+                ExpiresOn = expiry
             };
             return result;
         }
 
-        public static AccessToken Custom(string key, string value)
+        /// <summary>
+        /// Creates a basic access token
+        /// </summary>
+        public static AccessToken Basic(string value, DateTimeOffset? expiry = null)
         {
-            var result = new AccessToken
+            AccessToken result = new AccessToken
             {
-                Key = key,
-                Kind = AccessTokenKind.Custom,
-                Value = value
+                HeaderName = "Authorization",
+                Scheme = "Basic",
+                Value = value,
+                ExpiresOn = expiry
             };
+
             return result;
         }
-    }
-
-    public enum AccessTokenKind
-    {
-        Bearer,
-        Basic,
-        Custom,
     }
 }

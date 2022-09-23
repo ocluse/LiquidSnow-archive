@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Authors>Thismaker</Authors>
+	 <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageOutputPath>..\..\..\build</PackageOutputPath>
+    <Description>Goro is a UI/UX design library that allows you to create great looking WPF applications by providing custom themes. Almost all controls have been reskinned to look uniform and great. Allows you to use icons, such as those in SegoeMDL2 or those by Material Design by Google.</Description>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>ui ux ui/ux ui-ux user-interface material-design themes</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Version>3.1.0</Version>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Company>Ocluse</Company>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="defaultprofile.png" />
+    <None Include="..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Thismaker.Goro.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\defaultprofile.png" />
+    <EmbeddedResource Include="Assets\Icons\Material\*.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\Icons\Material\" />
+    <Folder Include="Assets\Icons\Aretha\" />
+  </ItemGroup>
+
+</Project>

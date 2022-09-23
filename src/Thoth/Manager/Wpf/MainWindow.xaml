@@ -1,0 +1,168 @@
+﻿<Window x:Class="Thismaker.Thoth.Manager.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Thismaker.Thoth.Manager.Wpf"
+        xmlns:goro="http://schemas.thismaker.com/liquidsnow/goro"
+        xmlns:thoth="clr-namespace:Thismaker.Thoth;assembly=Thismaker.Thoth"
+        Closing="OnClosing"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Thoth Manager" Height="450" Width="800" Style="{DynamicResource StandardWindow}">
+    <Window.DataContext>
+        <local:MainViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Menu FontSize="12">
+            <MenuItem Header="File">
+                <MenuItem Header="New" Command="{Binding CreateDataCommand}"/>
+                <MenuItem Header="Open" Command="{Binding OpenDataCommand}"/>
+                <MenuItem Header="Save" Command="{Binding SaveDataCommand}"/>
+                <MenuItem Header="Save As" Command="{Binding SaveDataAsCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Table">
+                <MenuItem Header="Add New Table" Command="{Binding AddTableCommand}"/>
+                <MenuItem Header="Edit Selected Table" Command="{Binding EditTableCommand}"/>
+                <MenuItem Header="Delete Selected Table" Command="{Binding DeleteTableCommand}"/>
+                <MenuItem Header="Export as SideloadTable" Command="{Binding ExportTableCommand}"/>
+                <MenuItem Header="Import SideloadTable" Command="{Binding ImportTableCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Localization Item">
+                <MenuItem Header="Add New Localization Item" Command="{Binding AddItemCommand}"/>
+                <MenuItem Header="Edit Selected Localization Item" Command="{Binding EditItemCommand}"/>
+                <MenuItem Header="Delete Selected Localization Item" Command="{Binding DeleteItemCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Translation">
+                <MenuItem Header="Add New Translation" Command="{Binding AddTranslationCommand}"/>
+                <MenuItem Header="Edit Selected Translation" Command="{Binding EditTranslationCommand}"/>
+                <MenuItem Header="Delete Selected Translation" Command="{Binding DeleteTranslationCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Locale">
+                <MenuItem Header="Add New Locale" Command="{Binding AddLocaleCommand}"/>
+                <MenuItem Header="Edit Selected Locale" Command="{Binding EditLocaleCommand}"/>
+                <MenuItem Header="Delete Selected Locale" Command="{Binding DeleteLocaleCommand}"/>
+            </MenuItem>
+        </Menu>
+        <WrapPanel Grid.Row="1" Background="{DynamicResource PanelGrayResponsive}">
+            <goro:ButtonIcon Icon="NewFolder" Command="{Binding CreateDataCommand}" ToolTip="Create a new localization database"/>
+            <goro:ButtonIcon Icon="FolderOpen" Command="{Binding OpenDataCommand}" ToolTip="Open existing localization database"/>
+            <goro:ButtonIcon Icon="Save" Command="{Binding SaveDataCommand}" ToolTip="Save the localization database"/>
+        </WrapPanel>
+        <TabControl Grid.Row="2" Margin="0 10 0 0">
+            <TabItem Header="Tables">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <WrapPanel Margin="4" Orientation="Horizontal" VerticalAlignment="Center">
+                        
+                        <ComboBox Width="300" VerticalAlignment="Center" ItemsSource="{Binding Tables}" SelectedItem="{Binding SelectedTable}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="local:LocTable">
+                                    <TextBlock Text="{Binding TableKey}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <goro:ButtonIcon Icon="Add" Command="{Binding AddTableCommand}" ToolTip="Add new table"/>
+                        <goro:ButtonIcon Icon="Edit" Margin="6" Command="{Binding EditTableCommand}" ToolTip="Edit table key"/>
+                        <goro:ButtonIcon Icon="Delete" Margin="6" Command="{Binding DeleteTableCommand}" ToolTip="Delete the table"/>
+                        <goro:CheckboxIcon Icon="StarOn" IsChecked="{Binding IsDefaultTable}" IsEnabled="{Binding IsDefaultTableEnabled}" ToolTip="Mark table as default"/>
+                    </WrapPanel>
+                    <Grid Grid.Row="1" Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <ListView Grid.Row="1" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate DataType="local:LocItem">
+                                        <StackPanel Margin="10">
+                                            <TextBlock Text="{Binding Key}" FontWeight="SemiBold" FontSize="14"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <WrapPanel Orientation="Horizontal"  Background="{DynamicResource PanelGrayResponsive}">
+                                <goro:ButtonIcon Icon="Add" Command="{Binding AddItemCommand}" ToolTip="Add new item"/>
+                                <goro:ButtonIcon Icon="Edit" Command="{Binding EditItemCommand}" ToolTip="Edit item key"/>
+                                <goro:ButtonIcon Icon="Delete" Command="{Binding DeleteItemCommand}" ToolTip="Delete item"/>
+                            </WrapPanel>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <goro:ButtonIcon Icon="Add" Command="{Binding AddTranslationCommand}" ToolTip="Add new locale translation"/>
+                                <goro:ButtonIcon Icon="Edit" Command="{Binding EditTranslationCommand}" ToolTip="Edit locale translation"/>
+                                <goro:ButtonIcon Icon="Delete" Command="{Binding DeleteTranslationCommand}" ToolTip="Delete locale translation"/>
+                            </WrapPanel>
+                            <ListView Grid.Row="1" ItemsSource="{Binding Translations}" SelectedItem="{Binding SelectedTranslation}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type local:LocTranslation}">
+                                        <StackPanel Margin="10">
+                                            <TextBlock Text="{Binding Locale,Converter={StaticResource localeConverter}}" Style="{DynamicResource Base}" Foreground="{DynamicResource Accent}"/>
+                                            <TextBlock TextWrapping="Wrap" Text="{Binding Value}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+
+                            </ListView>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Locales">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="1.5*" MaxWidth="400"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <WrapPanel Margin="10">
+                            <goro:CheckboxIcon Icon="StarOn" IsChecked="{Binding IsDefaultLocale}" IsEnabled="{Binding IsDefaultLocaleEnabled}"/>
+                        </WrapPanel>
+                        <ListView Grid.Row="1" ItemsSource="{Binding Locales}" SelectedItem="{Binding SelectedLocale}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate DataType="local:ManagedLocale">
+                                    <StackPanel Margin="10">
+                                        <TextBlock Text="{Binding Name}" Style="{DynamicResource Base}"/>
+                                        <TextBlock Text="{Binding ShortName}" Style="{DynamicResource Caption}" Foreground="{DynamicResource AccentLight}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                    <Grid Grid.Column="1" Margin="10">
+                        <StackPanel >
+                            <TextBox goro:ControlExtensions.Header="Locale Name" Text="{Binding LocaleName, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox goro:ControlExtensions.Header="Short Name" Text="{Binding LocaleShortName, UpdateSourceTrigger=PropertyChanged}"/>
+                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Width="100" Command="{Binding AddLocaleCommand}" Content="Add" Margin="10 10 0 10"/>
+                                <Button Width="100" Command="{Binding EditLocaleCommand}" Content="Edit" Margin="10 10 0 10"/>
+                                <Button Width="100" Command="{Binding DeleteLocaleCommand}" Content=" Delete" Margin="10 10 0 10"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Thismaker.Horus.Classical
 {
@@ -21,7 +19,7 @@ namespace Thismaker.Horus.Classical
         /// <summary>
         /// If provided, the rotors will be created with the specified notches.
         /// The default is 1.
-        /// Has no effect if <see cref="WithRotors(List{Rotor})"/> was called.
+        /// Has no effect if <see cref="WithRotors(IEnumerable{Rotor})"/> was called.
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
@@ -34,7 +32,7 @@ namespace Thismaker.Horus.Classical
         /// <summary>
         /// When provided, the Enigma Machine will be created with that number of rotors.
         /// The default is 3.
-        /// Has no effect if <see cref="WithRotors(List{Rotor})"/> was called.
+        /// Has no effect if <see cref="WithRotors(IEnumerable{Rotor})"/> was called.
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
@@ -45,7 +43,7 @@ namespace Thismaker.Horus.Classical
         }
 
         /// <summary>
-        /// If provided, the machine will autoreset. The default is <see cref="false"/>
+        /// If provided, the machine will autoreset. The default is false.
         /// </summary>
         /// <returns></returns>
         public EnigmaMachineBuilder WithAutoReset()

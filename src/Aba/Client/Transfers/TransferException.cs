@@ -1,24 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Thismaker.Aba.Client.Transfers
 {
+    /// <summary>
+    /// An esception thrown when a transfer fails.
+    /// </summary>
     public class TransferException : Exception
     {
-        public TransferException(string message) : base(message)
+        /// <summary>
+        /// The transfer that invoked the failure.
+        /// </summary>
+        public Transfer Transfer { get; set; }
+        /// <summary>
+        /// Creates a new instance of the <see cref="TransferException"/>
+        /// </summary>
+        public TransferException(string message, Transfer transfer) : base(message)
         {
-
+            Transfer = transfer;
         }
-
-        public TransferException(string message, Exception innerException) : base(message, innerException)
+        /// <summary>
+        /// Creates a new instance of the <see cref="TransferException"/>
+        /// </summary>
+        public TransferException(string message, Transfer transfer, Exception innerException) : base(message, innerException)
         {
-
+            Transfer = transfer;
         }
-
-        public TransferException()
+        /// <summary>
+        /// Creates a new instance of the <see cref="TransferException"/>
+        /// </summary>
+        public TransferException(Transfer transfer)
         {
-
+            Transfer = transfer;
         }
     }
 }

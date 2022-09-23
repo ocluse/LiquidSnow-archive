@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <Version>3.1.1</Version>
+    <PackageTags>ceasar-cipher playfair enigma enigma-machine</PackageTags>
+    <Authors>Thismaker</Authors>
+    <Description>This libary simplifies working with classical ciphers such as playfair, ceaser and vigenere, including working with Engima Machines which operate perfectly the same as the physical devices.</Description>
+    <RepositoryUrl>https://github.com/ocluse/LiquidSnow</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>Thisicon-Prime.png</PackageIcon>
+    <Copyright>© Ocluse. All rights reserved</Copyright>
+    <Company>Ocluse</Company>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageOutputPath>..\..\..\build</PackageOutputPath>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Horus\Thismaker.Horus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\assets\images\Thisicon-Prime.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -5,6 +5,9 @@ using Thismaker.Core;
 
 namespace Thismaker.Aba.Client.Transfers
 {
+    /// <summary>
+    /// A type of <see cref="Transfer"/>that has it's source or destination as a <see cref="System.IO.Stream"/>
+    /// </summary>
     public class StreamTransfer : Transfer
     {
         /// <summary>
@@ -12,12 +15,18 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public Stream Stream { get; internal set; }
 
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
         public StreamTransfer() : base()
         {
 
         }
     }
 
+    /// <summary>
+    /// A type of <see cref="Transfer"/> that has it's source or destination as a string path
+    /// </summary>
     public class FileTransfer : Transfer
     {
         /// <summary>
@@ -25,23 +34,32 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public string Path { get; internal set; }
 
+        /// <summary>
+        /// Creates a new instance.
+        /// </summary>
         public FileTransfer() : base()
         {
 
         }
     }
 
+    /// <summary>
+    /// Base class for transfers
+    /// </summary>
     public abstract class Transfer : BindableBase
     {
         #region Private Fields
         private string _name, _blobName;
+        private string _blobUri;
         private TransferMode _mode;
         private TransferState _state;
         private readonly CancellationTokenSource _cancellationTokenSource;
         #endregion
 
         #region Init
-
+        /// <summary>
+        /// Invoked when the transfer is cancelled.
+        /// </summary>
         public event Action<Transfer> TransferCancelled;
 
         internal Transfer()
@@ -89,6 +107,15 @@ namespace Thismaker.Aba.Client.Transfers
         }
 
         /// <summary>
+        /// The uri for the blob. If none is proivided and the transfer is started, the transfer manager tries to access one.
+        /// </summary>
+        public string BlobUri
+        {
+            get => _blobUri;
+            set => SetProperty(ref _blobUri, value);
+        }
+
+        /// <summary>
         /// The cancellation token associated with the transfer, 
         /// that will be tripped when the transfer is cancelled.
         /// </summary>
@@ -106,21 +133,51 @@ namespace Thismaker.Aba.Client.Transfers
         /// </summary>
         public void Cancel()
         {
-            if(State!=TransferState.Cancelled)
+            if(State!=TransferState.Canceled)
             _cancellationTokenSource.Cancel();
-            State = TransferState.Cancelled;
+            State = TransferState.Canceled;
             TransferCancelled.Invoke(this);
         }
         #endregion
     }
-
+    /// <summary>
+    /// The state of the transfer
+    /// </summary>
     public enum TransferState
     {
-        Processing, Waiting, Error, Requeued, Cancelled
+        /// <summary>
+        /// The transfer is in progress
+        /// </summary>
+        Processing, 
+        /// <summary>
+        /// Waiting to be executed
+        /// </summary>
+        Waiting, 
+        /// <summary>
+        /// An error occured during execution but has not been requeued
+        /// </summary>
+        Error, 
+        /// <summary>
+        /// Queued again after an error.
+        /// </summary>
+        Requeued, 
+        /// <summary>
+        /// Transfer has been cancalled.
+        /// </summary>
+        Canceled
     }
-
+    /// <summary>
+    /// The direction
+    /// </summary>
     public enum TransferMode
     {
-        Upload, Download
+        /// <summary>
+        /// Uploading to the cloud.
+        /// </summary>
+        Upload,
+        /// <summary>
+        /// Downloading from the cloud.
+        /// </summary>
+        Download
     }
 }
