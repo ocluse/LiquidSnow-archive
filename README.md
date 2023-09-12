@@ -1,3 +1,5 @@
+**IMPORTANT NOTE: This repository has now been archived, and will continue to be developed at https://github.com/ocluse/liquidsnow which is the same url it was on previously**
+
 <h1 align="center">LiquidSnow</h1>
 
 
